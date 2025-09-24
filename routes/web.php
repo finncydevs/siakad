@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfilSekolahController;
+use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
+use App\Http\Controllers\Admin\Kesiswaan\JalurController;
+use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
+use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
+use App\Http\Controllers\Admin\Kesiswaan\FormulirController;
+use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
+use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
+use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
+use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -13,3 +22,23 @@ Route::get('/admin/dashboard', function () {
 });
 Route::get('/profil-sekolah', [ProfilSekolahController::class, 'edit'])->name('profil-sekolah.edit');
 Route::put('/profil-sekolah', [ProfilSekolahController::class, 'update'])->name('profil-sekolah.update');
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes untuk bagian Kesiswaan -> PPDB
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('/admin/kesiswaan/ppdb')->name('admin.ppdb.')->group(function () {
+
+    Route::resource('/tahun-ppdb', tahunPpdbController::class)->names('tahun-ppdb');
+    Route::resource('/jalur-ppdb', JalurController::class)->names('jalur-ppdb');
+    Route::resource('/quota-ppdb', QuotaController::class)->names('quota-ppdb');
+    Route::resource('/syarat-ppdb', SyaratController::class)->names('syarat-ppdb');
+    Route::resource('/formulir-ppdb', FormulirController::class)->names('formulir-ppdb');
+    Route::resource('/daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class)->names('daftar-calon-peserta-didik');
+    Route::resource('/penempatan-kelas', PenempatanKelasController::class)->names('penempatan-kelas');
+    Route::resource('/laporan-pendaftaran', LaporanPendaftaranController::class)->names('laporan-pendaftaran');
+    Route::resource('/laporan-quota', LaporanQuotaController::class)->names('laporan-quota');
+
+});

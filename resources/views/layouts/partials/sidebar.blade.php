@@ -77,50 +77,89 @@
 
             {{-- Profil Sekolah --}}
             <li class="menu-header small text-uppercase">
-  <span class="menu-header-text">Pengaturan</span>
-</li>
-<li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
-  <a href="{{ route('profil-sekolah.edit') }}" class="menu-link">
-    <i class="menu-icon tf-icons bx bxs-school"></i>
-    <div data-i18n="Profil Sekolah">Profil Sekolah</div>
-  </a>
-</li>
+              <span class="menu-header-text">Pengaturan</span>
+            </li>
+            <li class="menu-item {{ request()->is('profil-sekolah*') ? 'active' : '' }}">
+              <a href="{{ route('profil-sekolah.edit') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-school"></i>
+                <div data-i18n="Profil Sekolah">Profil Sekolah</div>
+              </a>
+            </li>
 
             <!-- Layouts -->
-            <li class="menu-item">
+            <li class="menu-item {{ request()->is('admin/kesiswaan*') ? 'active open' : '' }}">
               <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-layout"></i>
-                <div data-i18n="Layouts">Layouts</div>
+                <div data-i18n="Layouts">Kesiswaan</div>
               </a>
 
+              <!-- Sub menu pertama -->
               <ul class="menu-sub">
-                <li class="menu-item">
-                  <a href="layouts-without-menu.html" class="menu-link">
-                    <div data-i18n="Without menu">Without menu</div>
+                <li class="menu-item {{ request()->is('admin/kesiswaan/ppdb*') ? 'active open' : '' }}">
+                  <a href="javascript:void(0);" class="menu-link menu-toggle">
+                    <i class="menu-icon tf-icons bx bx-layout"></i>
+                    <div data-i18n="Layouts">PPDB</div>
                   </a>
+
+                  <!-- Sub menu kedua (dropdown di dalam dropdown) -->
+                  <ul class="menu-sub">
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.tahun-ppdb.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.ppdb.tahun-ppdb.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Tahun Pendaftaran PPDB</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.jalur-ppdb.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.ppdb.jalur-ppdb.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Jalur Pendaftaran</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.quota-ppdb.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.ppdb.quota-ppdb.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Quota Pendaftaran</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.syarat-ppdb.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.ppdb.syarat-ppdb.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Syarat Pendaftaran</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.formulir-ppdb.index') ? 'active' : '' }}">
+                      <a href=" {{ route('admin.ppdb.formulir-ppdb.index') }} " class="menu-link">
+                        <div data-i18n="Without menu">Formulir Pendaftaran</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.daftar-calon-peserta-didik.index') ? 'active' : '' }}">
+                      <a href=" {{ route('admin.ppdb.daftar-calon-peserta-didik.index') }} " class="menu-link">
+                        <div data-i18n="Without menu">Daftar Calon Peserta Didik</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.penempatan-kelas.index') ? 'active' : '' }}">
+                      <a href=" {{ route('admin.ppdb.penempatan-kelas.index') }} " class="menu-link">
+                        <div data-i18n="Without menu">Penempatan Kelas</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.laporan-pendaftaran.index') ? 'active' : '' }}">
+                      <a href=" {{ route('admin.ppdb.laporan-pendaftaran.index') }} " class="menu-link">
+                        <div data-i18n="Without menu">Laporan Pendaftaran</div>
+                      </a>
+                    </li>
+                    <li class="menu-item {{ request()->routeIs('admin.ppdb.laporan-quota.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.ppdb.laporan-quota.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Laporan Quota</div>
+                      </a>
+                    </li>
+                  </ul>
                 </li>
+
+                <!-- Menu lain di level pertama -->
                 <li class="menu-item">
-                  <a href="layouts-without-navbar.html" class="menu-link">
-                    <div data-i18n="Without navbar">Without navbar</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="layouts-container.html" class="menu-link">
-                    <div data-i18n="Container">Container</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="layouts-fluid.html" class="menu-link">
-                    <div data-i18n="Fluid">Fluid</div>
-                  </a>
-                </li>
-                <li class="menu-item">
-                  <a href="layouts-blank.html" class="menu-link">
-                    <div data-i18n="Blank">Blank</div>
+                  <a href="#" class="menu-link">
+                    <div data-i18n="Without menu">Data Siswa</div>
                   </a>
                 </li>
               </ul>
             </li>
+
 
             <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Pages</span>
