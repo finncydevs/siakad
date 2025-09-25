@@ -16,7 +16,7 @@
         <div class="card mb-4">
             <h5 class="card-header">Detail Profil Sekolah</h5>
             <!-- Form -->
-            <form action="{{ route('profil-sekolah.update') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.profil-sekolah.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="card-body">
@@ -49,7 +49,6 @@
                                 <div class="row">
                                     <div class="mb-3 col-md-6">
                                         <label for="nama_instansi" class="form-label">Nama Instansi</label>
-                                        {{-- Tambahkan class form-control-sm --}}
                                         <input class="form-control form-control-sm" type="text" id="nama_instansi" name="nama_instansi" value="{{ old('nama_instansi', $profil->nama_instansi) }}">
                                     </div>
                                     <div class="mb-3 col-md-6">
@@ -192,3 +191,5 @@
     </div>
 </div>
 @endsection
+
+    
