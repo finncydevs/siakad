@@ -13,6 +13,8 @@ use App\Http\Controllers\Admin\Kesiswaan\FormulirController;
 use App\Http\Controllers\Admin\Kesiswaan\JalurController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
+use App\Http\Controllers\Admin\Akademik\TapelController;
+use App\Http\Controllers\Admin\Akademik\SemesterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,8 +65,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('laporan-quota', LaporanQuotaController::class);
     });
 
-    // Anda bisa menambahkan modul lain di sini, contoh:
-    // Route::prefix('akademik')->name('akademik.')->group(function () { ... });
-    // Route::prefix('kurikulum')->name('kurikulum.')->group(function () { ... });
+     Route::prefix('akademik')->name('akademik.')->group(function () {
+    Route::resource('tapel', TapelController::class)->only(['index', 'store', 'destroy']);
+    Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
+    Route::resource('semester', SemesterController::class)->only(['index']);
+    Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
+});
 
 });
