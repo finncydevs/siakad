@@ -28,12 +28,12 @@
                 </tr>
               </thead>
               <tbody class="table-border-bottom-0">
-                  @foreach ($tahunPpdb as $index => $tahun)
+                  @foreach ($tahunPelajaran as $index => $tahun)
                   <tr>
                       <td>{{ $index + 1 }}</td>
-                      <td>{{ $tahun->tahun }}</td>
+                      <td>{{ $tahun->tahun_pelajaran }}</td>
                       <td>
-                          @if ($tahun->active)
+                          @if ($tahun->is_active)
                               <span class="badge bg-label-success me-1">Active</span>
                           @else
                               <span class="badge bg-label-secondary me-1">Inactive</span>
@@ -42,7 +42,7 @@
                       <td>
                           <form action="{{ route('admin.ppdb.tahun-ppdb.toggleActive', $tahun->id) }}" method="POST" style="display:inline;">
                               @csrf
-                              @if (! $tahun->active)
+                              @if (! $tahun->is_active)
                                   <button type="submit" class="badge bg-label-primary border-0">
                                       <i class='bx bx-check-circle'></i>
                                   </button>

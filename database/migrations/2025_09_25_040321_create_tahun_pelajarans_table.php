@@ -6,24 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('tahun_ppdbs', function (Blueprint $table) {
+        Schema::create('tahun_pelajarans', function (Blueprint $table) {
             $table->id();
-            $table->string('tahun')->unique();
-            $table->boolean('active')->default(false);
+            $table->string('tahun_pelajaran')->unique(); // Misal: 2024/2025
+            $table->text('keterangan')->nullable();
+            $table->boolean('is_active')->default(false); // TRUE jika aktif
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('tahun_ppdbs');
+        Schema::dropIfExists('tahun_pelajarans');
     }
 };

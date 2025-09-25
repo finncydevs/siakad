@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Kesiswaan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\TahunPpdb;
+use App\Models\TahunPelajaran;
 
 class TahunPpdbController extends Controller
 {
@@ -19,11 +19,11 @@ class TahunPpdbController extends Controller
         $tahunDepan = $nextYear . ' - ' . ($nextYear + 1);
     
         // kalau belum ada, tambahin otomatis
-        TahunPpdb::firstOrCreate(['tahun' => $tahunDepan]);
+        TahunPelajaran::firstOrCreate(['tahun_pelajaran' => $tahunDepan]);
     
-        $tahunPpdb = TahunPpdb::orderBy('tahun', 'asc')->get();
+        $tahunPelajaran = TahunPelajaran::orderBy('tahun_pelajaran', 'asc')->get();
     
-        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb', compact('tahunPpdb'));
+        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb', compact('tahunPelajaran'));
     }
 
 
@@ -77,22 +77,22 @@ class TahunPpdbController extends Controller
 
     public function toggleActive($id)
     {
-        $tahun = TahunPpdb::findOrFail($id);
+        $tahun = TahunPelajaran::findOrFail($id);
     
-        if (! $tahun->active) {
+        if (! $tahun->is_active) {
             // kalau belum aktif, set semua lain jadi nonaktif
-            TahunPpdb::query()->update(['active' => false]);
+            TahunPelajaran::query()->update(['is_active' => false]);
         
-            $tahun->active = true;
+            $tahun->is_active = true;
             $tahun->save();
         
-            $message = "Tahun {$tahun->tahun} berhasil dijadikan Active";
+            $message = "Tahun {$tahun->tahun_pelajaran} berhasil dijadikan Active";
         } else {
             // kalau sudah aktif, nonaktifkan saja
-            $tahun->active = false;
+            $tahun->is_active = false;
             $tahun->save();
         
-            $message = "Tahun {$tahun->tahun} berhasil di-nonaktifkan";
+            $message = "Tahun {$tahun->tahun_pelajaran} berhasil di-nonaktifkan";
         }
     
         return redirect()->back()->with('success', $message);
