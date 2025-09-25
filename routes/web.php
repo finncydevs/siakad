@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
 use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
+use App\Http\Controllers\Admin\Akademik\TapelController;
+use App\Http\Controllers\Admin\Akademik\SemesterController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -42,3 +44,11 @@ Route::prefix('/admin/kesiswaan/ppdb')->name('admin.ppdb.')->group(function () {
     Route::resource('/laporan-quota', LaporanQuotaController::class)->names('laporan-quota');
 
 });
+
+Route::prefix('admin/akademik')->name('admin.akademik.')->group(function () {
+    Route::resource('tapel', TapelController::class)->only(['index', 'store', 'destroy']);
+    Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
+    Route::resource('semester', SemesterController::class)->only(['index']);
+    Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
+});
+

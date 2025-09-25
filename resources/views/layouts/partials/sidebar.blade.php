@@ -160,8 +160,28 @@
               </ul>
             </li>
 
+              <li class="menu-item {{ request()->is('admin/akademik*') ? 'active open' : '' }}">
+              <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-layout"></i>
+                <div data-i18n="Layouts">Akademik</div>
+              </a>
 
-            <li class="menu-header small text-uppercase">
+              <ul class="menu-sub">
+            <li class="menu-item {{ request()->routeIs('admin.akademik.tapel.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.akademik.tapel.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Tahun Pelajaran</div>
+                      </a>
+                    </li>
+                      <li class="menu-item {{ request()->routeIs('admin.akademik.semester.index') ? 'active' : '' }}">
+                      <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Without menu">Semester</div>
+                      </a>
+                    </li>
+              </ul>
+            </li>
+
+
+            {{-- <li class="menu-header small text-uppercase">
               <span class="menu-header-text">Pages</span>
             </li>
             <li class="menu-item">
@@ -340,9 +360,9 @@
                   </a>
                 </li>
               </ul>
-            </li>
+            </li> --}}
 
-            <!-- Extended components -->
+            {{-- <!-- Extended components -->
             <li class="menu-item">
               <a href="javascript:void(0)" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-copy"></i>
@@ -436,6 +456,6 @@
                 <i class="menu-icon tf-icons bx bx-file"></i>
                 <div data-i18n="Documentation">Documentation</div>
               </a>
-            </li>
-          </ul>
+            </li> --}}
+          {{-- </ul> --}}
         </aside>
