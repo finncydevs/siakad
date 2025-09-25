@@ -13,10 +13,6 @@ use App\Http\Controllers\Admin\Kesiswaan\FormulirController;
 use App\Http\Controllers\Admin\Kesiswaan\JalurController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
-use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
-use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController; // Casing diperbaiki
 
 /*
 |--------------------------------------------------------------------------
@@ -72,4 +68,3 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Route::prefix('kurikulum')->name('kurikulum.')->group(function () { ... });
 
 });
-
