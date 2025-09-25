@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\Kesiswaan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\TahunPpdb;
 
 class TahunPpdbController extends Controller
 {
@@ -12,8 +13,19 @@ class TahunPpdbController extends Controller
      */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb');
+        $currentYear = date('Y');
+        $nextYear = $currentYear + 1;
+    
+        $tahunDepan = $nextYear . ' - ' . ($nextYear + 1);
+    
+        // kalau belum ada, tambahin otomatis
+        TahunPpdb::firstOrCreate(['tahun' => $tahunDepan]);
+    
+        $tahunPpdb = TahunPpdb::orderBy('tahun', 'asc')->get();
+    
+        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb', compact('tahunPpdb'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -62,4 +74,29 @@ class TahunPpdbController extends Controller
     {
         //
     }
+
+    public function toggleActive($id)
+    {
+        $tahun = TahunPpdb::findOrFail($id);
+    
+        if (! $tahun->active) {
+            // kalau belum aktif, set semua lain jadi nonaktif
+            TahunPpdb::query()->update(['active' => false]);
+        
+            $tahun->active = true;
+            $tahun->save();
+        
+            $message = "Tahun {$tahun->tahun} berhasil dijadikan Active";
+        } else {
+            // kalau sudah aktif, nonaktifkan saja
+            $tahun->active = false;
+            $tahun->save();
+        
+            $message = "Tahun {$tahun->tahun} berhasil di-nonaktifkan";
+        }
+    
+        return redirect()->back()->with('success', $message);
+    }
+
+
 }

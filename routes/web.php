@@ -32,6 +32,8 @@ Route::put('/profil-sekolah', [ProfilSekolahController::class, 'update'])->name(
 Route::prefix('/admin/kesiswaan/ppdb')->name('admin.ppdb.')->group(function () {
 
     Route::resource('/tahun-ppdb', tahunPpdbController::class)->names('tahun-ppdb');
+    Route::post('/tahun-ppdb/{id}/toggle-active', [TahunPpdbController::class, 'toggleActive'])
+        ->name('tahun-ppdb.toggleActive');
     Route::resource('/jalur-ppdb', JalurController::class)->names('jalur-ppdb');
     Route::resource('/quota-ppdb', QuotaController::class)->names('quota-ppdb');
     Route::resource('/syarat-ppdb', SyaratController::class)->names('syarat-ppdb');

@@ -13,10 +13,59 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="card mb-4">
-            <h5 class="card-header">Tahun Pendaftaran</h5>
 
+       <!-- Bootstrap Table with Header - Light -->
+        <div class="card mb-4">
+          <h5 class="card-header">Tahun Pendaftaran</h5>
+          <div class="table-responsive text-nowrap">
+            <table class="table">
+              <thead class="table-light">
+                <tr>
+                  <th>No</th>
+                  <th>Tahun Pendaftaran</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody class="table-border-bottom-0">
+                  @foreach ($tahunPpdb as $index => $tahun)
+                  <tr>
+                      <td>{{ $index + 1 }}</td>
+                      <td>{{ $tahun->tahun }}</td>
+                      <td>
+                          @if ($tahun->active)
+                              <span class="badge bg-label-success me-1">Active</span>
+                          @else
+                              <span class="badge bg-label-secondary me-1">Inactive</span>
+                          @endif
+                      </td>
+                      <td>
+                          <form action="{{ route('admin.ppdb.tahun-ppdb.toggleActive', $tahun->id) }}" method="POST" style="display:inline;">
+                              @csrf
+                              @if (! $tahun->active)
+                                  <button type="submit" class="badge bg-label-primary border-0">
+                                      <i class='bx bx-check-circle'></i>
+                                  </button>
+                              @else
+                                  <button type="submit" class="badge bg-label-success border-0">
+                                      <i class='bx bx-check-circle'></i>
+                                  </button>
+                              @endif
+                          </form>
+                      
+                          <a href="{{ route('admin.ppdb.tahun-ppdb.edit', $tahun->id) }}" class="badge bg-label-primary me-1">
+                              <i class='bx bx-edit'></i>
+                          </a>
+                      </td>
+
+                  </tr>
+                  @endforeach
+              </tbody>
+
+            </table>
+          </div>
         </div>
+       <!-- Bootstrap Table with Header - Light -->
     </div>
 </div>
 @endsection
