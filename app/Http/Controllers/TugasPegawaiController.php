@@ -12,7 +12,6 @@ class TugasPegawaiController extends Controller
     {
         $tugasPegawais = TugasPegawai::with('pegawai')->latest()->get();
         $pegawais = Pegawai::orderBy('nama_lengkap', 'asc')->get();
-        // Pastikan path ini benar
         return view('admin.kepegawaian.tugas_pegawai.index', compact('tugasPegawais', 'pegawais'));
     }
 
@@ -39,9 +38,14 @@ class TugasPegawaiController extends Controller
             'tugas_pokok' => 'required|string|max:255',
         ]);
 
-        $tugasPegawai->update($request->all());
+        $tugasPegawai->fill($request->all());
 
-        return redirect()->route('admin.kepegawaian.tugas-pegawai.index')->with('success', 'Tugas pegawai berhasil diperbarui.');
+        if ($tugasPegawai->isDirty()) {
+            $tugasPegawai->save();
+            return redirect()->route('admin.kepegawaian.tugas-pegawai.index')->with('success', 'Tugas pegawai berhasil diperbarui.');
+        } else {
+            return redirect()->route('admin.kepegawaian.tugas-pegawai.index')->with('info', 'Anda tidak mengubah data apapun.');
+        }
     }
 
     public function destroy(TugasPegawai $tugasPegawai)

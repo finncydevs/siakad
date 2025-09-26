@@ -16,10 +16,10 @@
                 $table->string('nis')->unique()->nullable();
                 $table->string('nisn')->unique()->nullable();
                 $table->string('nik')->unique()->nullable();
-                $table->string('no_akta_lahir')->nullable();
-                $table->string('no_seri_pip')->nullable();
-                $table->string('pkh_kks')->nullable();
-                $table->string('kps')->nullable();
+                $table->string('no_akta_lahir')->nullable(); // Ditambahkan
+                $table->string('no_seri_pip')->nullable(); // Ditambahkan
+                $table->string('pkh_kks')->nullable(); // Ditambahkan
+                $table->string('kps')->nullable(); // Ditambahkan
                 $table->string('nama_lengkap');
                 $table->string('nama_panggilan')->nullable();
                 $table->string('jenis_kelamin')->nullable();
@@ -34,7 +34,7 @@
                 $table->integer('jumlah_saudara_tiri')->nullable();
                 $table->integer('jumlah_saudara_angkat')->nullable();
                 $table->string('status_dalam_keluarga')->nullable();
-                $table->string('kategori_anak')->nullable(); // Yatim, Piatu, dll.
+                $table->string('kategori_anak')->nullable();
 
                 // TAB: Tempat Tinggal
                 $table->text('alamat')->nullable();
