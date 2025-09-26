@@ -16,8 +16,8 @@
                     <div class="mt-3">
                         <h4 class="mb-0">{{ $pegawai->nama_lengkap }}</h4>
                         <p class="text-muted font-size-sm">{{ $pegawai->tipe_pegawai ?? 'Pegawai' }}</p>
-                        <a href="{{ route('admin.pegawai.edit', $pegawai->id) }}" class="btn btn-primary">Edit Profil</a>
-                        <a href="{{ route('admin.pegawai.index') }}" class="btn btn-outline-secondary">Kembali</a>
+                        <a href="{{ route('admin.kepegawaian.pegawai.edit', $pegawai->id) }}" class="btn btn-primary">Edit Profil</a>
+                        <a href="{{ route('admin.kepegawaian.pegawai.index') }}" class="btn btn-outline-secondary">Kembali</a>
                     </div>
                 </div>
             </div>

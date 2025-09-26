@@ -12,13 +12,15 @@ class PegawaiController extends Controller
 {
     public function index()
     {
-        $pegawais = Pegawai::latest()->get();
-        return view('admin.pegawai.index', compact('pegawais'));
+        $pegawais = Pegawai::with(['tugasTerbaru'])->latest()->get();
+        // Path ini sudah benar, kita akan gunakan pola ini untuk yang lain
+        return view('admin.kepegawaian.pegawai.index', compact('pegawais'));
     }
 
     public function create()
     {
-        return view('admin.pegawai.create');
+        // PERBAIKAN: Menyesuaikan path view
+        return view('admin.kepegawaian.pegawai.create');
     }
 
     public function store(Request $request)
@@ -43,7 +45,7 @@ class PegawaiController extends Controller
 
         Pegawai::create($data);
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
+        return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
     }
 
     public function show(Pegawai $pegawai)
@@ -51,12 +53,14 @@ class PegawaiController extends Controller
         $profilSekolah = ProfilSekolah::first();
         $tugas = TugasPegawai::where('pegawai_id', $pegawai->id)->latest()->first();
         
-        return view('admin.pegawai.show', compact('pegawai', 'profilSekolah', 'tugas'));
+        // PERBAIKAN: Menyesuaikan path view
+        return view('admin.kepegawaian.pegawai.show', compact('pegawai', 'profilSekolah', 'tugas'));
     }
 
     public function edit(Pegawai $pegawai)
     {
-        return view('admin.pegawai.edit', compact('pegawai'));
+        // PERBAIKAN: Menyesuaikan path view
+        return view('admin.kepegawaian.pegawai.edit', compact('pegawai'));
     }
 
     public function update(Request $request, Pegawai $pegawai)
@@ -87,7 +91,7 @@ class PegawaiController extends Controller
 
         $pegawai->update($data);
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+        return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
     }
 
     public function destroy(Pegawai $pegawai)
@@ -101,7 +105,7 @@ class PegawaiController extends Controller
         
         $pegawai->delete();
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil dihapus.');
+        return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil dihapus.');
     }
 }
 

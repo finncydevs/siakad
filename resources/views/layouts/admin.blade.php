@@ -76,5 +76,9 @@
     ])
     
     <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    {{-- Ini adalah baris yang ditambahkan agar script edit berfungsi --}}
+    @stack('scripts')
   </body>
 </html>
+

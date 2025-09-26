@@ -16,7 +16,8 @@
         <div class="card mb-4">
             <h5 class="card-header">Detail Profil Sekolah</h5>
             <!-- Form -->
-            <form action="{{ route('admin.profil-sekolah.update') }}" method="POST" enctype="multipart/form-data">
+            {{-- PERBAIKAN DI SINI --}}
+            <form action="{{ route('admin.pengaturan.profil_sekolah.update') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="card-body">
@@ -191,5 +192,4 @@
     </div>
 </div>
 @endsection
-
     
