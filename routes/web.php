@@ -23,6 +23,8 @@ use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 
+use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
+
 
 /*
 |--------------------------------------------------------------------------
@@ -50,6 +52,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
         Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
         Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
+        
+        // --- PENGATURAN WEB SERVICE BARU ---
+        Route::prefix('webservice')->name('webservice.')->group(function () {
+            // Rute ini memanggil ApiSettingsController@index
+            Route::get('/', [ApiSettingsController::class, 'index'])->name('index'); 
+        });
+        // -------------------------------------
     });
 
     // --- GRUP KEPEGAWAIAN ---
@@ -84,7 +93,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
         });
+        
+
     });
-
 });
-
