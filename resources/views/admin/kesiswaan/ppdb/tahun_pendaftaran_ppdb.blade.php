@@ -34,7 +34,7 @@
                           @endif
                       </td>
                       <td>
-                          <form action="{{ route('admin.ppdb.tahun-ppdb.toggleActive', $tahun->id) }}" method="POST">
+                          <form action="{{ route('admin.kesiswaan.ppdb.tahun-ppdb.toggleActive', $tahun->id) }}" method="POST">
                               @csrf
                                 <button type="submit" 
                                   class="btn btn-icon btn-sm me-1 @if($tahun->active) text-success @else text-info @endif"
@@ -46,7 +46,7 @@
                                 </button>
                           </form>
                       
-                          {{-- <a class="btn btn-icon btn-sm btn-outline-primary me-1" href="{{ route('admin.ppdb.tahun-ppdb.edit', $tahun->id) }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                          {{-- <a class="btn btn-icon btn-sm btn-outline-primary me-1" href="{{ route('admin.kesiswaan.ppdb.tahun-ppdb.edit', $tahun->id) }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                               <i class="bx bx-edit-alt"></i>
                           </a> --}}
                           {{-- <form action="{{ route('admin.pegawai.destroy', $pegawai->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">

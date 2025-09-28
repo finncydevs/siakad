@@ -28,12 +28,12 @@
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $syarat->tahunPpdb->tahun_pelajaran ?? '-' }}</td>
-                            <td>{{ $syarat->jalur->jalur ?? '-' }}</td>
+                            <td>{{ $syarat->jalurPendaftaran->jalur ?? '-' }}</td>
                             <td>{{ $syarat->syarat }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
                                     {{-- Toggle Active --}}
-                                    <form action="{{ route('admin.ppdb.syarat-ppdb.toggleActive', $syarat->id) }}" method="POST" class="me-1">
+                                    <form action="{{ route('admin.kesiswaan.ppdb.syarat-ppdb.toggleActive', $syarat->id) }}" method="POST" class="me-1">
                                       @csrf
                                       <button type="submit" 
                                         class="btn btn-icon btn-sm @if($syarat->is_active) text-success @else text-info @endif"
@@ -44,12 +44,21 @@
                                     </form>
 
                                     {{-- Edit --}}
-                                    <a href="{{ route('admin.ppdb.syarat-ppdb.edit', $syarat->id) }}" class="btn btn-icon btn-sm btn-outline-primary me-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                    {{-- Edit --}}
+                                    <button type="button" 
+                                        class="btn btn-icon btn-sm btn-outline-primary me-1 btn-edit"
+                                        data-id="{{ $syarat->id }}"
+                                        data-tahun="{{ $syarat->tahunPpdb->tahun_pelajaran ?? '-' }}"
+                                        data-tahunid="{{ $syarat->tahunPpdb->id ?? '' }}"
+                                        data-jalur="{{ $syarat->jalurPendaftaran->id ?? '' }}"
+                                        data-syarat="{{ $syarat->syarat }}"
+                                        title="Edit">
                                         <i class="bx bx-edit-alt"></i>
-                                    </a>
+                                    </button>
+
 
                                     {{-- Hapus --}}
-                                    <form action="{{ route('admin.ppdb.syarat-ppdb.destroy', $syarat->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
+                                    <form action="{{ route('admin.kesiswaan.ppdb.syarat-ppdb.destroy', $syarat->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
@@ -75,7 +84,7 @@
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <form action="{{ route('admin.ppdb.syarat-ppdb.store') }}" method="POST">
+            <form action="{{ route('admin.kesiswaan.ppdb.syarat-ppdb.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Syarat Pendaftaran</h5>
@@ -154,4 +163,31 @@
     </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const editButtons = document.querySelectorAll(".btn-edit");
+    const modal = new bootstrap.Modal(document.getElementById("editModal"));
+    const formEdit = document.getElementById("formEdit");
+
+    editButtons.forEach(btn => {
+        btn.addEventListener("click", function() {
+            const id = this.dataset.id;
+            const tahun = this.dataset.tahun;
+            const tahunId = this.dataset.tahunid;
+            const jalur = this.dataset.jalur;
+            const syarat = this.dataset.syarat;
+
+            formEdit.action = `/admin/kesiswaan/ppdb/syarat-ppdb/${id}`;
+
+            document.getElementById("editTahun").value = tahun;
+            document.getElementById("editTahunId").value = tahunId;
+            document.getElementById("editJalur").value = jalur;
+            document.getElementById("editSyarat").value = syarat;
+
+            modal.show();
+        });
+    });
+});
+
+</script>
 @endsection

@@ -13,9 +13,9 @@ return new class extends Migration
             $table->foreignId('tahunPelajaran_id') // relasi ke tabel tahun_pelajarans
                   ->constrained('tahun_pelajarans')
                   ->onDelete('cascade');
-            $table->string('keahlian');         // misal jurusan/kompetensi
-            $table->integer('jumlah_kelas');    // jumlah kelas
-            $table->integer('quota');           // quota per kelas / total
+            $table->string('keahlian')->nullable();         // misal jurusan/kompetensi
+            $table->integer('jumlah_kelas')->nullable();    // jumlah kelas
+            $table->integer('quota')->nullable();           // quota per kelas / total
             $table->timestamps();
         });
     }

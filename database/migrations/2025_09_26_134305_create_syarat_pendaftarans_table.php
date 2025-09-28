@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tahunPelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
             $table->foreignId('jalurPendaftaran_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
-            $table->text('syarat');
+            $table->text('syarat')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

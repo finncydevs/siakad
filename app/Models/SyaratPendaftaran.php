@@ -21,9 +21,15 @@ class SyaratPendaftaran extends Model
         return $this->belongsTo(TahunPelajaran::class, 'tahunPelajaran_id');
     }
 
-    public function jalur()
+    public function jalurPendaftaran()
     {
-        return $this->belongsTo(JalurPendaftaran::class, 'jalur_id');
+        return $this->belongsTo(JalurPendaftaran::class, 'jalurPendaftaran_id');
     }
 
+    public function formulir()
+    {
+        return $this->belongsToMany(FormulirPendaftaran::class, 'formulir_syarat', 'syarat_id', 'formulir_id')
+                    ->withPivot('is_checked')
+                    ->withTimestamps();
+    }
 }

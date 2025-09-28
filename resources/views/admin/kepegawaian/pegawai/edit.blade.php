@@ -8,17 +8,16 @@
         <h5 class="mb-0">Formulir Edit Data</h5>
     </div>
     <div class="card-body">
-        <form action="{{ route('admin.pegawai.update', $pegawai->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.kepegawaian.pegawai.update', $pegawai->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            @include('admin.pegawai._form')
+            @include('admin.kepegawaian.pegawai._form')
 
             <div class="mt-4">
                 <button type="submit" class="btn btn-primary">Update</button>
-                <a href="{{ route('admin.pegawai.index') }}" class="btn btn-outline-secondary">Batal</a>
+                <a href="{{ route('admin.kepegawaian.pegawai.index') }}" class="btn btn-outline-secondary">Batal</a>
             </div>
         </form>
     </div>
 </div>
 @endsection
-

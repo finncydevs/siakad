@@ -12,13 +12,13 @@ class PegawaiController extends Controller
 {
     public function index()
     {
-        $pegawais = Pegawai::latest()->get();
-        return view('admin.pegawai.index', compact('pegawais'));
+        $pegawais = Pegawai::with(['tugasTerbaru'])->latest()->get();
+        return view('admin.kepegawaian.pegawai.index', compact('pegawais'));
     }
 
     public function create()
     {
-        return view('admin.pegawai.create');
+        return view('admin.kepegawaian.pegawai.create');
     }
 
     public function store(Request $request)
@@ -31,7 +31,7 @@ class PegawaiController extends Controller
             'tanda_tangan' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['foto', 'tanda_tangan']);
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')->store('pegawai/foto', 'public');
@@ -43,7 +43,7 @@ class PegawaiController extends Controller
 
         Pegawai::create($data);
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
+        return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
     }
 
     public function show(Pegawai $pegawai)
@@ -51,12 +51,12 @@ class PegawaiController extends Controller
         $profilSekolah = ProfilSekolah::first();
         $tugas = TugasPegawai::where('pegawai_id', $pegawai->id)->latest()->first();
         
-        return view('admin.pegawai.show', compact('pegawai', 'profilSekolah', 'tugas'));
+        return view('admin.kepegawaian.pegawai.show', compact('pegawai', 'profilSekolah', 'tugas'));
     }
 
     public function edit(Pegawai $pegawai)
     {
-        return view('admin.pegawai.edit', compact('pegawai'));
+        return view('admin.kepegawaian.pegawai.edit', compact('pegawai'));
     }
 
     public function update(Request $request, Pegawai $pegawai)
@@ -69,7 +69,7 @@ class PegawaiController extends Controller
             'tanda_tangan' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['foto', 'tanda_tangan']);
 
         if ($request->hasFile('foto')) {
             if ($pegawai->foto) {
@@ -85,9 +85,14 @@ class PegawaiController extends Controller
             $data['tanda_tangan'] = $request->file('tanda_tangan')->store('pegawai/ttd', 'public');
         }
 
-        $pegawai->update($data);
+        $pegawai->fill($data);
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+        if ($pegawai->isDirty()) {
+            $pegawai->save();
+            return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+        } else {
+            return redirect()->route('admin.kepegawaian.pegawai.index')->with('info', 'Anda tidak mengubah data apapun.');
+        }
     }
 
     public function destroy(Pegawai $pegawai)
@@ -101,7 +106,7 @@ class PegawaiController extends Controller
         
         $pegawai->delete();
 
-        return redirect()->route('admin.pegawai.index')->with('success', 'Data pegawai berhasil dihapus.');
+        return redirect()->route('admin.kepegawaian.pegawai.index')->with('success', 'Data pegawai berhasil dihapus.');
     }
 }
 

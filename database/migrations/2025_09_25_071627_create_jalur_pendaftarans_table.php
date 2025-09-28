@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('jalur_pendaftarans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tahunPelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
-            $table->string('kode');
-            $table->string('jalur');
-            $table->string('keterangan');
+            $table->string('kode')->nullable();
+            $table->string('jalur')->nullable();
+            $table->string('keterangan')->nullable();
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });

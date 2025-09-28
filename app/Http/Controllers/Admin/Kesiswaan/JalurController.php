@@ -14,20 +14,13 @@ class JalurController extends Controller
      */
     public function index()
     {
-        $tahunPpdb = TahunPelajaran :: where('active', 1)->first();
-        
+        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+
         $jalurPendaftaran = $tahunPpdb
             ? JalurPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)->get()
             : collect(); // jika tidak ada tahun aktif, koleksi kosong
-        return view('admin.kesiswaan.ppdb.jalur_pendaftaran', compact('jalurPendaftaran','tahunPpdb'));
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return view('admin.kesiswaan.ppdb.jalur_pendaftaran', compact('jalurPendaftaran', 'tahunPpdb'));
     }
 
     /**
@@ -37,60 +30,53 @@ class JalurController extends Controller
     {
         try {
             $request->validate([
-                'tahun_id'      =>  'required|exists:tahun_pelajarans,id',
-                'kode'          =>  'required|string',
-                'jalur'         =>  'required|string',
-                'keterangan'    =>  'required|string',
+                'tahun_id'   => 'required|exists:tahun_pelajarans,id',
+                'kode'       => 'required|string|unique:jalur_pendaftarans,kode',
+                'jalur'      => 'required|string',
+                'keterangan' => 'required|string',
             ]);
 
-            JalurPendaftaran :: create ([
-                'tahunPelajaran_id' =>  $request->tahun_id,
-                'kode'              =>  $request->kode,
-                'jalur'             =>  $request->jalur,
-                'keterangan'        =>  $request->keterangan,
-                'is_active'         =>  0,
+            JalurPendaftaran::create([
+                'tahunPelajaran_id' => $request->tahun_id,
+                'kode'              => $request->kode,
+                'jalur'             => $request->jalur,
+                'keterangan'        => $request->keterangan,
+                'is_active'         => 0,
             ]);
 
-            return redirect()->route('admin.ppdb.jalur-ppdb.index')->with('success', 'Jalur berhasil ditambahkan.');
-
-        } catch (\Throwable $th) {
-            throw $th;
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
+                             ->with('success', 'Jalur berhasil ditambahkan.');
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
+                             ->with('error', 'Gagal menambahkan jalur: ' . $e->getMessage());
         }
-
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
-    {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
-        $jalurPendaftaran = JalurPendaftaran::all(); // untuk table
-        $editJalur = JalurPendaftaran::findOrFail($id); // untuk modal edit
-
-        return view('admin.kesiswaan.ppdb.jalur_pendaftaran', compact(
-            'tahunPpdb',
-            'jalurPendaftaran',
-            'editJalur'
-        ));
-    }
-
-
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $request->validate([
+                'kode'       => 'required|string|unique:jalur_pendaftarans,kode,' . $id,
+                'jalur'      => 'required|string',
+                'keterangan' => 'required|string',
+            ]);
+
+            $jalur = JalurPendaftaran::findOrFail($id);
+            $jalur->update([
+                'kode'       => $request->kode,
+                'jalur'      => $request->jalur,
+                'keterangan' => $request->keterangan,
+            ]);
+
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
+                             ->with('success', 'Jalur berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
+                             ->with('error', 'Gagal memperbarui jalur: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -99,36 +85,44 @@ class JalurController extends Controller
     public function destroy(string $id)
     {
         try {
-            $jalur = JalurPendaftaran::findOrFail($id);
+            $jalur = JalurPendaftaran::with('syarats')->findOrFail($id);
+
+            // Cek apakah masih ada syarat
+            if ($jalur->syarats->count() > 0) {
+                return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
+                                 ->with('error', "Tidak bisa menghapus {$jalur->jalur}, masih ada syarat terkait.");
+            }
+
             $jalur->delete();
 
-            return redirect()->route('admin.ppdb.jalur-ppdb.index')
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
                              ->with('success', "{$jalur->jalur} berhasil dihapus.");
-        } catch (\Exception $e) {
-            return redirect()->route('admin.ppdb.jalur-ppdb.index')
+        } catch (\Throwable $e) {
+            return redirect()->route('admin.kesiswaan.ppdb.jalur-ppdb.index')
                              ->with('error', "Terjadi kesalahan: " . $e->getMessage());
         }
     }
 
-
+    /**
+     * Toggle Active status
+     */
     public function toggleActive($id)
     {
-        $jalur = JalurPendaftaran::findOrFail($id);
-    
-        if (! $jalur->is_active) {
-        
-            $jalur->is_active = true;
+        try {
+            $jalur = JalurPendaftaran::findOrFail($id);
+
+            // Hanya toggle jalur yang dipilih, tanpa memengaruhi jalur lain
+            $jalur->is_active = ! $jalur->is_active;
             $jalur->save();
-        
-            $message = "{$jalur->jalur} berhasil dijadikan Active";
-        } else {
-            // kalau sudah aktif, nonaktifkan saja
-            $jalur->is_active = false;
-            $jalur->save();
-        
-            $message = "{$jalur->jalur} berhasil di-nonaktifkan";
+
+            $message = $jalur->is_active
+                ? "{$jalur->jalur} berhasil dijadikan Active"
+                : "{$jalur->jalur} berhasil di-nonaktifkan";
+
+            return redirect()->back()->with('success', $message);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', 'Gagal mengubah status jalur: ' . $e->getMessage());
         }
-    
-        return redirect()->back()->with('success', $message);
     }
+
 }

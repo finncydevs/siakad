@@ -42,7 +42,7 @@
                                title="Edit">
                                <i class="bx bx-edit-alt"></i>
                             </a>
-                            <form action="{{ route('admin.ppdb.quota-ppdb.destroy', $quota->id) }}" method="POST" 
+                            <form action="{{ route('admin.kesiswaan.ppdb.quota-ppdb.destroy', $quota->id) }}" method="POST" 
                                   onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                 @csrf
                                 @method('DELETE')
@@ -67,7 +67,7 @@
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <form action="{{ route('admin.ppdb.quota-ppdb.store') }}" method="POST">
+            <form action="{{ route('admin.kesiswaan.ppdb.quota-ppdb.store') }}" method="POST">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title">Tambah Quota</h5>
@@ -78,23 +78,23 @@
                         <div class="col">
                             <label for="tahunPendaftaran" class="form-label">Tahun Pendaftaran</label>
                             <input type="text" id="tahunPendaftaran" class="form-control" 
-                                   value="{{ $tahunPpdb?->tahun_pelajaran ?? '-' }}" readonly>
+                                   value="{{ $tahunPpdb?->tahun_pelajaran ?? 'Tahun Pendaftaran Tidak ada yang aktif' }}" readonly>
                             <input type="hidden" name="tahun_id" value="{{ $tahunPpdb?->id }}">
                         </div>
                         <div class="col">
                             <label for="keahlian" class="form-label">Keahlian</label>
-                            <input type="text" id="keahlian" name="keahlian" class="form-control" required>
+                            <input type="text" id="keahlian" name="keahlian" class="form-control" placeholder="Contoh : PPLG" required>
                         </div>
                     </div>
                 
                     <div class="row g-6 mb-3">
                         <div class="col">
                             <label for="jumlah_kelas" class="form-label">Jumlah Kelas</label>
-                            <input type="number" id="jumlah_kelas" name="jumlah_kelas" class="form-control" required>
+                            <input type="number" id="jumlah_kelas" name="jumlah_kelas" class="form-control" placeholder="Contoh : 3" required>
                         </div>
                         <div class="col">
                             <label for="quota" class="form-label">Quota</label>
-                            <input type="number" id="quota" name="quota" class="form-control" required>
+                            <input type="number" id="quota" name="quota" class="form-control" placeholder="Contoh : 96" required>
                         </div>
                     </div>
                 </div>
@@ -154,7 +154,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const jumlah = this.dataset.jumlah;
             const quota = this.dataset.quota;
 
-            formEdit.action = `/admin/ppdb/quota-ppdb/${id}`;
+            formEdit.action = `/admin/kesiswaan/ppdb/quota-ppdb/${id}`;
             document.getElementById("editKeahlian").value = keahlian;
             document.getElementById("editJumlah").value = jumlah;
             document.getElementById("editQuota").value = quota;

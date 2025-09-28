@@ -22,7 +22,7 @@ class JalurPendaftaran extends Model
         return $this->belongsTo(TahunPelajaran::class);
     }
 
-    public function syarats()
+    public function syaratPendaftaran()
     {
         return $this->hasMany(SyaratPendaftaran::class, 'tahunPelajaran_id');
     }
