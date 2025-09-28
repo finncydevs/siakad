@@ -43,6 +43,7 @@
   </head>
 
   <body>
+    @include('layouts.partials.toast')
     <div class="layout-wrapper layout-content-navbar">
       <div class="layout-container">
         
@@ -72,7 +73,9 @@
         'resources/sneat/assets/vendor/js/menu.js',
         'resources/sneat/assets/vendor/libs/apex-charts/apexcharts.js',
         'resources/sneat/assets/js/main.js',
-        'resources/sneat/assets/js/dashboards-analytics.js'
+        'resources/sneat/assets/js/dashboards-analytics.js',
+        'resources/sneat/assets/js/ui-modals.js',
+        'resources/sneat/assets/js/ui-toasts.js'
     ])
     
     <script async defer src="https://buttons.github.io/buttons.js"></script>

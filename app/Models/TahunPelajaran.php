@@ -13,6 +13,7 @@ class TahunPelajaran extends Model
         'tahun_pelajaran',
         'keterangan',
         'is_active',
+        'active',
     ];
 
     /**
@@ -27,4 +28,20 @@ class TahunPelajaran extends Model
         // 2. Aktifkan Tahun Pelajaran yang dipilih
         self::where('id', $id)->update(['is_active' => true]);
     }
+
+    public function jalurs()
+    {
+        return $this->hasMany(JalurPendaftaran::class, 'tahunPelajaran_id');
+    }
+
+    public function quotaPendaftarans()
+    {
+        return $this->hasMany(QuotaPendaftaran::class, 'tahunPelajaran_id');
+    }
+
+    public function syarats()
+    {
+        return $this->hasMany(SyaratPendaftaran::class, 'tahunPelajaran_id');
+    }
+    
 }

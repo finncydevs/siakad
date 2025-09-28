@@ -13,13 +13,6 @@ class TahunPpdbController extends Controller
      */
     public function index()
     {
-        $currentYear = date('Y');
-        $nextYear = $currentYear + 1;
-    
-        $tahunDepan = $nextYear . ' - ' . ($nextYear + 1);
-    
-        // kalau belum ada, tambahin otomatis
-        TahunPelajaran::firstOrCreate(['tahun_pelajaran' => $tahunDepan]);
     
         $tahunPelajaran = TahunPelajaran::orderBy('tahun_pelajaran', 'asc')->get();
     
@@ -46,7 +39,7 @@ class TahunPpdbController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
         //
     }
@@ -79,17 +72,17 @@ class TahunPpdbController extends Controller
     {
         $tahun = TahunPelajaran::findOrFail($id);
     
-        if (! $tahun->is_active) {
+        if (! $tahun->active) {
             // kalau belum aktif, set semua lain jadi nonaktif
-            TahunPelajaran::query()->update(['is_active' => false]);
+            TahunPelajaran::query()->update(['active' => false]);
         
-            $tahun->is_active = true;
+            $tahun->active = true;
             $tahun->save();
         
             $message = "Tahun {$tahun->tahun_pelajaran} berhasil dijadikan Active";
         } else {
             // kalau sudah aktif, nonaktifkan saja
-            $tahun->is_active = false;
+            $tahun->active = false;
             $tahun->save();
         
             $message = "Tahun {$tahun->tahun_pelajaran} berhasil di-nonaktifkan";

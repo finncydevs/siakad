@@ -63,9 +63,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('tahun-ppdb', TahunPpdbController::class);
         Route::post('/tahun-ppdb/{id}/toggle-active', [TahunPpdbController::class, 'toggleActive'])
             ->name('tahun-ppdb.toggleActive');
+
         Route::resource('jalur-ppdb', JalurController::class);
-        Route::resource('quota-ppdb', QuotaController::class);
-        Route::resource('syarat-ppdb', SyaratController::class);
+        Route::post('/jalur-ppdb/{id}/toggle-active', [JalurController::class, 'toggleActive'])
+            ->name('jalur-ppdb.toggleActive');
+            
+            Route::resource('quota-ppdb', QuotaController::class);
+            Route::resource('syarat-ppdb', SyaratController::class);
+            Route::post('/syarat-ppdb/{id}/toggle-active', [SyaratController::class, 'toggleActive'])
+                ->name('syarat-ppdb.toggleActive');
         Route::resource('formulir-ppdb', FormulirController::class);
         Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
         Route::resource('penempatan-kelas', PenempatanKelasController::class);

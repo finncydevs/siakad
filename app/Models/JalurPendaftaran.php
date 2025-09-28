@@ -10,5 +10,20 @@ class JalurPendaftaran extends Model
     
     use HasFactory;
 
-    protected $fillable = ['kode', 'jalur', 'keterangan', 'active'];
+    protected $fillable = [
+        'tahunPelajaran_id', 
+        'kode', 
+        'jalur', 
+        'keterangan', 
+        'is_active'];
+
+    public function tahunPpdb()
+    {
+        return $this->belongsTo(TahunPelajaran::class);
+    }
+
+    public function syarats()
+    {
+        return $this->hasMany(SyaratPendaftaran::class, 'tahunPelajaran_id');
+    }
 }

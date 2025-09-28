@@ -6,27 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('jalur_pendaftarans', function (Blueprint $table) {
+        Schema::create('syarat_pendaftarans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tahunPelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
-            $table->string('kode');
-            $table->string('jalur');
-            $table->string('keterangan');
+            $table->foreignId('jalurPendaftaran_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
+            $table->text('syarat');
             $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('jalur_pendaftarans');
+        Schema::dropIfExists('syarat_pendaftarans');
     }
 };

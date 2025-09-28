@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('tahun_pelajaran')->unique(); // Misal: 2024/2025
             $table->text('keterangan')->nullable();
             $table->boolean('is_active')->default(false); // TRUE jika aktif
+            $table->boolean('active')->default(false); // TRUE jika aktif
             $table->timestamps();
         });
     }
