@@ -94,7 +94,7 @@
                     <div class="mb-3">
                         <label>Tahun Pendaftaran</label>
                         <input type="text" class="form-control" value="{{ $tahunPpdb?->tahun_pelajaran ?? '-' }}" readonly>
-                        <input type="hidden" name="tahun_id" value="{{ $tahunPpdb?->id }}">
+                        <input type="hidden" name="tahun_id" value="{{ $tahunPpdb ? $tahunPpdb->id : '' }}">
                     </div>
                     <div class="mb-3">
                         <label>Jalur</label>
