@@ -15,12 +15,9 @@ class SyncApiAuth
      */
     public function handle(Request $request, Closure $next): Response
 {
-    // Ambil token dari header request
     $token = $request->header('X-Sync-Token');
 
-    // Bandingkan dengan token yang kita simpan (sebaiknya simpan di .env)
     if ($token !== 'lNoD7qFg1LggLIO') {
-        // Jika token salah, tolak akses
         abort(403, 'Unauthorized action.');
     }
 
