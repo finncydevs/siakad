@@ -108,6 +108,26 @@
                         <div data-i18n="Semester">Semester</div>
                     </a>
                 </li>
+                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Program Keahlian</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Kompetensi Keahlian</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Mapel</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Ekstrakulikuler</div>
+                    </a>
+                </li>
             </ul>
         </li>
 
