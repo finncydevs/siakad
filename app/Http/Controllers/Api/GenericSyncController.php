@@ -40,7 +40,6 @@ class GenericSyncController extends Controller
                 $table->timestamps();
             });
         } else {
-            // 4. Jika tabel sudah ada, cek apakah ada kolom baru yang perlu ditambahkan.
             $existingColumns = Schema::getColumnListing($tableName);
             $newColumns = array_diff($dapodikColumns, $existingColumns);
 
@@ -57,7 +56,7 @@ class GenericSyncController extends Controller
         $identifierColumn = $this->getIdentifierColumn($dapodikColumns, $entity);
 
         foreach ($dataFromDapodik as $row) {
-            
+
             // FIX: Cek setiap nilai di dalam baris data
             foreach ($row as $key => $value) {
                 // Jika nilainya adalah sebuah array, ubah menjadi string JSON
@@ -72,7 +71,7 @@ class GenericSyncController extends Controller
                 $row // Data yang sudah bersih dan lengkap
             );
         }
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Sinkronisasi ' . ucfirst($entity) . ' selesai.',
@@ -92,7 +91,7 @@ class GenericSyncController extends Controller
             'sekolah_id',
             'rombongan_belajar_id',
             'pengguna_id',
-            // Tambahkan ID lain jika ada
+
         ];
 
         foreach ($identifiers as $id) {
@@ -100,7 +99,7 @@ class GenericSyncController extends Controller
                 return $id;
             }
         }
-        
+
         // Fallback jika tidak ada, gunakan ID unik entitas (misal: 'siswa_id')
         $fallbackId = Str::snake($entity) . '_id';
         if(in_array($fallbackId, $columns)) {
@@ -117,16 +116,12 @@ class GenericSyncController extends Controller
     private function defineColumnType($table, string $column)
     {
         if (Str::endsWith($column, '_id_str')) {
-            // Jika berakhiran '_id_str', ini adalah TEXT
             $table->text($column)->nullable();
         } elseif (Str::endsWith($column, '_id')) {
-            // Jika hanya berakhiran '_id', ini adalah UUID atau string ID
             $table->string($column, 191)->nullable()->index(); // Gunakan string dengan index
         } elseif (str_contains($column, 'tanggal')) {
-            // Jika mengandung 'tanggal', ini adalah DATE
             $table->date($column)->nullable();
         } else {
-            // Sisanya adalah TEXT untuk menampung data string apapun
             $table->text($column)->nullable();
         }
     }

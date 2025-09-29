@@ -13,7 +13,6 @@ use App\Http\Controllers\Api\GenericSyncController;
 Route::post('/sync/{entity}', [GenericSyncController::class, 'handleSync'])
      ->middleware(SyncApiAuth::class);
 
-// Endpoint lain untuk aplikasi Anda (jika ada)
 
 Route::get('/user', function (Request $request) {
     return $request->user();
