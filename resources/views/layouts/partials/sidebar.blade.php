@@ -48,14 +48,16 @@
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">Sekull</span>
         </a>
+
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="bx bx-chevron-left bx-sm align-middle"></i>
         </a>
     </div>
+
     <div class="menu-inner-shadow"></div>
+
     <ul class="menu-inner py-1">
 
-        <!-- Dashboard -->
         <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
             <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -63,7 +65,6 @@
             </a>
         </li>
 
-        <!-- Pengaturan Dasar (Profil Sekolah) -->
         <li class="menu-item {{ request()->is('admin/pengaturan/profil_sekolah*') ? 'active' : '' }}">
             <a href="{{ route('admin.pengaturan.profil_sekolah.edit') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-school"></i>
@@ -71,7 +72,6 @@
             </a>
         </li>
 
-        <!-- Kepegawaian -->
         <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-user-badge"></i>
@@ -91,7 +91,6 @@
             </ul>
         </li>
 
-        <!-- Akademik -->
         <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
@@ -111,7 +110,6 @@
             </ul>
         </li>
 
-        <!-- Kesiswaan -->
         <li class="menu-item {{ request()->is('admin/kesiswaan*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
@@ -188,8 +186,41 @@
                 </li>
             </ul>
         </li>
-        
-        <!-- PENGATURAN SISTEM (DI BAWAH SENDIRI) -->
+
+        <li class="menu-item {{ request()->is('admin/rombel*') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-group"></i>
+                <div data-i18n="Rombel">Rombongan Belajar</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('admin/rombel/reguler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.reguler.index') }}" class="menu-link">
+                        <div data-i18n="Reguler">Reguler</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/praktik*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.praktik.index') }}" class="menu-link">
+                        <div data-i18n="Praktik">Praktik</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/ekstrakurikuler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.ekstrakurikuler.index') }}" class="menu-link">
+                        <div data-i18n="Ekstrakurikuler">Ekstrakurikuler</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/mapel-pilihan*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.mapel-pilihan.index') }}" class="menu-link">
+                        <div data-i18n="Mapel Pilihan">Mapel Pilihan</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/wali*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.wali.index') }}" class="menu-link">
+                        <div data-i18n="Wali">Wali</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
         <li class="menu-item {{ request()->is('admin/pengaturan/webservice*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

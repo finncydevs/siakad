@@ -23,8 +23,15 @@ use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 
-use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
+// Controller Rombongan Belajar
+use App\Http\Controllers\Admin\Rombel\RombelRegulerController;
+use App\Http\Controllers\Admin\Rombel\RombelPraktikController;
+use App\Http\Controllers\Admin\Rombel\RombelEkstrakurikulerController;
+use App\Http\Controllers\Admin\Rombel\RombelMapelPilihanController;
+use App\Http\Controllers\Admin\Rombel\RombelWaliController;
 
+// Controller Pengaturan
+use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,28 +42,25 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | Rute Panel Admin
 |--------------------------------------------------------------------------
 */
 Route::prefix('admin')->name('admin.')->group(function () {
-
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('dashboard');
 
+    // --- GRUP PENGATURAN ---
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
         Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
         Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
-
         Route::prefix('webservice')->name('webservice.')->group(function () {
             Route::get('/', [ApiSettingsController::class, 'index'])->name('index');
         });
     });
 
+    // --- GRUP KEPEGAWAIAN ---
     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
         Route::resource('pegawai', PegawaiController::class);
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
@@ -70,6 +74,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
     });
 
+    // --- GRUP KESISWAAN ---
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
         Route::resource('siswa', SiswaController::class);
         Route::prefix('ppdb')->name('ppdb.')->group(function () {
@@ -86,7 +91,28 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
         });
+    });
 
+    // --- GRUP ROMBONGAN BELAJAR ---
+    Route::prefix('rombel')->name('rombel.')->group(function () {
+        // Reguler
+        Route::get('/reguler/create', [RombelRegulerController::class, 'create'])->name('reguler.create');
+        Route::get('/reguler', [RombelRegulerController::class, 'index'])->name('reguler.index');
 
+        // Praktik (ROUTE BARU DITAMBAHKAN)
+        Route::get('/praktik/create', [RombelPraktikController::class, 'create'])->name('praktik.create');
+        Route::get('/praktik', [RombelPraktikController::class, 'index'])->name('praktik.index');
+
+        // Ekstrakurikuler (ROUTE BARU DITAMBAHKAN)
+        Route::get('/ekstrakurikuler/create', [RombelEkstrakurikulerController::class, 'create'])->name('ekstrakurikuler.create');
+        Route::get('/ekstrakurikuler', [RombelEkstrakurikulerController::class, 'index'])->name('ekstrakurikuler.index');
+
+        // Mapel Pilihan (ROUTE BARU DITAMBAHKAN)
+        Route::get('/mapel-pilihan/create', [RombelMapelPilihanController::class, 'create'])->name('mapel-pilihan.create');
+        Route::get('/mapel-pilihan', [RombelMapelPilihanController::class, 'index'])->name('mapel-pilihan.index');
+
+        // Wali (ROUTE BARU DITAMBAHKAN)
+        Route::get('/wali/create', [RombelWaliController::class, 'create'])->name('wali.create');
+        Route::get('/wali', [RombelWaliController::class, 'index'])->name('wali.index');
     });
 });
