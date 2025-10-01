@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Kesiswaan;
+namespace App\Http\Controllers\Admin\Kesiswaan\ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class DaftarCalonPesertaDidikController extends Controller
+class DaftarPesertaDidikBaruController extends Controller
 {
-    /**
+     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.daftar_calon_peserta_didik');
+        return view('admin.kesiswaan.ppdb.daftar_peserta_didik_baru');
     }
 
     /**

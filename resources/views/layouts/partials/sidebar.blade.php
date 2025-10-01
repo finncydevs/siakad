@@ -161,6 +161,13 @@
                             </a>
                         </li>
                         <li
+                            class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.daftar-peserta-didik-baru.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.kesiswaan.ppdb.daftar-peserta-didik-baru.index') }}"
+                                class="menu-link">
+                                <div data-i18n="Calon Peserta Didik">Peserta Didik Baru</div>
+                            </a>
+                        </li>
+                        <li
                             class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.penempatan-kelas.index') ? 'active' : '' }}">
                             <a href="{{ route('admin.kesiswaan.ppdb.penempatan-kelas.index') }}" class="menu-link">
                                 <div data-i18n="Penempatan Kelas">Penempatan Kelas</div>

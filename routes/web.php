@@ -13,15 +13,16 @@ use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
 
 // Controller Kesiswaan
-use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
-use App\Http\Controllers\Admin\Kesiswaan\FormulirPendaftaranController;
-use App\Http\Controllers\Admin\Kesiswaan\JalurController;
-use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
-use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
-use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
-use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarPesertaDidikBaruController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarCalonPesertaDidikController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\FormulirPendaftaranController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\JalurController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanPendaftaranController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanQuotaController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\PenempatanKelasController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\QuotaController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\SyaratController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\TahunPpdbController;
 
 use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
 
@@ -82,6 +83,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/syarat-ppdb/{id}/toggle-active', [SyaratController::class, 'toggleActive'])->name('syarat-ppdb.toggleActive');
             Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
             Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
+            Route::resource('daftar-peserta-didik-baru', DaftarPesertaDidikBaruController::class);
             Route::resource('penempatan-kelas', PenempatanKelasController::class);
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
