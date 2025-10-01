@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
 use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
 use App\Http\Controllers\Admin\Akademik\PaketKeahlianController; 
+use App\Http\Controllers\Admin\Akademik\JurusanController;
 
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
@@ -77,6 +78,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
         Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
         Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
+        Route::resource('jurusan', JurusanController::class)->only(['index']);
     });
 
     // --- GRUP KESISWAAN ---

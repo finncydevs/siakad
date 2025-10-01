@@ -108,14 +108,9 @@
                         <div data-i18n="Semester">Semester</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/program-keahlian*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.akademik.program-keahlian.index') }}" class="menu-link">
-                        <div data-i18n="Program Keahlian">Program Keahlian</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->is('admin/akademik/paket-keahlian*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.akademik.paket-keahlian.index') }}" class="menu-link">
-                        <div data-i18n="Paket Keahlian">Paket Keahlian</div>
+                <li class="menu-item {{ request()->is('admin/akademik/jurusan*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.jurusan.index') }}" class="menu-link">
+                        <div data-i18n="Jurusan">Konsentrasi Keahlian</div>
                     </a>
                 </li>
                 <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
