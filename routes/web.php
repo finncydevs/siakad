@@ -116,3 +116,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/wali', [RombelWaliController::class, 'index'])->name('wali.index');
     });
 });
+
+require __DIR__.'/auth.php';
