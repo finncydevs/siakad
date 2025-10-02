@@ -26,7 +26,7 @@ use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 
-use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
+use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 
 use App\Http\Controllers\Admin\Absensi\AbsensiSiswaController;
 use App\Http\Controllers\Admin\Pengaturan\HariLiburController;
