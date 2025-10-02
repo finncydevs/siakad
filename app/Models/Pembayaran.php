@@ -12,7 +12,7 @@ class Pembayaran extends Model
 
     protected $table = 'pembayarans';
     protected $fillable = [
-        'siswa_id', 'iuran_id', 'tagihan_id', 'tanggal_bayar', 'jumlah_bayar',
+        'siswa_id', 'iuran_id', 'tagihan_id', 'tunggakan_id', 'tanggal_bayar', 'jumlah_bayar',
         'master_kas_id', 'acc_jurnal_id', 'petugas_id', 'keterangan'
     ];
 
@@ -44,5 +44,27 @@ class Pembayaran extends Model
         return $this->belongsTo(Tagihan::class);
     }
 
-    // Asumsi: Model AccJurnal, MasterKas, dan Gtk sudah ada di Models folder
+    /**
+     * Relasi ke tunggakan (jika ini pembayaran bebas).
+     */
+    public function tunggakan(): BelongsTo
+    {
+        return $this->belongsTo(Tunggakan::class);
+    }
+
+    /**
+     * Relasi ke petugas (GTK) yang mencatat pembayaran.
+     */
+    public function petugas(): BelongsTo
+    {
+        return $this->belongsTo(Gtk::class, 'petugas_id');
+    }
+
+    /**
+     * Relasi ke master kas tujuan dana.
+     */
+    public function masterKas(): BelongsTo
+    {
+        return $this->belongsTo(MasterKas::class);
+    }
 }

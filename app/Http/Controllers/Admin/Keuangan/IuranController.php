@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Keuangan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Iuran;
-use App\Models\TahunAjaran;
+use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 
 class IuranController extends Controller
@@ -12,7 +12,7 @@ class IuranController extends Controller
     public function index()
     {
         $iurans = Iuran::with('tahunPelajaran')->latest()->get();
-        $tahunAjarans = TahunAjaran::where('status', 'Aktif')->get();
+        $tahunAjarans = TahunPelajaran::where('is_active', true)->get();;
 
         return view('admin.keuangan.iuran.index', compact('iurans', 'tahunAjarans'));
     }

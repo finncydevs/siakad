@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Keuangan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Siswa;
-use App\Models\TahunAjaran;
+use App\Models\TahunPelajaran;
 use App\Models\Tunggakan;
 use App\Models\Voucher;
 use Illuminate\Http\Request;
@@ -24,8 +24,8 @@ class VoucherController extends Controller
             ->get();
 
         // Data untuk form tambah voucher
-        $daftarSiswa = Siswa::where('status', 'Aktif')->orderBy('nama_siswa')->get();
-        $tahunAjarans = TahunAjaran::where('status', 'Aktif')->get();
+        $daftarSiswa = Siswa::where('status', 'Aktif')->orderBy('nama')->get();
+        $tahunAjarans = TahunPelajaran::where('is_active', true)->get();
 
         return view('admin.keuangan.voucher.index', compact('siswas', 'daftarSiswa', 'tahunAjarans'));
     }

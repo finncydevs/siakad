@@ -13,11 +13,16 @@ class Voucher extends Model
     protected $table = 'vouchers';
     protected $fillable = ['siswa_id', 'tahun_pelajaran_id', 'nilai_voucher', 'keterangan'];
 
-    /**
-     * Relasi ke siswa yang menerima voucher ini.
-     */
     public function siswa(): BelongsTo
     {
         return $this->belongsTo(Siswa::class);
+    }
+
+    /**
+     * Relasi ke tahun pelajaran saat voucher diberikan.
+     */
+    public function tahunPelajaran(): BelongsTo
+    {
+        return $this->belongsTo(tahunPelajaran::class, 'tahun_pelajaran_id');
     }
 }

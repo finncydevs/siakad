@@ -17,10 +17,10 @@ return new class extends Migration
     $table->string('kode_akun')->nullable(); // Dari COA (Chart of Accounts)
     $table->text('uraian');
     $table->unsignedBigInteger('nominal');
-    $table->foreignId('petugas_id')->nullable()->constrained('gtks');
+    $table->unsignedBigInteger('petugas_id')->nullable();
     $table->unsignedBigInteger('master_kas_id');
     $table->timestamps();
-}); 
+});
     }
 
     /**

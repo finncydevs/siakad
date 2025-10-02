@@ -6,13 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('tunggakans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->foreignId('iuran_id')->constrained('iurans')->onDelete('cascade');
-            $table->foreignId('tahun_pelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
+            $table->unsignedBigInteger('siswa_id');
+            $table->unsignedBigInteger('iuran_id');
+            $table->unsignedBigInteger('tahun_pelajaran_id');
             $table->unsignedBigInteger('total_tunggakan_awal');
             $table->unsignedBigInteger('sisa_tunggakan');
             $table->enum('status', ['Belum Lunas', 'Lunas'])->default('Belum Lunas');
@@ -22,8 +25,12 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('tunggakans');
     }
 };
+

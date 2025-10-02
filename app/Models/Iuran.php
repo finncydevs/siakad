@@ -19,7 +19,7 @@ class Iuran extends Model
      */
     public function tahunPelajaran(): BelongsTo
     {
-        return $this->belongsTo(TahunAjaran::class);
+        return $this->belongsTo(TahunPelajaran::class, 'tahun_pelajaran_id');
     }
 
     /**

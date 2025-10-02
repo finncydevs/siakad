@@ -6,30 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->foreignId('iuran_id')->constrained('iurans')->onDelete('cascade');
-            $table->foreignId('iuran_id')->constrained('iurans')->onDelete('cascade');
-$table->foreignId('tagihan_id')->nullable()->constrained('tagihans')->onDelete('set null');
-$table->foreignId('tunggakan_id')->nullable()->constrained('tunggakans')->onDelete('set null'); // <-- TAMBAHKAN INI
-$table->date('tanggal_bayar');
-            $table->foreignId('tagihan_id')->nullable()->constrained('tagihans')->onDelete('set null');
+            $table->unsignedBigInteger('siswa_id');
+            $table->unsignedBigInteger('iuran_id');
+            $table->unsignedBigInteger('tagihan_id')->nullable();
+            $table->unsignedBigInteger('tunggakan_id')->nullable();
             $table->date('tanggal_bayar');
             $table->unsignedBigInteger('jumlah_bayar');
             $table->unsignedBigInteger('master_kas_id');
             $table->unsignedBigInteger('acc_jurnal_id')->nullable();
-
-            $table->foreignId('petugas_id')->nullable()->constrained('gtks')->onDelete('set null');
+            $table->unsignedBigInteger('petugas_id')->nullable();
             $table->text('keterangan')->nullable();
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('pembayarans');
     }
 };
+

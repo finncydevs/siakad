@@ -18,9 +18,26 @@ class Penggajian extends Model
     ];
 
     /**
+     * Relasi ke GTK (guru/pegawai) yang menerima gaji.
      */
-    public function pegawai(): BelongsTo
+    public function gtk(): BelongsTo
     {
         return $this->belongsTo(Gtk::class, 'gtk_id');
+    }
+
+    /**
+     * Relasi ke tahun pelajaran saat penggajian terjadi.
+     */
+    public function tahunPelajaran(): BelongsTo
+    {
+        return $this->belongsTo(TahunPelajaran::class, 'tahun_pelajaran_id');
+    }
+
+    /**
+     * Relasi ke master kas sumber dana.
+     */
+    public function masterKas(): BelongsTo
+    {
+        return $this->belongsTo(MasterKas::class);
     }
 }

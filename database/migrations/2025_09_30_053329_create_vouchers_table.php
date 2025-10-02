@@ -6,12 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('vouchers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->foreignId('tahun_pelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
+            $table->unsignedBigInteger('siswa_id');
+            $table->unsignedBigInteger('tahun_pelajaran_id');
             $table->unsignedBigInteger('nilai_voucher');
             $table->text('keterangan')->nullable();
             $table->timestamps();
@@ -20,8 +23,12 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('vouchers');
     }
 };
+

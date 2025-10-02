@@ -17,10 +17,25 @@ class Tunggakan extends Model
     ];
 
     /**
-     * Relasi ke siswa yang memiliki tunggakan ini.
      */
     public function siswa(): BelongsTo
     {
         return $this->belongsTo(Siswa::class);
+    }
+
+    /**
+     * Relasi ke jenis iuran yang ditunggak.
+     */
+    public function iuran(): BelongsTo
+    {
+        return $this->belongsTo(Iuran::class);
+    }
+
+    /**
+     * Relasi ke tahun pelajaran saat tunggakan terjadi.
+     */
+    public function tahunPelajaran(): BelongsTo
+    {
+        return $this->belongsTo(TahunPelajaran::class, 'tahun_pelajaran_id');
     }
 }

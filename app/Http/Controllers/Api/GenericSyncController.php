@@ -5,15 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Siswa;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class GenericSyncController extends Controller
 {
-    /**
-     * Menangani semua permintaan sinkronisasi secara dinamis,
-     * membuat atau mengubah tabel dan kolom sesuai kebutuhan.
-     */
     public function handleSync(Request $request, $entity)
     {
         $dataFromDapodik = $request->all();
@@ -56,21 +53,33 @@ class GenericSyncController extends Controller
         $identifierColumn = $this->getIdentifierColumn($dapodikColumns, $entity);
 
         foreach ($dataFromDapodik as $row) {
-
-            // FIX: Cek setiap nilai di dalam baris data
             foreach ($row as $key => $value) {
-                // Jika nilainya adalah sebuah array, ubah menjadi string JSON
                 if (is_array($value)) {
                     $row[$key] = json_encode($value, JSON_UNESCAPED_UNICODE);
                 }
             }
 
-            // Sekarang, $row dijamin aman untuk disimpan ke database
-            DB::table($tableName)->updateOrInsert(
-                [$identifierColumn => $row[$identifierColumn]], // Kunci untuk mencari
-                $row // Data yang sudah bersih dan lengkap
-            );
+            if ($tableName === 'siswas') {
+
+                $siswa = Siswa::firstOrNew([
+                    $identifierColumn => $row[$identifierColumn]
+                ]);
+
+                $siswa->fill($row);
+                $siswa->save();
+                if ($siswa->wasRecentlyCreated && is_null($siswa->qr_token)) {
+                    $siswa->qr_token = Str::uuid()->toString();
+                    $siswa->save();
+                }
+            } else {
+                DB::table($tableName)->updateOrInsert(
+                    [$identifierColumn => $row[$identifierColumn]],
+                    $row
+                );
+            }
         }
+            // --- AKHIR BAGIAN YANG DIPERBARUI ---
+
 
         return response()->json([
             'success' => true,
@@ -110,9 +119,6 @@ class GenericSyncController extends Controller
         return $columns[0];
     }
 
-    /**
-     * Helper untuk mendefinisikan tipe kolom secara dinamis.
-     */
     private function defineColumnType($table, string $column)
     {
         if (Str::endsWith($column, '_id_str')) {

@@ -43,7 +43,7 @@
                                     <option value="">-- Pilih Siswa --</option>
                                     @foreach ($daftarSiswa as $siswa)
                                         <option value="{{ $siswa->id }}" @selected(old('siswa_id') == $siswa->id)>
-                                            {{ $siswa->nama_siswa }} (NIS: {{ $siswa->nis }})
+                                            {{ $siswa->nama }} (NIS: {{ $siswa->nis }})
                                         </option>
                                     @endforeach
                                 </select>
@@ -100,7 +100,7 @@
                                     $sisaTagihan = $totalKewajiban - $totalBayar - $totalVoucher;
                                 @endphp
                                 <tr>
-                                    <td><strong>{{ $siswa->nama_siswa }}</strong></td>
+                                    <td><strong>{{ $siswa->nama }}</strong></td>
                                     <td>Rp {{ number_format($totalKewajiban, 0, ',', '.') }}</td>
                                     <td class="text-success">Rp {{ number_format($totalBayar, 0, ',', '.') }}</td>
                                     <td class="text-info">Rp {{ number_format($totalVoucher, 0, ',', '.') }}</td>

@@ -50,7 +50,7 @@
                             <a href="{{ route('admin.keuangan.penerimaan.index', ['siswa_id' => $siswa->id]) }}"
                                class="list-group-item list-group-item-action @if(request('siswa_id') == $siswa->id) active @endif">
                                 <div>
-                                    <h6 class="mb-1">{{ $siswa->nama_siswa }}</h6>
+                                    <h6 class="mb-1">{{ $siswa->nama }}</h6>
                                     <small class="text-muted">NIS: {{ $siswa->nis }}</small>
                                 </div>
                             </a>
@@ -72,7 +72,7 @@
                                 </span>
                             </div>
                             <div>
-                                <h5 class="mb-0">{{ $siswaDipilih->nama_siswa }}</h5>
+                                <h5 class="mb-0">{{ $siswaDipilih->nama }}</h5>
                                 <small class="text-muted">NIS: {{ $siswaDipilih->nis }} | Kelas: {{ $siswaDipilih->rombel->nama_rombel ?? 'N/A' }}</small>
                             </div>
                         </div>

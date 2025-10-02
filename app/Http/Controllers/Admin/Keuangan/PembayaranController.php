@@ -20,8 +20,8 @@ class PembayaranController extends Controller
      */
     public function index(Request $request)
     {
-        $siswas = Siswa::where('status', 'Aktif')->orderBy('nama_siswa')->get();
-        $daftarKas = MasterKas::where('status', 'Aktif')->get(); // Data untuk dropdown kas
+        $siswas = Siswa::where('status', 'Aktif')->orderBy('nama')->get();
+$daftarKas = MasterKas::where('is_active', true)->get(); // Data untuk dropdown kas
         $siswaDipilih = null;
 
         if ($request->filled('siswa_id')) {
@@ -91,7 +91,7 @@ class PembayaranController extends Controller
             $keteranganKas = sprintf(
                 'Pembayaran %s a/n %s',
                 $model->iuran->nama_iuran,
-                $siswa->nama_siswa
+                $siswa->nama
             );
 
             KasMutasi::create([

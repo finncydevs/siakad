@@ -18,7 +18,7 @@ class PengeluaranController extends Controller
     public function index()
     {
         $pengeluarans = Pengeluaran::with('masterKas', 'petugas')->latest()->get();
-        $daftarKas = MasterKas::where('status', 'Aktif')->get();
+      $daftarKas = MasterKas::where('is_active', true)->get();
 
         return view('admin.keuangan.pengeluaran.index', compact('pengeluarans', 'daftarKas'));
     }
