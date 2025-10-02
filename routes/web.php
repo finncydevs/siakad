@@ -129,5 +129,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
 
+
     });
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+ Route::get('/penerimaan', [PembayaranController::class, 'index'])->name('penerimaan.index');
+ Route::post('/penerimaan', [PembayaranController::class, 'store'])->name('penerimaan.store');
+ Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
+ Route::resource('/iuran', IuranController::class)->except(['create', 'edit', 'show']);
+ Route::resource('/voucher', VoucherController::class)->only(['index', 'store', 'destroy']);
+ Route::resource('/pengeluaran', PengeluaranController::class)->except(['create', 'edit', 'show']);
+});
 });

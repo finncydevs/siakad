@@ -195,7 +195,41 @@
                 </li>
             </ul>
         </li>
-        
+
+         <li class="menu-item {{ request()->routeIs('admin.keuangan.*') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons ti ti-cash"></i>
+                <div data-i18n="Keuangan">Keuangan</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->routeIs('admin.keuangan.penerimaan.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.keuangan.penerimaan.index') }}" class="menu-link">
+                        <div data-i18n="Penerimaan">Penerimaan</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.keuangan.pengeluaran.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.keuangan.pengeluaran.index') }}" class="menu-link">
+                        <div data-i18n="Pengeluaran">Pengeluaran</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.keuangan.kas.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.keuangan.kas.index') }}" class="menu-link">
+                        <div data-i18n="Buku Kas">Buku Kas</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->routeIs('admin.keuangan.iuran.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.keuangan.iuran.index') }}" class="menu-link">
+                        <div data-i18n="Pengaturan Iuran">Pengaturan Iuran</div>
+                    </a>
+                </li>
+                 <li class="menu-item {{ request()->routeIs('admin.keuangan.voucher.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.keuangan.voucher.index') }}" class="menu-link">
+                        <div data-i18n="Manajemen Voucher">Manajemen Voucher</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
         <!-- PENGATURAN SISTEM (DI BAWAH SENDIRI) -->
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
         <li class="menu-item {{ request()->is('admin/pengaturan/webservice*') ? 'open' : '' }}">
