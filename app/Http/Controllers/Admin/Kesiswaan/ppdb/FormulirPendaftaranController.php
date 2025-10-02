@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\FormulirPendaftaran;
+use App\Models\CalonSiswa;
 use App\Models\JalurPendaftaran;
 use App\Models\SyaratPendaftaran;
 use App\Models\TahunPelajaran;
@@ -13,7 +13,7 @@ class FormulirPendaftaranController extends Controller
 {
     public function index()
     {
-        $formulirs = FormulirPendaftaran::with(['jalurPendaftaran', 'syarat'])->get();
+        $formulirs = CalonSiswa::with(['jalurPendaftaran', 'syarat'])->get();
         return view('admin.kesiswaan.ppdb.formulir_pendaftaran', compact('formulirs'));
     }
 
@@ -21,11 +21,13 @@ class FormulirPendaftaranController extends Controller
     {
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
         $jalurs = JalurPendaftaran::where('is_active', true)->get();
+        $syarats = SyaratPendaftaran::where('is_active', true)->get();
 
         return view('admin.kesiswaan.ppdb.formulir_pendaftaran', [
-            'formulir' => null,   // untuk tambah baru
+            'formulir' => null,
             'jalurs' => $jalurs,
             'tahunAktif' => $tahunAktif,
+            'syarats' => $syarats,
         ]);
     }
 
@@ -56,13 +58,13 @@ class FormulirPendaftaranController extends Controller
             'pembayaran'    => 'nullable|numeric',
         ]);
 
-        // Simpan formulir baru
-        $formulir = FormulirPendaftaran::create($validated);
+        // Simpan siswa baru
+        $calon = CalonSiswa::create($validated);
 
-        // Simpan pivot syarat jika ada
+        // Simpan syarat yang dicentang
         if ($request->has('documents')) {
             foreach ($request->documents as $syaratId => $checked) {
-                $formulir->syarat()->attach($syaratId, ['is_checked' => true]);
+                $calon->syarat()->attach($syaratId, ['is_checked' => true]);
             }
         }
 
@@ -72,20 +74,22 @@ class FormulirPendaftaranController extends Controller
 
     public function edit($id)
     {
-        $formulir = FormulirPendaftaran::with('syarat')->findOrFail($id);
+        $formulir = CalonSiswa::with('syarat')->findOrFail($id);
         $jalurs = JalurPendaftaran::where('is_active', true)->get();
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+        $syarats = SyaratPendaftaran::where('is_active', true)->get();
 
         return view('admin.kesiswaan.ppdb.formulir_pendaftaran', [
-            'formulir' => $formulir,  // untuk edit
+            'formulir' => $formulir,
             'jalurs' => $jalurs,
             'tahunAktif' => $tahunAktif,
+            'syarats' => $syarats,
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $formulir = FormulirPendaftaran::findOrFail($id);
+        $calon = CalonSiswa::findOrFail($id);
 
         $validated = $request->validate([
             'tahun_id'      => 'required|exists:tahun_pelajarans,id',
@@ -112,16 +116,16 @@ class FormulirPendaftaranController extends Controller
             'pembayaran'    => 'nullable|numeric',
         ]);
 
-        $formulir->update($validated);
+        $calon->update($validated);
 
-        // Sync pivot syarat
+        // Sync syarat
         if ($request->has('documents')) {
             $syaratIds = array_keys($request->documents);
-            $formulir->syarat()->sync(
+            $calon->syarat()->sync(
                 collect($syaratIds)->mapWithKeys(fn($id) => [$id => ['is_checked' => true]])->toArray()
             );
         } else {
-            $formulir->syarat()->sync([]);
+            $calon->syarat()->sync([]);
         }
 
         return redirect()->route('admin.kesiswaan.ppdb.formulir.index')
@@ -130,8 +134,8 @@ class FormulirPendaftaranController extends Controller
 
     public function destroy($id)
     {
-        $formulir = FormulirPendaftaran::findOrFail($id);
-        $formulir->delete();
+        $calon = CalonSiswa::findOrFail($id);
+        $calon->delete();
 
         return redirect()->route('admin.kesiswaan.ppdb.formulir.index')
                          ->with('success', 'Formulir pendaftaran berhasil dihapus.');

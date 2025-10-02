@@ -87,6 +87,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('penempatan-kelas', PenempatanKelasController::class);
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
+
+
         });
 
 

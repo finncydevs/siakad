@@ -12,7 +12,7 @@ class SyaratController extends Controller
 {
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)->first();
         $syaratPendaftaran = $tahunPpdb
             ? SyaratPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)
                 ->with(['tahunPpdb', 'jalurPendaftaran'])

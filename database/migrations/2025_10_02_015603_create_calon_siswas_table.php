@@ -9,10 +9,9 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // database/migrations/xxxx_xx_xx_create_formulir_pendaftarans_table.php
-    public function up()
+    public function up(): void
     {
-        Schema::create('formulir_pendaftarans', function (Blueprint $table) {
+        Schema::create('calon_siswas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tahun_id')->constrained('tahun_pelajarans')->onDelete('cascade');
             $table->foreignId('jalur_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
@@ -40,12 +39,11 @@ return new class extends Migration
         });
     }
 
-
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('formulir_pendaftarans');
+        Schema::dropIfExists('calon_siswas');
     }
 };

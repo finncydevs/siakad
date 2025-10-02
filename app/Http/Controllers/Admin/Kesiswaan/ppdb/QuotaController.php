@@ -11,7 +11,7 @@ class QuotaController extends Controller
 {
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)->first();
         $quotas = $tahunPpdb
             ? QuotaPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)->get()
             : collect(); // jika tidak ada tahun aktif, koleksi kosong

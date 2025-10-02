@@ -1,3 +1,5 @@
+<?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -11,9 +13,9 @@ class FormulirSyarat extends Model
 
     protected $fillable = ['formulir_id', 'syarat_id', 'is_checked'];
 
-    public function formulir()
+    public function calonSiswa()
     {
-        return $this->belongsTo(FormulirPendaftaran::class, 'formulir_id');
+        return $this->belongsTo(CalonSiswa::class, 'formulir_id');
     }
 
     public function syarat()

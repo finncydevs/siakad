@@ -14,9 +14,9 @@ class TahunPpdbController extends Controller
     public function index()
     {
     
-        $tahunPelajaran = TahunPelajaran::orderBy('tahun_pelajaran', 'asc')->get();
+        $tahunPpdb = TahunPelajaran::orderBy('tahun_pelajaran', 'asc')->get();
     
-        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb', compact('tahunPelajaran'));
+        return view('admin.kesiswaan.ppdb.tahun_pendaftaran_ppdb', compact('tahunPpdb'));
     }
 
 
@@ -33,7 +33,18 @@ class TahunPpdbController extends Controller
      */
     public function store(Request $request)
     {
-        //
+            $request->validate([
+            'tahun_pelajaran' => 'required|string|max:20|unique:tahun_pelajarans,tahun_pelajaran',
+            'keterangan' => 'nullable|string|max:255',
+        ]);
+    
+        TahunPelajaran::create([
+            'tahun_pelajaran' => $request->tahun_pelajaran,
+            'keterangan' => $request->keterangan,
+            'is_active' => false, // default non-aktif
+        ]);
+    
+        return redirect()->back()->with('success', 'Tahun PPDB berhasil ditambahkan');
     }
 
     /**
@@ -72,17 +83,17 @@ class TahunPpdbController extends Controller
     {
         $tahun = TahunPelajaran::findOrFail($id);
     
-        if (! $tahun->active) {
+        if (! $tahun->is_active) {
             // kalau belum aktif, set semua lain jadi nonaktif
-            TahunPelajaran::query()->update(['active' => false]);
+            TahunPelajaran::query()->update(['is_active' => false]);
         
-            $tahun->active = true;
+            $tahun->is_active = true;
             $tahun->save();
         
-            $message = "Tahun {$tahun->tahun_pelajaran} berhasil dijadikan Active";
+            $message = "Tahun {$tahun->tahun_pelajaran} berhasil dijadikan is_active";
         } else {
             // kalau sudah aktif, nonaktifkan saja
-            $tahun->active = false;
+            $tahun->is_active = false;
             $tahun->save();
         
             $message = "Tahun {$tahun->tahun_pelajaran} berhasil di-nonaktifkan";

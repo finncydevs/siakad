@@ -14,7 +14,7 @@ class JalurController extends Controller
      */
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)->first();
 
         $jalurPendaftaran = $tahunPpdb
             ? JalurPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)->get()
