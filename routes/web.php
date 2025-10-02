@@ -11,7 +11,9 @@ use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
-use App\Http\Controllers\Admin\Akademik\JadwalPelajaranController;
+use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
+use App\Http\Controllers\Admin\Akademik\PaketKeahlianController;
+use App\Http\Controllers\Admin\Akademik\JurusanController;
 
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
@@ -37,20 +39,9 @@ use App\Http\Controllers\Admin\Laporan\LaporanAbsensiController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.dashboard');
 });
 
-
-/*
-|--------------------------------------------------------------------------
-| Rute Panel Guru
-|--------------------------------------------------------------------------
-*/
-Route::prefix('guru')->middleware(['auth'])->name('guru.')->group(function () {
-    Route::get('/absensi', [App\Http\Controllers\Guru\GuruAbsensiController::class, 'index'])->name('absensi.index');
-    Route::get('/absensi/kelas/{jadwal}', [App\Http\Controllers\Guru\GuruAbsensiController::class, 'show'])->name('absensi.show');
-    Route::post('/absensi/kelas', [App\Http\Controllers\Guru\GuruAbsensiController::class, 'store'])->name('absensi.store');
-});
 
 /*
 |--------------------------------------------------------------------------
@@ -64,63 +55,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
-    Route::prefix('laporan')->name('laporan.')->group(function() {
-    Route::get('absensi', [LaporanAbsensiController::class, 'index'])->name('absensi.index');
-    Route::get('absensi/export', [LaporanAbsensiController::class, 'export'])->name('absensi.export');
-        Route::get('absensi/tanpa-pulang', [LaporanAbsensiController::class, 'laporanTanpaPulang'])->name('absensi.tanpa_pulang');
-});
-     // --- GRUP ABSENSI ---
-    Route::prefix('absensi')->name('absensi.')->group(function () {
-        
-
-        // --- Grup Absensi Siswa (BAGIAN YANG DIPERBAIKI) ---
-        // Kita definisikan rute satu per satu untuk kejelasan
-        Route::prefix('siswa')->name('siswa.')->group(function() {
-            Route::get('/todays-scans', [AbsensiSiswaController::class, 'getTodaysScans'])->name('get_todays_scans');
-            
-            // Rute untuk menampilkan halaman PILIH KELAS
-            // URL: /admin/absensi/siswa
-            Route::get('/', [AbsensiSiswaController::class, 'index'])->name('index');
-
-            // Rute untuk menampilkan FORM ABSENSI untuk kelas & tanggal tertentu
-            // URL: /admin/absensi/siswa/form?rombel_id=...&tanggal=...
-            Route::get('/form', [AbsensiSiswaController::class, 'show'])->name('show_form');
-
-            // Rute untuk MENYIMPAN data absensi dari form
-            // URL: /admin/absensi/siswa (Method: POST)
-            Route::post('/', [AbsensiSiswaController::class, 'store'])->name('store');
-            
-            // Rute untuk scanner QR Code
-            // URL: /admin/absensi/siswa/scanner
-            Route::get('/scanner', [AbsensiSiswaController::class, 'showScanner'])->name('show_scanner');
-            
-            // Rute untuk menangani data dari scanner
-            // URL: /admin/absensi/siswa/handle-scan (Method: POST)
-            Route::post('/handle-scan', [AbsensiSiswaController::class, 'handleScan'])->name('handle_scan');
-        });
-        Route::resource('izin-siswa', \App\Http\Controllers\Admin\Absensi\IzinSiswaController::class);
-
-    });
-
-    
-    Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
-        
-        Route::get('absensi', [PengaturanAbsensiController::class, 'edit'])->name('absensi.edit');
-        Route::put('absensi', [PengaturanAbsensiController::class, 'update'])->name('absensi.update');
-
-        // Rute untuk Manajemen Hari Libur
-        Route::resource('hari-libur', HariLiburController::class)->except(['show', 'edit', 'update']);
-    });
-
+    // --- GRUP PENGATURAN ---
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
         Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
         Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
-        
+
+        // --- PENGATURAN WEB SERVICE BARU ---
         Route::prefix('webservice')->name('webservice.')->group(function () {
             Route::get('/', [ApiSettingsController::class, 'index'])->name('index');
         });
     });
-    
+
+    // --- GRUP KEPEGAWAIAN ---
     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
         Route::resource('pegawai', PegawaiController::class);
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
@@ -132,13 +78,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
         Route::resource('semester', SemesterController::class)->only(['index']);
         Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
-        
-        Route::get('jadwal', [JadwalPelajaranController::class, 'index'])->name('jadwal.index');
-        Route::get('jadwal/{rombel}/edit', [JadwalPelajaranController::class, 'edit'])->name('jadwal.edit');
-        Route::post('jadwal', [JadwalPelajaranController::class, 'store'])->name('jadwal.store');
-        Route::delete('jadwal/{jadwal}', [JadwalPelajaranController::class, 'destroy'])->name('jadwal.destroy');
+        Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
+        Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
+        Route::resource('jurusan', JurusanController::class)->only(['index']);
     });
-    
+
+    // --- GRUP KESISWAAN ---
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
         Route::get('/siswa/{siswa}/cetak-kartu', [SiswaController::class, 'cetakKartu'])->name('siswa.cetak_kartu');
         // Rute untuk menampilkan halaman pemilihan kelas
