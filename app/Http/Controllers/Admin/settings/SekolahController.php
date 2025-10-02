@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin\Settings;
 
 use App\Models\Sekolah;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 class SekolahController extends Controller

@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin\Kepegawaian;
 
 use App\Models\Gtk;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class GtkController extends Controller
 {
