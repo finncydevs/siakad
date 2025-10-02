@@ -103,22 +103,22 @@
                         <div data-i18n="Tahun Pelajaran">Tahun Pelajaran</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
                         <div data-i18n="Semester">Semester</div>
                     </a>
-                </li>
+                </li> --}}
                 <li class="menu-item {{ request()->is('admin/akademik/jurusan*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.jurusan.index') }}" class="menu-link">
                         <div data-i18n="Jurusan">Konsentrasi Keahlian</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/akademik/mapel*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
                         <div data-i18n="Semester">Mapel</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/akademik/ekstarakulikuler*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
                         <div data-i18n="Semester">Ekstrakulikuler</div>
                     </a>
