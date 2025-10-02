@@ -62,4 +62,23 @@ class LaporanAbsensiController extends Controller
         // Untuk saat ini, kita bisa redirect kembali dengan pesan.
         return back()->with('info', 'Fitur ekspor sedang dalam pengembangan.');
     }
+
+    public function laporanTanpaPulang()
+    {
+        // Set judul halaman
+        $title = 'Laporan Siswa Tanpa Absen Pulang';
+
+        // Ambil data siswa yang punya jam masuk tapi tidak punya jam pulang
+        // untuk semua tanggal SEBELUM hari ini.
+        $laporan = AbsensiSiswa::whereNotNull('jam_masuk')
+                                ->whereNull('jam_pulang')
+                                ->where('tanggal', '<', Carbon::today()->toDateString())
+                                ->with('siswa:id,nama') // Ambil data siswa yang relevan saja
+                                ->orderBy('tanggal', 'desc')
+                                ->orderBy('created_at', 'desc')
+                                ->paginate(20);
+
+        // Arahkan ke file view baru yang akan kita buat
+        return view('admin.laporan.absensi.tanpa_pulang', compact('laporan', 'title'));
+    }
 }

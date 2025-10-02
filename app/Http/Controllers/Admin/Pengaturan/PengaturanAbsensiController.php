@@ -4,48 +4,36 @@ namespace App\Http\Controllers\Admin\Pengaturan;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB; // Gunakan DB facade
 
 class PengaturanAbsensiController extends Controller
 {
     public function edit()
     {
-        // Ambil data pengaturan
-        $pengaturan = DB::table('pengaturan_absensi')->first();
-
-        // Jika tabel masih kosong, buat baris pengaturan default
-        if (!$pengaturan) {
-            DB::table('pengaturan_absensi')->insert([
-                'jam_masuk_sekolah' => '07:00:00',
-                'jam_pulang_sekolah' => '15:00:00',
-                'batas_toleransi_terlambat' => 15,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            // Ambil lagi data yang baru saja dibuat
-            $pengaturan = DB::table('pengaturan_absensi')->first();
-        }
-
+        // Ambil SEMUA pengaturan untuk 7 hari, diurutkan berdasarkan ID/urutan hari
+        $pengaturan = DB::table('pengaturan_absensi')->orderByRaw("FIELD(hari, 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu')")->get();
         return view('admin.pengaturan.absensi.edit', compact('pengaturan'));
     }
 
     public function update(Request $request)
     {
         $request->validate([
-            'jam_masuk_sekolah' => 'required',
-            'jam_pulang_sekolah' => 'required',
-            'batas_toleransi_terlambat' => 'required|integer|min:0',
+            'pengaturan' => 'required|array',
+            'pengaturan.*.jam_masuk_sekolah' => 'required|date_format:H:i',
+            'pengaturan.*.jam_pulang_sekolah' => 'required|date_format:H:i',
+            'pengaturan.*.batas_toleransi_terlambat' => 'required|integer|min:0',
         ]);
 
-        // Selalu update baris pertama
-        DB::table('pengaturan_absensi')->where('id', 1)->update([
-            'jam_masuk_sekolah' => $request->jam_masuk_sekolah,
-            'jam_pulang_sekolah' => $request->jam_pulang_sekolah,
-            'batas_toleransi_terlambat' => $request->batas_toleransi_terlambat,
-            'updated_at' => now(),
-        ]);
+        foreach ($request->pengaturan as $id => $data) {
+            DB::table('pengaturan_absensi')->where('id', $id)->update([
+                'jam_masuk_sekolah' => $data['jam_masuk_sekolah'],
+                'jam_pulang_sekolah' => $data['jam_pulang_sekolah'],
+                'batas_toleransi_terlambat' => $data['batas_toleransi_terlambat'],
+                'is_active' => isset($data['is_active']) ? 1 : 0, // Cek apakah checkbox dicentang
+                'updated_at' => now(),
+            ]);
+        }
 
         return back()->with('success', 'Pengaturan absensi berhasil diperbarui.');
     }
 }
-

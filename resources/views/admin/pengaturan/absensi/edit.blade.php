@@ -1,42 +1,57 @@
 @extends('layouts.admin')
 
 @section('content')
-<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Pengaturan /</span> Pengaturan Absensi</h4>
+<h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Pengaturan Sistem /</span> Pengaturan Absensi
+</h4>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Atur Jam Sekolah & Toleransi</h5>
+    <div class="col-md-12">
+        <form action="{{ route('admin.pengaturan.absensi.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            <div class="accordion" id="accordionPengaturan">
+                @foreach ($pengaturan as $item)
+                <div class="card accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ $item->hari }}">
+                        <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $item->hari }}" aria-expanded="false" aria-controls="collapse-{{ $item->hari }}">
+                            <i class='bx bxs-calendar-edit me-2'></i>
+                            <strong>Pengaturan Hari {{ $item->hari }}</strong>
+                        </button>
+                    </h2>
+                    <div id="collapse-{{ $item->hari }}" class="accordion-collapse collapse" data-bs-parent="#accordionPengaturan">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <label for="jam_masuk_{{ $item->id }}" class="form-label">Jam Masuk Sekolah</label>
+                                    <input class="form-control" type="time" name="pengaturan[{{ $item->id }}][jam_masuk_sekolah]" value="{{ \Carbon\Carbon::parse($item->jam_masuk_sekolah)->format('H:i') }}" id="jam_masuk_{{ $item->id }}">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="jam_pulang_{{ $item->id }}" class="form-label">Jam Pulang Sekolah</label>
+                                    <input class="form-control" type="time" name="pengaturan[{{ $item->id }}][jam_pulang_sekolah]" value="{{ \Carbon\Carbon::parse($item->jam_pulang_sekolah)->format('H:i') }}" id="jam_pulang_{{ $item->id }}">
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <label for="toleransi_{{ $item->id }}" class="form-label">Batas Toleransi Terlambat (Menit)</label>
+                                    <input class="form-control" type="number" name="pengaturan[{{ $item->id }}][batas_toleransi_terlambat]" value="{{ $item->batas_toleransi_terlambat }}" id="toleransi_{{ $item->id }}">
+                                </div>
+                                <div class="col-md-3 mb-3 d-flex align-items-end">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="pengaturan[{{ $item->id }}][is_active]" id="is_active_{{ $item->id }}" {{ $item->is_active ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_active_{{ $item->id }}">Absensi Aktif</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
             </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
-                
-                <form action="{{ route('admin.pengaturan.absensi.update') }}" method="POST">
-                    @csrf
-                    @method('PUT')
 
-                    <div class="mb-3">
-                        <label for="jam_masuk_sekolah" class="form-label">Jam Masuk Sekolah</label>
-                        <input type="time" class="form-control" id="jam_masuk_sekolah" name="jam_masuk_sekolah" value="{{ $pengaturan->jam_masuk_sekolah }}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="jam_pulang_sekolah" class="form-label">Jam Pulang Sekolah</label>
-                        <input type="time" class="form-control" id="jam_pulang_sekolah" name="jam_pulang_sekolah" value="{{ $pengaturan->jam_pulang_sekolah }}">
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="batas_toleransi_terlambat" class="form-label">Batas Toleransi Terlambat (Menit)</label>
-                        <input type="number" class="form-control" id="batas_toleransi_terlambat" name="batas_toleransi_terlambat" value="{{ $pengaturan->batas_toleransi_terlambat }}">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
-                </form>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 @endsection

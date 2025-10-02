@@ -67,6 +67,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('laporan')->name('laporan.')->group(function() {
     Route::get('absensi', [LaporanAbsensiController::class, 'index'])->name('absensi.index');
     Route::get('absensi/export', [LaporanAbsensiController::class, 'export'])->name('absensi.export');
+        Route::get('absensi/tanpa-pulang', [LaporanAbsensiController::class, 'laporanTanpaPulang'])->name('absensi.tanpa_pulang');
 });
      // --- GRUP ABSENSI ---
     Route::prefix('absensi')->name('absensi.')->group(function () {
@@ -97,6 +98,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // URL: /admin/absensi/siswa/handle-scan (Method: POST)
             Route::post('/handle-scan', [AbsensiSiswaController::class, 'handleScan'])->name('handle_scan');
         });
+        Route::resource('izin-siswa', \App\Http\Controllers\Admin\Absensi\IzinSiswaController::class);
 
     });
 

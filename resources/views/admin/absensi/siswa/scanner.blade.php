@@ -229,9 +229,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
 <script>
-// Tidak ada perubahan sama sekali pada JavaScript, karena logika tetap sama.
-// Ini menunjukkan pemisahan yang baik antara struktur (HTML), tampilan (CSS), dan logika (JS).
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi variabel ---
     const modalEl = document.getElementById('scanResultModal');
     const scanResultModal = new bootstrap.Modal(modalEl);
     const modalContent = modalEl.querySelector('.modal-content');
@@ -242,9 +241,32 @@ document.addEventListener('DOMContentLoaded', function () {
     const recentScansList = document.getElementById('recent-scans-list');
     let isScanning = false;
 
-    const successSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 } }).toDestination();
-    const errorSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+    // --- Inisialisasi Audio ---
+    let successSynth, errorSynth;
+    let isAudioReady = false;
 
+    // Fungsi untuk menginisialisasi audio setelah interaksi pengguna
+    async function initAudio() {
+        if (isAudioReady) return;
+        try {
+            await Tone.start();
+            successSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 } }).toDestination();
+            errorSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
+            isAudioReady = true;
+            console.log('AudioContext is ready!');
+            // Hapus listener setelah berhasil agar tidak berjalan lagi
+            document.body.removeEventListener('click', initAudio);
+            document.body.removeEventListener('touchend', initAudio);
+        } catch (e) {
+            console.error("Could not start AudioContext:", e);
+        }
+    }
+
+    // Tambahkan listener untuk klik atau sentuhan pertama kali
+    document.body.addEventListener('click', initAudio, { once: true });
+    document.body.addEventListener('touchend', initAudio, { once: true });
+    
+    // --- Jam & Fullscreen ---
     const timeEl = document.getElementById('clock-time');
     const dateEl = document.getElementById('clock-date');
     function updateClock() {
@@ -258,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const mainContent = document.querySelector('.layout-page'); 
     fullscreenBtn.addEventListener('click', () => {
+        initAudio(); // Coba aktifkan audio saat tombol fullscreen diklik juga
         if (!document.fullscreenElement) {
             mainContent.requestFullscreen().catch(err => alert(`Error: ${err.message}`));
         } else if (document.exitFullscreen) {
@@ -269,7 +292,8 @@ document.addEventListener('DOMContentLoaded', function () {
             ? "<i class='bx bx-exit-fullscreen'></i>" 
             : "<i class='bx bx-fullscreen'></i>";
     });
-
+    
+    // --- Fungsi Tambah Data ke Daftar Aktivitas ---
     function addScanToList(scanData) {
         if (recentScansList.querySelector('.text-center')) {
             recentScansList.innerHTML = '';
@@ -277,7 +301,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const li = document.createElement('li');
         const scanTime = scanData.jam_masuk ? new Date(`1970-01-01T${scanData.jam_masuk}`).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
         
-        // Menggunakan class badge bawaan dari Sneat/Bootstrap
         let statusBadge = '';
         if (scanData.status_kehadiran === 'Tepat Waktu') {
             statusBadge = `<span class="badge rounded-pill bg-label-success status-badge">Masuk</span>`;
@@ -287,7 +310,6 @@ document.addEventListener('DOMContentLoaded', function () {
             statusBadge = `<span class="badge rounded-pill bg-label-info status-badge">Pulang</span>`;
         }
 
-        const inisial = scanData.siswa.nama.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
         const photoUrl = scanData.siswa.foto ? `{{ asset('storage') }}/${scanData.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(scanData.siswa.nama)}&background=696cff&color=fff&size=45`;
         
         li.innerHTML = `
@@ -304,7 +326,8 @@ document.addEventListener('DOMContentLoaded', function () {
             recentScansList.lastChild.remove();
         }
     }
-
+    
+    // --- Fungsi Ambil Data Awal ---
     function fetchInitialScans() {
         fetch("{{ route('admin.absensi.siswa.get_todays_scans') }}")
             .then(response => response.json())
@@ -322,95 +345,180 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     }
 
+    // --- Fungsi Tampilkan Notifikasi Modal ---
     function showFeedback(type, message, studentName, statusInfo, photoUrl) {
         modalContent.className = `modal-content text-center status-${type}`;
+        
         let iconClass = '';
-        if (type === 'success') iconClass = 'bx bx-check';
-        else if (type === 'warning') iconClass = 'bx bx-time-five';
-        else if (type === 'info') iconClass = 'bx bx-log-out';
-        else iconClass = 'bx bx-x';
+        if (type === 'loading') {
+            iconClass = 'bx bx-loader-alt bx-spin';
+        } else if (type === 'success') {
+            iconClass = 'bx bx-check';
+        } else if (type === 'warning') {
+            iconClass = 'bx bx-error-circle';
+        } else if (type === 'info') {
+            iconClass = 'bx bx-log-out';
+        } else {
+            iconClass = 'bx bx-x';
+        }
         
         modalIcon.innerHTML = `<i class='${iconClass}'></i>`;
-        modalPhoto.src = photoUrl;
+        modalPhoto.src = photoUrl || `https://ui-avatars.com/api/?name=?&background=dee3e0&color=fff&size=120`;
         modalName.textContent = studentName;
         modalStatus.textContent = statusInfo;
         
-        if (type === 'danger') errorSynth.triggerAttackRelease("C3", "0.2");
-        else successSynth.triggerAttackRelease("C5", "0.1");
+        if (isAudioReady && type !== 'loading') {
+            if (type === 'danger' || type === 'warning') {
+                errorSynth.triggerAttackRelease("C3", "0.2");
+            } else {
+                successSynth.triggerAttackRelease("C5", "0.1");
+            }
+        }
         
         scanResultModal.show();
-        setTimeout(() => scanResultModal.hide(), 3500);
+        
+        if (type !== 'loading') {
+            setTimeout(() => scanResultModal.hide(), 3500);
+        }
     }
     
+    // --- Fungsi Logika Utama Saat Scan Berhasil ---
     function onScanSuccess(decodedText, decodedResult) {
-    // Mencegah pemindaian ganda jika permintaan sebelumnya masih diproses
-    if (isScanning) return;
-    isScanning = true;
+        if (isScanning) return;
+        isScanning = true;
 
-    // Menampilkan feedback visual bahwa pemindaian sedang diproses
-    // (Opsional, tapi meningkatkan user experience)
-    const photoPlaceholder = `https://ui-avatars.com/api/?name=?&background=696cff&color=fff&size=120`;
-    showFeedback('info', 'Memproses...', 'Mohon Tunggu', 'Mengirim data ke server...', photoPlaceholder);
-
-    fetch("{{ route('admin.absensi.siswa.handle_scan') }}", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}' // Pastikan token CSRF ini ada
-        },
-        body: JSON.stringify({ token: decodedText })
-    })
-    .then(response => {
-        // --- PERBAIKAN UTAMA DI SINI ---
-        // Cek dulu apakah respons dari server itu sukses (status code 200-299).
-        // Jika tidak (misal: error 500), maka lemparkan error agar ditangkap oleh .catch().
-        if (!response.ok) {
-            // Kita coba baca teks error dari server jika ada, untuk debugging
-            return response.text().then(text => { 
-                throw new Error(`Server Error: ${response.status} ${response.statusText}. Response: ${text}`);
-            });
-        }
-        // Jika respons OK, baru kita proses sebagai JSON.
-        return response.json();
-    })
-    .then(data => {
-        // Logika ini dijalankan HANYA jika server merespons dengan sukses (response.ok)
-        if (data.success) {
-            let statusType = 'success';
-            let statusMessage = '';
-            if (data.status === 'Terlambat') {
-                statusType = 'warning';
-                statusMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
-            } else if (data.status === 'Tepat Waktu') {
-                statusType = 'success';
-                statusMessage = 'Status: Hadir Tepat Waktu.';
-            } else if (data.status === 'Pulang') {
-                statusType = 'info';
-                statusMessage = 'Status: Absen Pulang Tercatat.';
+        const loadingSpinnerUrl = `https://ui-avatars.com/api/?name=.&background=dee3e0&color=fff&size=120&font-size=0.1`;
+        showFeedback('loading', '', 'Memproses...', 'Mohon tunggu sebentar...', loadingSpinnerUrl);
+        
+        fetch("{{ route('admin.absensi.siswa.handle_scan') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ token: decodedText })
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(errorData => {
+                    let err = new Error(errorData.message || 'Error tidak diketahui');
+                    err.data = errorData;
+                    throw err;
+                });
             }
-            showFeedback(statusType, data.message, data.siswa.nama, statusMessage, data.foto);
-            fetchInitialScans(); // Muat ulang daftar aktivitas
-        } else {
-            // Menangani kasus di mana server merespons success=false (misal: QR tidak valid)
-            const errorPhoto = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
-            showFeedback('danger', 'Gagal', data.message, 'Silakan coba lagi.', errorPhoto);
-        }
-    })
-    .catch(error => {
-        // Blok ini sekarang akan menangkap error jaringan DAN error dari server (seperti 500)
-        console.error('Fetch Error:', error);
-        const errorPhoto = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
-        showFeedback('danger', 'Error Kritis', 'Gagal memproses permintaan.', 'Periksa log server atau koneksi.', errorPhoto);
-    })
-    .finally(() => {
-        // Setelah 3.6 detik, izinkan pemindaian lagi
-        setTimeout(() => { isScanning = false; }, 3600);
-    });
-}
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                let statusType = 'success';
+                let statusMessage = '';
+                if (data.status === 'Terlambat') {
+                    statusType = 'warning';
+                    statusMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
+                } else if (data.status === 'Tepat Waktu') {
+                    statusType = 'success';
+                    statusMessage = 'Status: Hadir Tepat Waktu.';
+                } else if (data.status === 'Pulang') {
+                    statusType = 'info';
+                    statusMessage = 'Status: Absen Pulang Tercatat.';
+                }
+                showFeedback(statusType, data.message, data.siswa.nama, statusMessage, data.foto);
+                fetchInitialScans();
+            } else {
+                const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
+                showFeedback('danger', 'Gagal', data.message, 'Silakan coba lagi.', photoPlaceholder);
+            }
+        })
+        .catch(error => {
+    console.error('Scan Error:', error);
+    if (error.data && error.data.siswa) {
+        const studentName = error.data.siswa.nama;
+        const photoUrl = error.data.siswa.foto 
+            ? `{{ asset('storage') }}/${error.data.siswa.foto}` 
+            : `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=ffab00&color=fff&size=120`;
+        
+        // === GANTI DENGAN VERSI YANG LEBIH BAIK INI ===
+        showFeedback('warning', 'Peringatan', studentName, error.message, photoUrl);
     
-    const html5QrcodeScanner = new Html5QrcodeScanner( "qr-reader", { fps: 10, qrbox: { width: 250, height: 250 }, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA], rememberLastUsedCamera: true }, false );
-    html5QrcodeScanner.render(onScanSuccess, (error) => {});
+    } else {
+        const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
+        showFeedback('danger', 'Error Kritis', error.message || 'Tidak dapat memproses permintaan.', 'Periksa koneksi atau hubungi admin.', photoPlaceholder);
+    }
+        })
+        .finally(() => {
+            setTimeout(() => { isScanning = false; }, 2500); 
+        });
+    }
     
+    // --- Logika Pengecekan & Inisialisasi Scanner ---
+    const readerEl = document.getElementById('qr-reader');
+    
+    function startScanner(config) {
+        const html5QrcodeScanner = new Html5QrcodeScanner(
+            "qr-reader",
+            config,
+            false // verbose
+        );
+        html5QrcodeScanner.render(onScanSuccess, (error) => {
+            // Callback error ini sengaja dikosongkan karena akan sering ter-trigger
+            // saat kamera mencari QR code. Penanganan error utama dilakukan
+            // saat pengecekan izin di awal.
+        });
+    }
+
+    const baseConfig = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+        rememberLastUsedCamera: true
+    };
+    
+    // Cek apakah browser mendukung akses media
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        // Buat konfigurasi yang fleksibel untuk kamera
+        const videoConstraints = {
+            facingMode: "user" // Prioritaskan kamera yang menghadap pengguna (webcam)
+        };
+
+        const fullConfig = {
+            ...baseConfig,
+            camera: {
+                videoConstraints: videoConstraints
+            }
+        };
+
+        // Minta daftar kamera untuk memastikan ada kamera yang terhubung dan izin diberikan
+        Html5Qrcode.getCameras().then(cameras => {
+            if (cameras && cameras.length) {
+                console.log("Kamera terdeteksi:", cameras);
+                // Jika ada kamera, mulai scanner dengan konfigurasi yang sudah disiapkan
+                startScanner(fullConfig);
+            } else {
+                // Jika tidak ada kamera yang terdeteksi sama sekali
+                throw new Error("Tidak ada kamera yang ditemukan di perangkat ini.");
+            }
+        }).catch(err => {
+            // Tangani error jika gagal mendapatkan daftar kamera,
+            // ini biasanya terjadi karena pengguna menolak izin akses kamera.
+            console.error("Gagal mendapatkan daftar kamera:", err);
+            readerEl.innerHTML = `
+                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                    <i class='bx bx-error-circle me-2' style="font-size: 1.5rem;"></i>
+                    <div>
+                        <strong>Akses Kamera Gagal.</strong><br>
+                        Pastikan Anda telah memberikan izin dan tidak ada aplikasi lain yang sedang menggunakan kamera.
+                    </div>
+                </div>
+            `;
+        });
+
+    } else {
+        // Jika browser tidak mendukung fitur ini sama sekali
+        console.error("getUserMedia tidak didukung oleh browser ini.");
+        readerEl.innerHTML = `<div class="alert alert-danger">Browser Anda tidak mendukung akses kamera.</div>`;
+    }
+    
+    // Panggil fungsi untuk memuat data aktivitas awal
     fetchInitialScans();
 });
 </script>
