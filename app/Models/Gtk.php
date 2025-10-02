@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+<<<<<<< HEAD
 class Gtk extends Model // <-- UBAH DI SINI
 {
     use HasFactory;
@@ -35,3 +36,16 @@ class Gtk extends Model // <-- UBAH DI SINI
     //     return $this->hasMany(TugasPegawai::class);
     // }
 }
+=======
+class Gtk extends Model
+{
+    use HasFactory;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'gtks';
+}
+>>>>>>> origin/modul/absensi

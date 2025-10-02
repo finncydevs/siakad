@@ -12,12 +12,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
             $table->foreignId('iuran_id')->constrained('iurans')->onDelete('cascade');
-            $table->foreignId('iuran_id')->constrained('iurans')->onDelete('cascade');
 $table->foreignId('tagihan_id')->nullable()->constrained('tagihans')->onDelete('set null');
 $table->foreignId('tunggakan_id')->nullable()->constrained('tunggakans')->onDelete('set null'); // <-- TAMBAHKAN INI
 $table->date('tanggal_bayar');
-            $table->foreignId('tagihan_id')->nullable()->constrained('tagihans')->onDelete('set null');
-            $table->date('tanggal_bayar');
             $table->unsignedBigInteger('jumlah_bayar');
             $table->unsignedBigInteger('master_kas_id');
             $table->unsignedBigInteger('acc_jurnal_id')->nullable();

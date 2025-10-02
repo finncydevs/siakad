@@ -6,29 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('kas_mutasis', function (Blueprint $table) {
+        Schema::create('master_kas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('master_kas_id')->constrained('master_kas')->onDelete('cascade');
-            $table->date('tanggal');
-            $table->string('sumber_transaksi')->nullable(); // Contoh: 'Pembayaran', 'Pengeluaran', 'Gaji'
-            $table->unsignedBigInteger('transaksi_id')->nullable(); // ID dari tabel sumber (pembayarans, pengeluarans, dll)
-            $table->text('keterangan');
-            $table->unsignedBigInteger('debit')->default(0);  // Kolom untuk uang masuk
-            $table->unsignedBigInteger('kredit')->default(0); // Kolom untuk uang keluar
+            $table->string('nama_kas');
+            $table->unsignedBigInteger('saldo_awal')->default(0);
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('kas_mutasis');
+        Schema::dropIfExists('master_kas');
     }
 };
