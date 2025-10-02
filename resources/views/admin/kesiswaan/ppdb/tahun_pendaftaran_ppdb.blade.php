@@ -43,10 +43,10 @@
                     <form action="{{ route('admin.kesiswaan.ppdb.tahun-ppdb.toggleActive', $tahun->id) }}" method="POST" class="me-1">
                       @csrf
                       <button type="submit" 
-                        class="btn btn-icon btn-sm @if($tahun->is_active) text-success @else text-info @endif"
+                        class="btn btn-icon btn-sm @if($tahun->is_active) text-danger @else text-info @endif"
                         data-bs-toggle="tooltip" data-bs-placement="top" 
                         title="@if($tahun->is_active) Non Aktifkan @else Aktifkan Jalur @endif">
-                        <i class='bx @if($tahun->is_active) bx-check-square @else bx-power-off @endif'></i>
+                        <i class='bx @if($tahun->is_active) bx-block @else bx-power-off @endif'></i>
                       </button>
                     </form>
 

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CalonSiswa;
+use App\Models\TahunPelajaran;
 
 class DaftarCalonPesertaDidikController extends Controller
 {
@@ -12,7 +14,18 @@ class DaftarCalonPesertaDidikController extends Controller
      */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.daftar_calon_peserta_didik');
+        // ambil tahun pelajaran aktif
+        $tahunAktif = TahunPelajaran::where('is_active', true)->first();
+
+        // kalau ada tahun aktif, ambil calon siswa sesuai tahun tsb
+        $formulirs = [];
+        if ($tahunAktif) {
+            $formulirs = CalonSiswa::with(['jalurPendaftaran', 'syarat'])
+                ->where('tahun_id', $tahunAktif->id)
+                ->get();
+        }
+
+        return view('admin.kesiswaan.ppdb.daftar_calon_peserta_didik', compact('formulirs', 'tahunAktif'));
     }
 
     /**

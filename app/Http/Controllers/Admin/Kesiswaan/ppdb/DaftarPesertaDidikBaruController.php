@@ -1,18 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Kesiswaan\ppdb;
+namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CalonSiswa;
+use App\Models\TahunPelajaran;
 
 class DaftarPesertaDidikBaruController extends Controller
 {
-     /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.daftar_peserta_didik_baru');
+        // Ambil tahun aktif
+        $tahunAktif = TahunPelajaran::where('is_active', true)->first();
+
+        $pesertaDidik = collect();
+
+        if ($tahunAktif) {
+            // Ambil calon siswa tahun aktif beserta relasi
+            $calonSiswas = CalonSiswa::with(['jalurPendaftaran.syaratPendaftaran', 'syarat'])
+                ->where('tahun_id', $tahunAktif->id)
+                ->get();
+
+            // Filter hanya yang sudah memenuhi semua syarat
+            $pesertaDidik = $calonSiswas->filter(function ($calon) {
+                $totalSyarat = $calon->jalurPendaftaran
+                    ? $calon->jalurPendaftaran->syaratPendaftaran()->count()
+                    : 0;
+
+                $syaratTerpenuhi = $calon->syarat->where('pivot.is_checked', true)->count();
+
+                return $totalSyarat > 0 && $syaratTerpenuhi >= $totalSyarat;
+            });
+        }
+
+        return view('admin.kesiswaan.ppdb.daftar_peserta_didik_baru', compact('pesertaDidik', 'tahunAktif'));
     }
 
     /**

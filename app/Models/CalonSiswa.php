@@ -12,6 +12,7 @@ class CalonSiswa extends Model
     protected $fillable = [
         'tahun_id', 
         'jalur_id', 
+        'nomor_resi',
         'nama_lengkap', 
         'nisn', 
         'npun',

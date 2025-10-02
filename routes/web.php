@@ -104,12 +104,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
             
 
-            Route::get('/get-syarat/{jalurId}', function ($jalurId) {
-    $syarat = \App\Models\SyaratPendaftaran::where('jalurPendaftaran_id', $jalurId)
-                ->where('is_active', 1)
-                ->get(['id','syarat']);
-    return response()->json($syarat);
-});
+            Route::get('/get-syarat/{jalurId}', [SyaratController::class, 'getByJalur'])->name('admin.kesiswaan.ppdb.get-syarat');
 
 
 

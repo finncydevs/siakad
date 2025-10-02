@@ -35,6 +35,8 @@
                             <a href="javascript:void(0);" 
                                class="btn btn-icon btn-sm btn-outline-primary me-1 btn-edit"
                                data-id="{{ $quota->id }}"
+                               data-tahunid="{{ $quota->tahunPpdb?->id ?? '' }}"
+                               data-tahun="{{ $quota->tahunPpdb->tahun_pelajaran ?? '-' }}"
                                data-keahlian="{{ $quota->keahlian }}"
                                data-jumlah="{{ $quota->jumlah_kelas }}"
                                data-quota="{{ $quota->quota }}"
@@ -120,6 +122,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label>Tahun Pendaftaran</label>
+                        <input type="text" class="form-control" id="editTahun" readonly>
+                        <input type="hidden" name="editTahun_id" id="editTahunId">
+                    </div>
+                    <div class="mb-3">
                         <label>Keahlian</label>
                         <input type="text" id="editKeahlian" name="keahlian" class="form-control" required>
                     </div>
@@ -150,18 +157,21 @@ document.addEventListener("DOMContentLoaded", function() {
     editButtons.forEach(btn => {
         btn.addEventListener("click", function() {
             const id = this.dataset.id;
-            const keahlian = this.dataset.keahlian;
-            const jumlah = this.dataset.jumlah;
-            const quota = this.dataset.quota;
-
             formEdit.action = `/admin/kesiswaan/ppdb/quota-ppdb/${id}`;
-            document.getElementById("editKeahlian").value = keahlian;
-            document.getElementById("editJumlah").value = jumlah;
-            document.getElementById("editQuota").value = quota;
+
+            // otomatis mapping semua dataset ke input dengan id yang cocok
+            Object.keys(this.dataset).forEach(key => {
+                const input = document.getElementById("edit" + key.charAt(0).toUpperCase() + key.slice(1));
+                if (input) {
+                    input.value = this.dataset[key];
+                }
+            });
 
             modal.show();
         });
     });
 });
 </script>
+
+
 @endsection

@@ -22,16 +22,20 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {{-- Contoh data statis (sementara) --}}
-                        <tr>
-                            <td>1</td>
-                            <td><span class="fw-bold text-primary">RESI-001</span></td>
-                            <td>Ahmad Fauzi</td>
-                            <td>Laki-Laki</td>
-                            <td>Rekayasa Perangkat Lunak</td>
-                            <td>Bandung, 12 Agustus 2008</td>
-                        </tr>
-                        {{-- Nanti bisa diganti looping dari database --}}
+                        @forelse ($pesertaDidik as $i => $peserta)
+                            <tr>
+                                <td>{{ $i+1 }}</td>
+                                <td><span class="fw-bold text-primary">{{ $peserta->nomor_resi }}</span></td>
+                                <td>{{ $peserta->nama_lengkap }}</td>
+                                <td>{{ $peserta->jenis_kelamin }}</td>
+                                <td>{{ $peserta->jurusan }}</td>
+                                <td>{{ $peserta->tempat_lahir }}, {{ \Carbon\Carbon::parse($peserta->tanggal_lahir)->translatedFormat('d F Y') }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">Belum ada peserta didik baru</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>

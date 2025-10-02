@@ -11,13 +11,16 @@
             <div class="card-header d-flex align-items-center">
                 <h5 class="mb-0">{{ isset($formulir) ? 'Edit Calon Siswa' : 'Tambah Calon Siswa' }}</h5>
                 <div class="ms-auto d-flex gap-2">
-                    <button type="submit" form="calonSiswaForm" class="btn btn-primary d-flex align-items-center">
+                    <button type="submit" name="action" value="update" 
+                            form="calonSiswaForm" class="btn btn-primary d-flex align-items-center">
                         <i class='bx bx-save me-1'></i> Simpan
                     </button>
-                    <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.index') }}" 
-                       class="btn btn-success d-flex align-items-center">
+                    
+                    <button type="submit" name="action" value="create" 
+                            form="calonSiswaForm" class="btn btn-success d-flex align-items-center">
                         <i class='bx bx-plus me-1'></i> Baru
-                    </a>
+                    </button>
+
                 </div>
             </div>
 
@@ -48,12 +51,12 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">NISN</label>
-                                <input type="text" name="nisn" class="form-control"
+                                <input type="number" name="nisn" class="form-control"
                                        value="{{ old('nisn', $formulir->nisn ?? '') }}">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">NPUN</label>
-                                <input type="text" name="npun" class="form-control"
+                                <input type="number" name="npun" class="form-control"
                                        value="{{ old('npun', $formulir->npun ?? '') }}">
                             </div>
                             <div class="mb-3">
@@ -122,12 +125,12 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kode Pos</label>
-                                <input type="text" name="kode_pos" class="form-control"
+                                <input type="number" name="kode_pos" class="form-control"
                                        value="{{ old('kode_pos', $formulir->kode_pos ?? '') }}">
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kontak</label>
-                                <input type="text" name="kontak" class="form-control"
+                                <input type="number" name="kontak" class="form-control"
                                        value="{{ old('kontak', $formulir->kontak ?? '') }}">
                             </div>
                         </div>
@@ -209,59 +212,93 @@
         </div>
     </div>
 </div>
-@endsection 
 
-@section('scripts')
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const jalurSelect = document.getElementById("jalurPendaftaran");
-    const syaratContainer = document.getElementById("syaratContainer");
+document.getElementById('jalurPendaftaran').addEventListener('change', function () {
+    let jalurId = this.value;
 
-    // Kalau edit → ada syarat yang sudah tercentang
-    let checkedSyarat = @json(isset($formulir) ? $formulir->syarat->pluck('id') : []);
-
-    function loadSyarat(jalurId) {
-        if(!jalurId) {
-            syaratContainer.innerHTML = 'Silahkan pilih jalur terlebih dahulu';
-            return;
-        }
-
-        fetch("{{ url('admin/kesiswaan/ppdb/get-syarat') }}/" + jalurId)
-            .then(res => res.json())
+    if (jalurId) {
+        fetch(`/admin/kesiswaan/ppdb/get-syarat/${jalurId}`)
+            .then(response => response.json())
             .then(data => {
-                syaratContainer.innerHTML = '';
+                let container = document.getElementById('syaratContainer');
+                container.innerHTML = "";
 
-                if (data.length === 0) {
-                    syaratContainer.innerHTML = 'Tidak ada syarat aktif untuk jalur ini';
-                    return;
+                if (data.length > 0) {
+                    let list = "";
+                    data.forEach(item => {
+                        list += `
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="syarat_id[]" value="${item.id}" id="syarat_${item.id}">
+                                <label class="form-check-label" for="syarat_${item.id}">
+                                    ${item.syarat}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = list;
+                } else {
+                    container.innerHTML = "<p class='text-muted'>Tidak ada syarat untuk jalur ini</p>";
                 }
-
-                data.forEach(s => {
-                    const checked = checkedSyarat.includes(s.id) ? 'checked' : '';
-                    syaratContainer.innerHTML += `
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="syarat_${s.id}" 
-                                   name="documents[${s.id}]" ${checked}>
-                            <label class="form-check-label" for="syarat_${s.id}">${s.syarat}</label>
-                        </div>
-                    `;
-                });
             })
-            .catch(err => {
-                console.error("Error ambil syarat:", err);
-                syaratContainer.innerHTML = 'Gagal memuat syarat';
-            });
-    }
-
-    // Event saat ganti jalur
-    jalurSelect.addEventListener("change", function() {
-        loadSyarat(this.value);
-    });
-
-    // Kalau edit mode langsung load syarat sesuai jalur tersimpan
-    if(jalurSelect.value) {
-        loadSyarat(jalurSelect.value);
+            .catch(error => console.error("Error:", error));
+    } else {
+        document.getElementById('syaratContainer').innerHTML = "Silahkan pilih jalur terlebih dahulu";
     }
 });
+
+function loadSyarat(jalurId, selectedSyarats = []) {
+    if (jalurId) {
+        fetch(`/admin/kesiswaan/ppdb/get-syarat/${jalurId}`)
+            .then(response => response.json())
+            .then(data => {
+                let container = document.getElementById('syaratContainer');
+                container.innerHTML = "";
+
+                if (data.length > 0) {
+                    let list = "";
+                    data.forEach(item => {
+                        let checked = selectedSyarats.includes(item.id) ? "checked" : "";
+                        list += `
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="syarat_id[]" value="${item.id}" id="syarat_${item.id}" ${checked}>
+                                <label class="form-check-label" for="syarat_${item.id}">
+                                    ${item.syarat}
+                                </label>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = list;
+                } else {
+                    container.innerHTML = "<p class='text-muted'>Tidak ada syarat untuk jalur ini</p>";
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    } else {
+        document.getElementById('syaratContainer').innerHTML = "Silahkan pilih jalur terlebih dahulu";
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    let jalurSelect = document.getElementById('jalurPendaftaran');
+
+    // 🔹 Kalau sedang edit, ambil syarat yang sudah dipilih
+    let selectedSyarats = @json(isset($formulir) ? $formulir->syarat->pluck('id')->toArray() : []);
+
+    // load awal kalau jalur sudah kepilih
+    if (jalurSelect.value) {
+        loadSyarat(jalurSelect.value, selectedSyarats);
+    }
+
+    // load ulang kalau user ganti jalur
+    jalurSelect.addEventListener('change', function () {
+        loadSyarat(this.value, []);
+    });
+});
+
 </script>
-@endsection
+@endsection 
+
+
