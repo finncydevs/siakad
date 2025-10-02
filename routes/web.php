@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\Kepegawaian\TugasPegawaiController;
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
+use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
+use App\Http\Controllers\Admin\Akademik\PaketKeahlianController; 
+use App\Http\Controllers\Admin\Akademik\JurusanController;
 
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
@@ -33,8 +36,7 @@ use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 */
 
 Route::get('/', function () {
-    // Arahkan ke dashboard admin saat membuka halaman utama
-    return redirect()->route('admin.dashboard');
+    return view('admin.dashboard');
 });
 
 
@@ -59,25 +61,36 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // --- GRUP KEPEGAWAIAN ---
-    Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
-        Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
-        Route::resource('gtk', GtkController::class);
+     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
+        // Route untuk Guru
+        Route::prefix('guru')->name('guru.')->controller(GtkController::class)->group(function () {
+            Route::get('/', 'indexGuru')->name('index');
+            Route::get('/export/excel', 'exportGuruExcel')->name('export.excel');
+        });
+
+        // Route untuk Tenaga Kependidikan
+        Route::prefix('tenaga-kependidikan')->name('tendik.')->controller(GtkController::class)->group(function () {
+            Route::get('/', 'indexTendik')->name('index');
+            Route::get('/export/excel', 'exportTendikExcel')->name('export.excel');
+        });
+
+        // Route untuk detail multi-GTK
+        Route::get('/gtk/show-multiple', [GtkController::class, 'showMultiple'])->name('gtk.show-multiple');
+        
+        // Route untuk Tugas Pegawai
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
 
+
     // --- GRUP AKADEMIK ---
     Route::prefix('akademik')->name('akademik.')->group(function () {
-        Route::controller(TapelController::class)->prefix('tapel')->name('tapel.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::delete('/{tapel}', 'destroy')->name('destroy');
-            Route::patch('/{tapel}/toggle', 'toggleStatus')->name('toggle');
-        });
-
-        Route::controller(SemesterController::class)->prefix('semester')->name('semester.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::patch('/{semester}/toggle', 'toggle')->name('toggle');
-        });
+        Route::resource('tapel', TapelController::class)->only(['index', 'store', 'destroy']);
+        Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
+        Route::resource('semester', SemesterController::class)->only(['index']);
+        Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
+        Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
+        Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
+        Route::resource('jurusan', JurusanController::class)->only(['index']);
     });
 
     // --- GRUP KESISWAAN ---
