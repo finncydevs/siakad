@@ -70,16 +70,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
 
-    // --- GRUP AKADEMIK ---
-    Route::prefix('akademik')->name('akademik.')->group(function () {
-        Route::resource('tapel', TapelController::class)->only(['index', 'store', 'destroy']);
-        Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
-        Route::resource('semester', SemesterController::class)->only(['index']);
-        Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
-        Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
-        Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
-        Route::resource('jurusan', JurusanController::class)->only(['index']);
-    });
+// --- GRUP AKADEMIK ---
+Route::prefix('akademik')->name('akademik.')->group(function () {
+    Route::get('tapel', [TapelController::class, 'index'])->name('tapel.index');
+    Route::get('tapel/sinkron', [TapelController::class, 'sinkron'])->name('tapel.sinkron');
+    Route::post('tapel/aktif/{id}', [TapelController::class, 'setAktif'])->name('tapel.aktif');
+    Route::resource('semester', SemesterController::class)->only(['index']);
+    Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
+    Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
+    Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
+    Route::resource('jurusan', JurusanController::class)->only(['index']);
+});
 
     // --- GRUP KESISWAAN ---
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
