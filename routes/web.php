@@ -35,7 +35,7 @@ use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini d
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.dashboard');
 });
 
 
