@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AbsensiSiswa;
 use App\Models\Rombel;
 use App\Models\Siswa;
+use App\Models\IzinSiswa;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -148,96 +149,109 @@ class AbsensiSiswaController extends Controller
 
 public function handleScan(Request $request)
 {
-    // Memulai transaksi database untuk memastikan integritas data
     DB::beginTransaction();
-
     try {
         $token = $request->input('token');
         $waktuScan = Carbon::now();
         $tanggalScan = $waktuScan->toDateString();
 
-        // Mengambil pengaturan absensi berdasarkan HARI INI (Logika Dinamis)
-        $namaHariIni = $waktuScan->isoFormat('dddd'); // e.g., "Senin", "Selasa"
-        $pengaturan = DB::table('pengaturan_absensi')->where('hari', $namaHariIni)->first();
-
-        // Validasi 1: Pastikan ada pengaturan untuk hari ini
-        if (!$pengaturan) {
-            throw new \Exception("Pengaturan absensi untuk hari {$namaHariIni} tidak ditemukan.");
+        // ALUR 1: PROSES SCAN KEMBALI (TIKET MASUK)
+        $izinKembali = IzinSiswa::where('token_sementara', $token)->where('status', 'SEDANG_KELUAR')->first();
+        if ($izinKembali) {
+            if ($waktuScan->gt(Carbon::parse($izinKembali->jam_izin_selesai))) {
+                return response()->json(['success' => false, 'message' => 'Waktu izin Anda untuk kembali sudah berakhir.'], 400);
+            }
+            $izinKembali->waktu_kembali = $waktuScan;
+            $izinKembali->status = 'DIGUNAKAN';
+            $izinKembali->save();
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Selamat datang kembali, ' . $izinKembali->siswa->nama . '!']);
         }
 
-        // Validasi 2: Cek apakah hari ini jadwal absensi aktif
-        if (!$pengaturan->is_active) {
-            return response()->json(['success' => false, 'message' => "Hari {$namaHariIni} tidak ada jadwal absensi."], 400);
-        }
-
+        // ALUR 2: PROSES SCAN PRIBADI (IDENTIFIKASI SISWA)
         $siswa = Siswa::where('qr_token', $token)->first();
-        if (!$siswa) {
-            return response()->json(['success' => false, 'message' => 'QR Code tidak valid!'], 404);
+        if (!$siswa) { return response()->json(['success' => false, 'message' => 'QR Code tidak valid!'], 404); }
+
+        $absensiHariIni = AbsensiSiswa::where('siswa_id', $siswa->id)->where('tanggal', $tanggalScan)->lockForUpdate()->first();
+        $izinHariIni = IzinSiswa::where('siswa_id', $siswa->id)->where('tanggal_izin', $tanggalScan)->whereIn('status', ['DISETUJUI', 'SEDANG_KELUAR'])->first();
+
+        // SUB-ALUR A: JIKA SISWA MEMILIKI IZIN AKTIF
+        if ($izinHariIni) {
+            if ($izinHariIni->tipe_izin == 'KELUAR_SEMENTARA' && $izinHariIni->status == 'DISETUJUI') {
+                if (!$absensiHariIni || !$absensiHariIni->jam_masuk) { return response()->json(['success' => false, 'message' => 'Anda harus absen masuk terlebih dahulu sebelum keluar.'], 400); }
+                $izinHariIni->waktu_keluar = $waktuScan;
+                $izinHariIni->status = 'SEDANG_KELUAR';
+                $izinHariIni->save();
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Izin keluar dikonfirmasi. Gunakan QR sementara saat kembali.']);
+            }
+            if ($izinHariIni->tipe_izin == 'PULANG_AWAL' && $izinHariIni->status == 'DISETUJUI') {
+                if (!$absensiHariIni || !$absensiHariIni->jam_masuk) { return response()->json(['success' => false, 'message' => 'Anda harus absen masuk terlebih dahulu.'], 400); }
+                if ($waktuScan->lt(Carbon::parse($izinHariIni->jam_izin_mulai))) { return response()->json(['success' => false, 'message' => 'Belum waktunya untuk pulang sesuai izin.'], 400); }
+                
+                $absensiHariIni->jam_pulang = $waktuScan->toTimeString();
+                $absensiHariIni->status_kehadiran = 'Pulang Awal (Izin)';
+                $absensiHariIni->keterangan = $izinHariIni->alasan;
+                $absensiHariIni->save();
+                $izinHariIni->status = 'DIGUNAKAN';
+                $izinHariIni->save();
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Sampai Jumpa, '. $siswa->nama, 'status' => 'Pulang Awal (Izin)', 'siswa' => $siswa]);
+            }
+            if ($izinHariIni->tipe_izin == 'DATANG_TERLAMBAT' && $izinHariIni->status == 'DISETUJUI') {
+                if ($absensiHariIni && $absensiHariIni->jam_masuk) { return response()->json(['success' => false, 'message' => 'Anda sudah tercatat absen masuk hari ini.'], 409); }
+                if ($waktuScan->gt(Carbon::parse($izinHariIni->jam_izin_selesai))) { return response()->json(['success' => false, 'message' => 'Batas waktu izin terlambat Anda sudah berakhir.'], 400); }
+                AbsensiSiswa::updateOrCreate(
+                    ['siswa_id' => $siswa->id, 'tanggal' => $tanggalScan],
+                    ['status' => 'Hadir', 'jam_masuk' => $waktuScan->toTimeString(), 'status_kehadiran' => 'Hadir (Dispensasi)', 'keterangan' => $izinHariIni->alasan, 'dicatat_oleh' => auth()->id() ?? 1]
+                );
+                $izinHariIni->status = 'DIGUNAKAN';
+                $izinHariIni->save();
+                DB::commit();
+                return response()->json(['success' => true, 'message' => 'Selamat Datang, '. $siswa->nama, 'status' => 'Hadir (Dispensasi)', 'siswa' => $siswa]);
+            }
         }
 
-        // Validasi 3: Cek hari libur nasional
+        // SUB-ALUR B: JIKA TIDAK ADA IZIN, JALANKAN LOGIKA NORMAL
+        $namaHariIni = $waktuScan->isoFormat('dddd');
+        $pengaturan = DB::table('pengaturan_absensi')->where('hari', $namaHariIni)->first();
+        
+        // --- PERBAIKAN DI SINI ---
+        if (!$pengaturan) { 
+            // Mengganti "throw new Exception" dengan respons JSON yang terkontrol
+            return response()->json(['success' => false, 'message' => "Pengaturan absensi untuk hari {$namaHariIni} tidak ditemukan. Silakan hubungi admin."], 400);
+        }
+        // --- AKHIR PERBAIKAN ---
+
+        if (!$pengaturan->is_active) { return response()->json(['success' => false, 'message' => "Hari {$namaHariIni} tidak ada jadwal absensi."], 400); }
         $isLibur = DB::table('hari_libur')->where('tanggal', $tanggalScan)->exists();
-        if ($isLibur) { // Pengecekan isWeekend() tidak diperlukan lagi karena ada is_active
-            return response()->json(['success' => false, 'message' => 'Hari ini adalah hari libur.'], 400);
-        }
-
-        // Mengunci record absensi untuk mencegah race condition
-        $absensiHariIni = AbsensiSiswa::where('siswa_id', $siswa->id)
-                                        ->where('tanggal', $tanggalScan)
-                                        ->lockForUpdate()
-                                        ->first();
-
-        // Validasi 4: Mencegah override status Sakit, Izin, atau Alfa
+        if ($isLibur) { return response()->json(['success' => false, 'message' => 'Hari ini adalah hari libur.'], 400); }
         if ($absensiHariIni && in_array($absensiHariIni->status, ['Sakit', 'Izin', 'Alfa'])) {
-            return response()->json([
-                'success' => false,
-                'message' => "Scan ditolak. Status Anda sudah tercatat '{$absensiHariIni->status}'.",
-                'siswa'   => $siswa->only(['nama', 'foto'])
-            ], 409); // 409 Conflict
+            return response()->json(['success' => false, 'message' => "Scan ditolak. Status Anda sudah tercatat '{$absensiHariIni->status}'.", 'siswa' => $siswa->only(['nama', 'foto'])], 409);
         }
 
-        // Skenario 1: Siswa melakukan absen PULANG
-        if ($absensiHariIni && $absensiHariIni->jam_masuk) {
-            $intervalMinimum = 5;
-            if ($waktuScan->diffInMinutes(Carbon::parse($absensiHariIni->jam_masuk)) < $intervalMinimum) {
-                return response()->json([
-                    'success' => false, 'message' => 'Anda sudah tercatat presensi masuk hari ini.',
-                    'siswa'   => $siswa->only(['nama', 'foto']),
-                ], 409);
-            }
-
+        if ($absensiHariIni && $absensiHariIni->jam_masuk) { // Proses Pulang Normal
             $jamPulangSekolah = Carbon::parse($pengaturan->jam_pulang_sekolah);
-            $batasAkhirPulang = $jamPulangSekolah->copy()->addHours(3);
-
-            if (!$waktuScan->between($jamPulangSekolah, $batasAkhirPulang)) {
-                $pesan = $waktuScan->lt($jamPulangSekolah) ? 'Belum waktunya untuk absen pulang!' : 'Waktu untuk absen pulang sudah berakhir.';
-                return response()->json(['success' => false, 'message' => $pesan, 'siswa' => $siswa->only(['nama', 'foto'])], 400);
-            }
-
+            if ($waktuScan->lt($jamPulangSekolah)) { return response()->json(['success' => false, 'message' => 'Belum waktunya untuk absen pulang.', 'siswa' => $siswa->only(['nama', 'foto'])], 400); }
             $absensiHariIni->jam_pulang = $waktuScan->toTimeString();
             $absensiHariIni->save();
-            $responseData = ['success' => true, 'message' => "Sampai Jumpa, {$siswa->nama}!", 'foto' => $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://ui-avatars.com/api/?name='.urlencode($siswa->nama).'&background=03c3ec&color=fff&size=120', 'status' => 'Pulang', 'siswa' => $siswa];
+            $responseData = ['success' => true, 'message' => "Sampai Jumpa, {$siswa->nama}!", 'status' => 'Pulang', 'siswa' => $siswa];
         
-        } else { // Skenario 2: Siswa melakukan absen MASUK
+        } else { // Proses Masuk Normal
             $batasMasuk = Carbon::parse($pengaturan->jam_masuk_sekolah);
             $batasTerlambat = $batasMasuk->copy()->addMinutes($pengaturan->batas_toleransi_terlambat);
-            
-            // Validasi 5: Jendela waktu absen masuk (mencegah absen terlalu pagi)
-            $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60); 
+            $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60);
             if (!$waktuScan->between($batasAwalMasuk, $batasTerlambat)) {
                 $pesan = $waktuScan->lt($batasAwalMasuk) ? 'Belum waktunya untuk absen masuk!' : 'Waktu untuk absen masuk sudah berakhir.';
                 return response()->json(['success' => false, 'message' => $pesan, 'siswa' => $siswa->only(['nama', 'foto'])], 400);
             }
-            
             $statusKehadiran = $waktuScan->gt($batasMasuk) ? 'Terlambat' : 'Tepat Waktu';
             $keterlambatan = ($statusKehadiran === 'Terlambat') ? $waktuScan->diffInMinutes($batasMasuk) : null;
-
             AbsensiSiswa::updateOrCreate(
                 ['siswa_id' => $siswa->id, 'tanggal' => $tanggalScan],
                 ['status' => 'Hadir', 'jam_masuk' => $waktuScan->toTimeString(), 'status_kehadiran' => $statusKehadiran, 'dicatat_oleh' => auth()->id() ?? 1]
             );
-
-            $responseData = ['success' => true, 'message' => "Selamat Datang, {$siswa->nama}!", 'foto' => $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://ui-avatars.com/api/?name='.urlencode($siswa->nama).'&background=696cff&color=fff&size=120', 'status' => $statusKehadiran, 'keterlambatan' => $keterlambatan, 'siswa' => $siswa];
+            $responseData = ['success' => true, 'message' => "Selamat Datang, {$siswa->nama}!", 'status' => $statusKehadiran, 'keterlambatan' => $keterlambatan, 'siswa' => $siswa];
         }
 
         DB::commit();
@@ -245,22 +259,26 @@ public function handleScan(Request $request)
 
     } catch (\Exception $e) {
         DB::rollBack();
-        Log::error('Gagal memproses scan absensi: ' . $e->getMessage(), ['token' => $request->input('token')]);
+        Log::error('Gagal memproses scan absensi: ' . $e->getMessage() . ' di baris ' . $e->getLine());
         return response()->json(['success' => false, 'message' => 'Terjadi kesalahan pada server. Silakan coba lagi.'], 500);
     }
 }
 
+    /**
+     * Mendapatkan data absensi hari ini untuk tampilan real-time.
+     */
+public function getTodaysScans()
+{
+    $today = Carbon::now()->toDateString();
 
-    public function getTodaysScans()
-    {
-        $today = Carbon::now()->toDateString();
-        $absensiHariIni = AbsensiSiswa::where('tanggal', $today)
-            ->whereNotNull('jam_masuk')
-            ->with('siswa:id,nama,foto') // Ambil hanya data siswa yang relevan
-            ->orderBy('created_at', 'desc')
-            ->get();
+    $absensiHariIni = AbsensiSiswa::where('tanggal', $today)
+        ->whereNotNull('jam_masuk')
+        ->with('siswa:id,nama,foto')
+        // INI BAGIAN PENTINGNYA
+        ->orderBy('jam_masuk', 'desc') // <-- Pastikan diurutkan berdasarkan 'jam_masuk' secara descending
+        ->get();
 
-        return response()->json($absensiHariIni);
-    }
+    return response()->json($absensiHariIni);
+}
 }
 

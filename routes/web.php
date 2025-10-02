@@ -99,7 +99,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::post('/handle-scan', [AbsensiSiswaController::class, 'handleScan'])->name('handle_scan');
         });
         Route::resource('izin-siswa', \App\Http\Controllers\Admin\Absensi\IzinSiswaController::class);
-
     });
 
     
