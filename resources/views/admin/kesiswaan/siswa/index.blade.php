@@ -42,7 +42,7 @@
                         <td>{{ $siswa->nis ?? '-' }}</td>
                         <td>{{ $siswa->nisn ?? '-' }}</td>
                         <td>{{ $siswa->nik ?? '-' }}</td>
-                        <td><strong>{{ $siswa->nama_lengkap }}</strong></td>
+                        <td><strong>{{ $siswa->nama}}</strong></td>
                         <td>{{ $siswa->tempat_lahir }}, {{ \Carbon\Carbon::parse($siswa->tanggal_lahir)->format('d-m-Y') }}</td>
                         <td>{{ $siswa->jenis_kelamin == 'Laki-laki' ? 'L' : 'P' }}</td>
                         <td><span class="badge bg-label-primary me-1">{{ $siswa->kelas_aktif_id ? $kelas[$siswa->kelas_aktif_id] : 'Belum ada kelas' }}</span></td>

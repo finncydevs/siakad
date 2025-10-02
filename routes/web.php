@@ -23,6 +23,9 @@ use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 
+// Controller Indisipliner
+use App\Http\Controllers\Admin\Indisipliner\IndisiplinerSiswaController;
+
 use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
 
 
@@ -87,6 +90,39 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('laporan-quota', LaporanQuotaController::class);
         });
 
+
+    });
+
+    Route::prefix('indisipliner-siswa')->name('indisipliner.siswa.')->group(function () {
+        
+        // --- PENGATURAN ---
+        Route::get('pengaturan', [IndisiplinerSiswaController::class, 'pengaturanIndex'])->name('pengaturan.index');
+        
+        // Kategori
+        Route::post('pengaturan/kategori', [IndisiplinerSiswaController::class, 'storeKategori'])->name('pengaturan.kategori.store');
+        Route::put('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'updateKategori'])->name('pengaturan.kategori.update');
+        Route::delete('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'destroyKategori'])->name('pengaturan.kategori.destroy');
+
+        // Poin Pelanggaran
+        Route::post('pengaturan/poin', [IndisiplinerSiswaController::class, 'storePoin'])->name('pengaturan.poin.store');
+        Route::put('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'updatePoin'])->name('pengaturan.poin.update');
+        Route::delete('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+
+        // Sanksi
+        Route::post('pengaturan/sanksi', [IndisiplinerSiswaController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
+        Route::put('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'updateSanksi'])->name('pengaturan.sanksi.update');
+        Route::delete('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'destroySanksi'])->name('pengaturan.sanksi.destroy');
+
+        Route::get('daftar', [IndisiplinerSiswaController::class, 'daftarIndex'])->name('daftar.index');
+        Route::get('daftar/input', [IndisiplinerSiswaController::class, 'createPelanggaran'])->name('daftar.create'); // HALAMAN FORM BARU
+        Route::post('daftar', [IndisiplinerSiswaController::class, 'storePelanggaran'])->name('daftar.store');
+        Route::delete('daftar/{pelanggaranNilai}', [IndisiplinerSiswaController::class, 'destroyPelanggaran'])->name('daftar.destroy');
+        
+        // Route untuk AJAX request
+        Route::get('get-siswa-by-rombel/{rombel}', [IndisiplinerSiswaController::class, 'getSiswaByRombel'])->name('getSiswaByRombel');
+
+        // --- REKAPITULASI ---
+        Route::get('rekapitulasi', [IndisiplinerSiswaController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
 
     });
 });

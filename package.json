@@ -4,8 +4,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "php artisan serve & vite"
-    },
+        "dev": "concurrently \"php artisan serve\" \"vite\""
+      },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/vite": "^4.0.0",
