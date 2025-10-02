@@ -20,4 +20,9 @@
             'kepribadian' => 'array',
             'prestasi' => 'array',
         ];
+
+        public function tagihans() { return $this->hasMany(Tagihan::class); }
+public function tunggakans() { return $this->hasMany(Tunggakan::class); }
+public function pembayarans() { return $this->hasMany(Pembayaran::class); }
+public function vouchers() { return $this->hasMany(Voucher::class); }
     }

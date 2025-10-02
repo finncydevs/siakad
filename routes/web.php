@@ -12,7 +12,6 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
 
-// Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
 use App\Http\Controllers\Admin\Kesiswaan\FormulirPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\JalurController;
@@ -22,6 +21,13 @@ use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
 use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
+
+// --- CONTROLLER MODUL KEUANGAN ---
+use App\Http\Controllers\Admin\Keuangan\IuranController;
+use App\Http\Controllers\Admin\Keuangan\KasController;
+use App\Http\Controllers\Admin\Keuangan\PembayaranController;
+use App\Http\Controllers\Admin\Keuangan\PengeluaranController;
+use App\Http\Controllers\Admin\Keuangan\VoucherController;
 
 use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
 
@@ -88,5 +94,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
 
 
+
     });
+    Route::prefix('keuangan')->name('keuangan.')->group(function () {
+ Route::get('/penerimaan', [PembayaranController::class, 'index'])->name('penerimaan.index');
+ Route::post('/penerimaan', [PembayaranController::class, 'store'])->name('penerimaan.store');
+ Route::get('/kas', [KasController::class, 'index'])->name('kas.index');
+ Route::resource('/iuran', IuranController::class)->except(['create', 'edit', 'show']);
+ Route::resource('/voucher', VoucherController::class)->only(['index', 'store', 'destroy']);
+ Route::resource('/pengeluaran', PengeluaranController::class)->except(['create', 'edit', 'show']);
+});
 });
