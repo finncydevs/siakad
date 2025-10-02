@@ -14,7 +14,11 @@ class FormulirPendaftaranController extends Controller
     public function index()
     {
         $formulirs = CalonSiswa::with(['jalurPendaftaran', 'syarat'])->get();
-        return view('admin.kesiswaan.ppdb.formulir_pendaftaran', compact('formulirs'));
+        $jalurs = JalurPendaftaran::where('is_active', true)->get();
+        $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+        $syarats = SyaratPendaftaran::where('is_active', true)->get();
+
+        return view('admin.kesiswaan.ppdb.formulir_pendaftaran', compact('formulirs', 'jalurs', 'tahunAktif', 'syarats'));
     }
 
     public function create()
@@ -23,7 +27,7 @@ class FormulirPendaftaranController extends Controller
         $jalurs = JalurPendaftaran::where('is_active', true)->get();
         $syarats = SyaratPendaftaran::where('is_active', true)->get();
 
-        return view('admin.kesiswaan.ppdb.formulir_pendaftaran', [
+        return view('admin.kesiswaan.ppdb.formulir_pendaftaran_form', [
             'formulir' => null,
             'jalurs' => $jalurs,
             'tahunAktif' => $tahunAktif,
@@ -58,10 +62,8 @@ class FormulirPendaftaranController extends Controller
             'pembayaran'    => 'nullable|numeric',
         ]);
 
-        // Simpan siswa baru
         $calon = CalonSiswa::create($validated);
 
-        // Simpan syarat yang dicentang
         if ($request->has('documents')) {
             foreach ($request->documents as $syaratId => $checked) {
                 $calon->syarat()->attach($syaratId, ['is_checked' => true]);
@@ -79,7 +81,7 @@ class FormulirPendaftaranController extends Controller
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
         $syarats = SyaratPendaftaran::where('is_active', true)->get();
 
-        return view('admin.kesiswaan.ppdb.formulir_pendaftaran', [
+        return view('admin.kesiswaan.ppdb.formulir_pendaftaran_form', [
             'formulir' => $formulir,
             'jalurs' => $jalurs,
             'tahunAktif' => $tahunAktif,
@@ -118,7 +120,6 @@ class FormulirPendaftaranController extends Controller
 
         $calon->update($validated);
 
-        // Sync syarat
         if ($request->has('documents')) {
             $syaratIds = array_keys($request->documents);
             $calon->syarat()->sync(
@@ -140,4 +141,6 @@ class FormulirPendaftaranController extends Controller
         return redirect()->route('admin.kesiswaan.ppdb.formulir.index')
                          ->with('success', 'Formulir pendaftaran berhasil dihapus.');
     }
+
+    
 }

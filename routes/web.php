@@ -71,20 +71,57 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
     });
 
+    /*
+    |--------------------------------------------------------------------------
+    | Kesiswaan
+    |--------------------------------------------------------------------------
+    */
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
         Route::resource('siswa', SiswaController::class);
+        
+        /*
+        |--------------------------------------------------------------------------
+        | Kesiswaan (PPDB)
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('ppdb')->name('ppdb.')->group(function () {
+            // Tahun Pelajaran PPDB
             Route::resource('tahun-ppdb', TahunPpdbController::class);
             Route::post('/tahun-ppdb/{id}/toggle-active', [TahunPpdbController::class, 'toggleActive'])->name('tahun-ppdb.toggleActive');
+
+            // Jalur Pendaftaran
             Route::resource('jalur-ppdb', JalurController::class);
             Route::post('/jalur-ppdb/{id}/toggle-active', [JalurController::class, 'toggleActive'])->name('jalur-ppdb.toggleActive');
+
+            // Quota Pendaftaran
             Route::resource('quota-ppdb', QuotaController::class);
+
+            // Syarat Pendaftaran
             Route::resource('syarat-ppdb', SyaratController::class);
             Route::post('/syarat-ppdb/{id}/toggle-active', [SyaratController::class, 'toggleActive'])->name('syarat-ppdb.toggleActive');
+
+            // Formulir Pendaftaran
             Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
+            
+
+            Route::get('/get-syarat/{jalurId}', function ($jalurId) {
+    $syarat = \App\Models\SyaratPendaftaran::where('jalurPendaftaran_id', $jalurId)
+                ->where('is_active', 1)
+                ->get(['id','syarat']);
+    return response()->json($syarat);
+});
+
+
+
+
+            // Data Peserta Didik
             Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
             Route::resource('daftar-peserta-didik-baru', DaftarPesertaDidikBaruController::class);
+
+            // Penempatan Kelas
             Route::resource('penempatan-kelas', PenempatanKelasController::class);
+
+            // Laporan
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
 

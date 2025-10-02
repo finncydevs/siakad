@@ -105,4 +105,13 @@ class SyaratController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengubah status syarat.');
         }
     }
+    public function getSyarat($jalurId)
+{
+    $syarat = \App\Models\SyaratPendaftaran::where('jalurPendaftaran_id', $jalurId)
+                ->where('is_active', 1)
+                ->get();
+
+    return response()->json($syarat);
+}
+
 }
