@@ -159,8 +159,8 @@
                                 <label class="form-label">Jurusan Yang Diminati</label>
                                 <select name="jurusan" class="form-select">
                                     <option>- pilih -</option>
-                                    @foreach(['IPA','IPS','Bahasa'] as $jurusan)
-                                        <option value="{{ $jurusan }}" 
+                                    @foreach( $jurusans as $jurusan)
+                                        <option value="{{ $jurusan  }}" 
                                             {{ old('jurusan', $formulir->jurusan ?? '') == $jurusan ? 'selected' : '' }}>
                                             {{ $jurusan }}
                                         </option>

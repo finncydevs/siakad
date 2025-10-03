@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tahun_id')->constrained('tahun_pelajarans')->onDelete('cascade');
             $table->foreignId('jalur_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
+            $table->string('nis')->nullable();;
             $table->string('nomor_resi');
             $table->string('nama_lengkap');
             $table->string('nisn')->nullable();

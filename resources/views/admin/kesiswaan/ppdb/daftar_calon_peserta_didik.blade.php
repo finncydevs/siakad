@@ -28,7 +28,7 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                   <strong class="text-primary">{{ $calon->nomor_resi }}</strong><br>
-                  <small class="text-muted">{{ $calon->jalurPendaftaran->jalur ?? '-' }}</small>
+                  <small class="text-muted">{{ $calon->jurusan ?? '-' }}</small>
                 </td>
                 <td>
                   <strong>{{ $calon->nama_lengkap }} ({{ $calon->jenis_kelamin }})</strong><br>

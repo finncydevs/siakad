@@ -19,17 +19,27 @@
 
                 <div class="row mb-3">
                     <div class="col-md-6">
-                        <label for="pilih_jalur" class="form-label">Pilih Jalur / Angkatan</label>
-                        <select id="pilih_jalur" class="form-select">
-                            <option value="">- Pilih -</option>
-                            {{-- Looping jalur/angkatan dari controller --}}
-                        </select>
+                        <form method="GET" action="{{ route('admin.kesiswaan.ppdb.penempatan-kelas.index') }}">
+                            <label class="form-label">Filter Jurusan</label>
+                            <select name="jurusan" class="form-select" onchange="this.form.submit()">
+                                <option value="">-- Semua Jurusan --</option>
+                                @foreach($jurusans as $jurusan)
+                                    <option value="{{ $jurusan }}" {{ request('jurusan') == $jurusan ? 'selected' : '' }}>
+                                        {{ $jurusan }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </form>
                     </div>
                     <div class="col-md-6">
                         <label for="pilih_kelas" class="form-label">Pilih Kelas Tujuan</label>
+                        
                         <select id="pilih_kelas" class="form-select">
                             <option value="">- Pilih Kelas Tujuan -</option>
+                            @foreach ( $kelas as $rombel )
+                            <option value=""> {{ $rombel -> nama }} </option>
                             {{-- Looping kelas tujuan --}}
+                            @endforeach
                         </select>
                     </div>
                 </div>
@@ -46,16 +56,30 @@
                                         <th>NIS</th>
                                         <th>NAMA SISWA</th>
                                         <th>SEKOLAH ASAL</th>
-                                        <th><input type="checkbox"></th>
+                                        <th>
+                                            <input type="checkbox" id="checkAll">
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td colspan="5" class="text-center text-muted">Maaf, data tidak ditemukan</td>
-                                    </tr>
-                                    {{-- Loop data siswa di sini --}}
+                                    @forelse($formulirs as $index => $formulir)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $formulir->nis ?? '-' }}</td>
+                                            <td>{{ $formulir->nama_lengkap }}</td>
+                                            <td>{{ $formulir->asal_sekolah ?? '-' }}</td>
+                                            <td>
+                                                <input type="checkbox" name="siswa_id[]" value="{{ $formulir->id }}">
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">Maaf, data tidak ditemukan</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
 

@@ -8,14 +8,63 @@ use App\Models\CalonSiswa;
 use App\Models\JalurPendaftaran;
 use App\Models\SyaratPendaftaran;
 use App\Models\TahunPelajaran;
+use App\Models\Rombel;
 
 class FormulirPendaftaranController extends Controller
 {
+    // ===== Helper Generate NIS =====
+    private function generateNis($tahunPelajaranId)
+{
+    $tahun = TahunPelajaran::findOrFail($tahunPelajaranId);
+
+    $tp = $tahun->tahun_pelajaran; // <-- ambil dari field yang benar
+
+    if (strpos($tp, '-') !== false) {
+        [$awal, $akhir] = array_map('trim', explode('-', $tp));
+        $awal  = (int) $awal;
+        $akhir = (int) $akhir;
+    } else {
+        $awal  = (int) trim($tp);
+        $akhir = $awal + 1;
+    }
+
+    // format 4 digit
+    $awal  = str_pad($awal, 4, '0', STR_PAD_LEFT);
+    $akhir = str_pad($akhir, 4, '0', STR_PAD_LEFT);
+
+    $awal2  = substr($awal, -2);   // 25
+    $akhir2 = substr($akhir, -2); // 26
+    $base   = $awal2 . $akhir2 . "10"; // 252610
+
+    $last = CalonSiswa::whereNotNull('nis')
+        ->where('tahun_id', $tahunPelajaranId)
+        ->orderByDesc('nis')
+        ->first();
+
+    if ($last) {
+        $lastNumber = (int) substr($last->nis, -3);
+        $urutan = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
+    } else {
+        $urutan = "001";
+    }
+
+    return $base . $urutan;
+}
+
+
+
+
+
     public function index()
     {
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
 
         $formulirs = CalonSiswa::with(['jalurPendaftaran', 'syarat'])->get();
+
+        $jurusans = Rombel::select('jurusan_id_str')
+            ->distinct()
+            ->orderBy('jurusan_id_str')
+            ->pluck('jurusan_id_str');
 
         $jalurs = $tahunAktif
             ? JalurPendaftaran::where('tahunPelajaran_id', $tahunAktif->id)
@@ -31,6 +80,7 @@ class FormulirPendaftaranController extends Controller
 
         return view('admin.kesiswaan.ppdb.formulir_pendaftaran', compact(
             'formulirs',
+            'jurusans',
             'jalurs',
             'tahunAktif',
             'syarats'
@@ -87,42 +137,28 @@ class FormulirPendaftaranController extends Controller
             'ukuran_pakaian'=> 'nullable|string|max:20',
             'pembayaran'    => 'nullable|numeric',
         ]);
-        // ====== Generate Nomor Seri ======
-        $prefix = "137"; // bisa diset sesuai kode unit
-        $tanggal = now()->format('ymd'); // contoh: 250930 (30 Sept 2025)
-        
-        // hitung urutan hari ini
+
+        // generate nomor resi
+        $prefix = "137";
+        $tanggal = now()->format('ymd');
+
         $last = CalonSiswa::whereDate('created_at', now()->toDateString())
-                    ->orderByDesc('id')
-                    ->first();
+            ->orderByDesc('id')
+            ->first();
 
         if ($last) {
-            // ambil angka setelah titik
-            $lastNumber = (int) substr($last->nomer_seri, -3);
+            $lastNumber = (int) substr($last->nomor_resi, -3);
             $urutan = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
         } else {
             $urutan = "001";
         }
 
         $nomerSeri = "{$prefix}-{$tanggal}.{$urutan}";
-
-        // masukkan ke validated
         $validated['nomor_resi'] = $nomerSeri;
 
-         if ($request->action === 'create') {
-            // tombol Baru → selalu buat entri baru
-            $calon = CalonSiswa::create($validated);
-        } else {
-            // tombol Simpan → kalau ada id, update data
-            if ($request->id) {
-                $calon = CalonSiswa::findOrFail($request->id);
-                $calon->update($validated);
-            } else {
-                $calon = CalonSiswa::create($validated);
-            }
-        }
-    
-        // Simpan syarat
+        $calon = CalonSiswa::create($validated);
+
+        // simpan syarat
         $syaratIds = $request->syarat_id ?? [];
         $syncData = [];
         foreach ($syaratIds as $id) {
@@ -130,7 +166,18 @@ class FormulirPendaftaranController extends Controller
         }
         $calon->syarat()->sync($syncData);
 
-        
+        // cek syarat wajib
+        $tahunId = $validated['tahun_id'];
+        $syaratWajib = SyaratPendaftaran::where('tahunPelajaran_id', $tahunId)
+            ->where('is_active', true)->count();
+
+        $syaratTerpenuhi = $calon->syarat()->wherePivot('is_checked', true)->count();
+
+        if ($syaratTerpenuhi >= $syaratWajib) {
+            $calon->nis = $this->generateNis($tahunId);
+            $calon->save();
+        }
+
         return redirect()->back()->with('success', 'Formulir calon peserta didik berhasil disimpan.');
     }
 
@@ -138,6 +185,11 @@ class FormulirPendaftaranController extends Controller
     {
         $formulir = CalonSiswa::with('syarat')->findOrFail($id);
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+
+        $jurusans = Rombel::select('jurusan_id_str')
+            ->distinct()
+            ->orderBy('jurusan_id_str')
+            ->pluck('jurusan_id_str');
 
         $jalurs = $tahunAktif
             ? JalurPendaftaran::where('tahunPelajaran_id', $tahunAktif->id)
@@ -153,6 +205,7 @@ class FormulirPendaftaranController extends Controller
 
         return view('admin.kesiswaan.ppdb.formulir_pendaftaran', [
             'formulir'   => $formulir,
+            'jurusans'   => $jurusans,
             'jalurs'     => $jalurs,
             'tahunAktif' => $tahunAktif,
             'syarats'    => $syarats,
@@ -190,17 +243,25 @@ class FormulirPendaftaranController extends Controller
 
         $calon->update($validated);
 
-        // update syarat (checkbox)
-        if ($request->filled('syarat_id')) {
-            $calon->syarat()->sync(
-                collect($request->syarat_id)->mapWithKeys(fn($id) => [$id => ['is_checked' => true]])->toArray()
-            );
-        } else {
-            $calon->syarat()->sync([]); // kosongkan jika semua uncheck
+        // update syarat
+        $calon->syarat()->sync(
+            collect($request->syarat_id ?? [])->mapWithKeys(fn($id) => [$id => ['is_checked' => true]])->toArray()
+        );
+
+        // cek syarat
+        $tahunId = $validated['tahun_id'];
+        $syaratWajib = SyaratPendaftaran::where('tahunPelajaran_id', $tahunId)
+            ->where('is_active', true)->count();
+
+        $syaratTerpenuhi = $calon->syarat()->wherePivot('is_checked', true)->count();
+
+        if ($syaratTerpenuhi >= $syaratWajib && !$calon->nis) {
+            $calon->nis = $this->generateNis($tahunId);
+            $calon->save();
         }
 
         return redirect()->route('admin.kesiswaan.ppdb.daftar-calon-peserta-didik.index')
-                         ->with('success', 'Data Calon Peserta didik berhasil diperbarui.');
+            ->with('success', 'Data Calon Peserta didik berhasil diperbarui.');
     }
 
     public function destroy($id)
@@ -209,6 +270,6 @@ class FormulirPendaftaranController extends Controller
         $calon->delete();
 
         return redirect()->route('admin.kesiswaan.ppdb.formulir.index')
-                         ->with('success', 'Formulir pendaftaran berhasil dihapus.');
+            ->with('success', 'Formulir pendaftaran berhasil dihapus.');
     }
 }
