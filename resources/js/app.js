@@ -1,3 +1,4 @@
+// Import vendor Sneat
 import '../sneat/assets/vendor/libs/jquery/jquery.js';
 import '../sneat/assets/vendor/libs/popper/popper.js';
 import '../sneat/assets/vendor/js/bootstrap.js';
@@ -9,15 +10,10 @@ import '../sneat/assets/js/dashboards-analytics.js';
 import '../sneat/assets/js/ui-modals.js';
 import '../sneat/assets/js/ui-toasts.js';
 
-import './bootstrap';
-import Alpine from 'alpinejs';
-window.Alpine = Alpine;
-Alpine.start();
-
+// Laravel bootstrap
 import './bootstrap';
 
+// AlpineJS
 import Alpine from 'alpinejs';
-
 window.Alpine = Alpine;
-
 Alpine.start();
