@@ -17,16 +17,15 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Admin Sekolah</title>
     {{-- ... --}}
-    @vite([
-        'resources/sneat/assets/vendor/fonts/boxicons.css',
-        'resources/sneat/assets/vendor/css/core.css',
-        'resources/sneat/assets/vendor/css/theme-default.css',
-        'resources/sneat/assets/css/demo.css',
-        'resources/sneat/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css',
-        'resources/sneat/assets/vendor/libs/apex-charts/apex-charts.css',
-        'resources/sneat/assets/vendor/js/helpers.js',
-        'resources/sneat/assets/js/config.js'
-    ])
+    <link rel="stylesheet" href="{{ asset('sneat/assets/vendor/fonts/boxicons.css') }}">
+<link rel="stylesheet" href="{{ asset('sneat/assets/vendor/css/core.css') }}">
+<link rel="stylesheet" href="{{ asset('sneat/assets/vendor/css/theme-default.css') }}">
+<link rel="stylesheet" href="{{ asset('sneat/assets/css/demo.css') }}">
+<link rel="stylesheet" href="{{ asset('sneat/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}">
+<link rel="stylesheet" href="{{ asset('sneat/assets/vendor/libs/apex-charts/apex-charts.css') }}">
+<script src="{{ asset('sneat/assets/vendor/js/helpers.js') }}"></script>
+<script src="{{ asset('sneat/assets/js/config.js') }}"></script>
+
 
     @stack('styles')
   </head>
