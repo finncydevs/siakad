@@ -47,17 +47,17 @@
                             <div class="mb-3">
                                 <label class="form-label">Nama Lengkap</label>
                                 <input type="text" name="nama_lengkap" class="form-control" 
-                                       value="{{ old('nama_lengkap', $formulir->nama_lengkap ?? '') }}">
+                                       value="{{ old('nama_lengkap', $formulir->nama_lengkap ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">NISN</label>
                                 <input type="number" name="nisn" class="form-control"
-                                       value="{{ old('nisn', $formulir->nisn ?? '') }}">
+                                       value="{{ old('nisn', $formulir->nisn ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">NPUN</label>
                                 <input type="number" name="npun" class="form-control"
-                                       value="{{ old('npun', $formulir->npun ?? '') }}">
+                                       value="{{ old('npun', $formulir->npun ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Jenis Kelamin</label>
@@ -77,22 +77,22 @@
                             <div class="mb-3">
                                 <label class="form-label">Tempat Lahir</label>
                                 <input type="text" name="tempat_lahir" class="form-control"
-                                       value="{{ old('tempat_lahir', $formulir->tempat_lahir ?? '') }}">
+                                       value="{{ old('tempat_lahir', $formulir->tempat_lahir ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Tanggal Lahir</label>
                                 <input type="date" name="tgl_lahir" class="form-control"
-                                       value="{{ old('tgl_lahir', $formulir->tgl_lahir ?? '') }}">
+                                       value="{{ old('tgl_lahir', $formulir->tgl_lahir ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Nama Ayah</label>
                                 <input type="text" name="nama_ayah" class="form-control"
-                                       value="{{ old('nama_ayah', $formulir->nama_ayah ?? '') }}">
+                                       value="{{ old('nama_ayah', $formulir->nama_ayah ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Nama Ibu</label>
                                 <input type="text" name="nama_ibu" class="form-control"
-                                       value="{{ old('nama_ibu', $formulir->nama_ibu ?? '') }}">
+                                       value="{{ old('nama_ibu', $formulir->nama_ibu ?? '') }}" required>
                             </div>
                         </div>
 
@@ -101,37 +101,37 @@
                             <div class="mb-3">
                                 <label class="form-label">Alamat</label>
                                 <input type="text" name="alamat" class="form-control"
-                                       value="{{ old('alamat', $formulir->alamat ?? '') }}">
+                                       value="{{ old('alamat', $formulir->alamat ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Desa</label>
                                 <input type="text" name="desa" class="form-control"
-                                       value="{{ old('desa', $formulir->desa ?? '') }}">
+                                       value="{{ old('desa', $formulir->desa ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kecamatan</label>
                                 <input type="text" name="kecamatan" class="form-control"
-                                       value="{{ old('kecamatan', $formulir->kecamatan ?? '') }}">
+                                       value="{{ old('kecamatan', $formulir->kecamatan ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kabupaten</label>
                                 <input type="text" name="kabupaten" class="form-control"
-                                       value="{{ old('kabupaten', $formulir->kabupaten ?? '') }}">
+                                       value="{{ old('kabupaten', $formulir->kabupaten ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Provinsi</label>
                                 <input type="text" name="provinsi" class="form-control"
-                                       value="{{ old('provinsi', $formulir->provinsi ?? '') }}">
+                                       value="{{ old('provinsi', $formulir->provinsi ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kode Pos</label>
                                 <input type="number" name="kode_pos" class="form-control"
-                                       value="{{ old('kode_pos', $formulir->kode_pos ?? '') }}">
+                                       value="{{ old('kode_pos', $formulir->kode_pos ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kontak</label>
                                 <input type="number" name="kontak" class="form-control"
-                                       value="{{ old('kontak', $formulir->kontak ?? '') }}">
+                                       value="{{ old('kontak', $formulir->kontak ?? '') }}" required>
                             </div>
                         </div>
 
@@ -140,7 +140,7 @@
                             <div class="mb-3">
                                 <label class="form-label">Asal Sekolah</label>
                                 <input type="text" name="asal_sekolah" class="form-control"
-                                       value="{{ old('asal_sekolah', $formulir->asal_sekolah ?? '') }}">
+                                       value="{{ old('asal_sekolah', $formulir->asal_sekolah ?? '') }}" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Kelas</label>
@@ -149,7 +149,7 @@
                                     @for($i=65; $i<=75; $i++)
                                         @php $huruf = chr($i); @endphp
                                         <option value="9 {{ $huruf }}" 
-                                            {{ old('kelas', $formulir->kelas ?? '') == "9 $huruf" ? 'selected' : '' }}>
+                                            {{ old('kelas', $formulir->kelas ?? '') == "9 $huruf" ? 'selected' : '' }} required>
                                             9 {{ $huruf }}
                                         </option>
                                     @endfor
