@@ -8,7 +8,6 @@
   data-template="vertical-menu-template-free"
 >
   <head>
-    {{-- ... (Isi <head> tidak ada perubahan) ... --}}
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -16,15 +15,14 @@
     />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Admin Sekolah</title>
-    {{-- ... --}}
+
+    {{-- Load CSS & JS dari Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
   </head>
   <body>
 
-    <!-- Toast -->
-        
-     @include('layouts.partials.toast')
+    @include('layouts.partials.toast')
 
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
@@ -43,19 +41,6 @@
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
 
-    @vite([
-        'resources/sneat/assets/vendor/libs/jquery/jquery.js',
-        'resources/sneat/assets/vendor/libs/popper/popper.js',
-        'resources/sneat/assets/vendor/js/bootstrap.js',
-        'resources/sneat/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js',
-        'resources/sneat/assets/vendor/js/menu.js',
-        'resources/sneat/assets/vendor/libs/apex-charts/apexcharts.js',
-        'resources/sneat/assets/js/main.js',
-        'resources/sneat/assets/js/dashboards-analytics.js',
-        'resources/sneat/assets/js/ui-modals.js',
-        'resources/sneat/assets/js/ui-toasts.js'
-    ])
-    
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -75,7 +60,6 @@
                 toast.show();
             @endif
 
-            {{-- Logika untuk Toast Info - BARU --}}
             @if(session('info'))
                 const infoToast = document.getElementById('infoToast');
                 const infoToastBody = document.getElementById('infoToastBody');
@@ -85,7 +69,7 @@
             @endif
         });
     </script>
+
     @stack('scripts')
   </body>
 </html>
-
