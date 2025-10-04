@@ -8,6 +8,7 @@
   data-template="vertical-menu-template-free"
 >
   <head>
+    {{-- ... (Isi <head> tidak ada perubahan) ... --}}
     <meta charset="utf-8" />
     <meta
       name="viewport"
@@ -15,14 +16,15 @@
     />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Admin Sekolah</title>
-
-    {{-- Load CSS & JS dari Vite --}}
+    {{-- ... --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
   </head>
   <body>
 
-    @include('layouts.partials.toast')
+    <!-- Toast -->
+        
+     @include('layouts.partials.toast')
 
     <div class="layout-wrapper layout-content-navbar">
         <div class="layout-container">
@@ -41,6 +43,8 @@
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
 
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -60,6 +64,7 @@
                 toast.show();
             @endif
 
+            {{-- Logika untuk Toast Info - BARU --}}
             @if(session('info'))
                 const infoToast = document.getElementById('infoToast');
                 const infoToastBody = document.getElementById('infoToastBody');
@@ -69,7 +74,7 @@
             @endif
         });
     </script>
-
     @stack('scripts')
   </body>
 </html>
+
