@@ -34,6 +34,7 @@ return new class extends Migration
             $table->string('kontak')->nullable();
             $table->string('asal_sekolah')->nullable();
             $table->string('kelas')->nullable();
+            $table->string('kelas_tujuan')->nullable();
             $table->string('jurusan')->nullable();
             $table->string('ukuran_pakaian')->nullable();
             $table->decimal('pembayaran', 12, 2)->default(0);

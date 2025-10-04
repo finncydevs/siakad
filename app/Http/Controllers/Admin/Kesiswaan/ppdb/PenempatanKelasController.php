@@ -16,34 +16,36 @@ class PenempatanKelasController extends Controller
     public function index(Request $request)
     {
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
-
-
-        // Data untuk dropdown kelas tujuan
-        $kelas = Rombel::orderBy('nama')->get();
-
-        // ambil jurusan untuk dropdown filter
+    
+        // Data untuk dropdown kelas tujuan (hanya kelas X)
+        $kelas = Rombel::where('nama', 'LIKE', 'X %')
+            ->orderBy('nama')
+            ->get();
+    
+        // Ambil jurusan untuk filter
         $jurusans = Rombel::select('jurusan_id_str')
                     ->distinct()
                     ->orderBy('jurusan_id_str')
                     ->pluck('jurusan_id_str');
-
-        // ambil data calon siswa
-        $calonSiswaQuery = CalonSiswa::with(['jalurPendaftaran', 'syarat']);
-
-        // filter: hanya yang sudah melengkapi semua syarat
-        $calonSiswaQuery->whereHas('syarat', function ($q) {
-            $q->where('is_checked', true);
-        });
-
-        // filter jurusan kalau ada
+    
+        // Query dasar
+        $baseQuery = CalonSiswa::where('tahun_id', $tahunAktif->id)
+            ->whereHas('syarat', function ($q) {
+                $q->where('is_checked', true);
+            });
+        
+        // Filter jurusan kalau ada
         if ($request->filled('jurusan')) {
-            $calonSiswaQuery->where('jurusan', $request->jurusan);
+            $baseQuery->where('jurusan', $request->jurusan);
         }
-
-        $formulirs = $calonSiswaQuery->get();
-
+    
+        // Pisahkan siswa
+        $belumDitempatkan = (clone $baseQuery)->whereNull('kelas_tujuan')->get();
+        $sudahDitempatkan = (clone $baseQuery)->whereNotNull('kelas_tujuan')->get();
+    
         return view('admin.kesiswaan.ppdb.penempatan_kelas', compact(
-            'formulirs',
+            'belumDitempatkan',
+            'sudahDitempatkan',
             'jurusans',
             'kelas',
             'tahunAktif'
@@ -51,52 +53,25 @@ class PenempatanKelasController extends Controller
     }
 
 
+    public function updateKelas(Request $request)
+{
+    $siswaIds = $request->input('siswa_id', []);
+    $kelasTujuan = $request->input('kelas_tujuan');
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+    if (empty($siswaIds) || !$kelasTujuan) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Data tidak lengkap'
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    \App\Models\CalonSiswa::whereIn('id', $siswaIds)
+        ->update(['kelas_tujuan' => $kelasTujuan]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    return response()->json([
+        'success' => true,
+        'message' => 'Berhasil update kelas'
+    ]);
+}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

@@ -31,6 +31,7 @@ class CalonSiswa extends Model
         'kontak', 
         'asal_sekolah', 
         'kelas',
+        'kelas_tujuan',
         'jurusan', 
         'ukuran_pakaian', 
         'pembayaran'

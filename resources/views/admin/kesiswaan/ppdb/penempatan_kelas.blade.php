@@ -37,7 +37,7 @@
                         <select id="pilih_kelas" class="form-select">
                             <option value="">- Pilih Kelas Tujuan -</option>
                             @foreach ( $kelas as $rombel )
-                            <option value=""> {{ $rombel -> nama }} </option>
+                            <option value="{{ $rombel -> nama }} "> {{ $rombel -> nama }} </option>
                             {{-- Looping kelas tujuan --}}
                             @endforeach
                         </select>
@@ -62,7 +62,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($formulirs as $index => $formulir)
+                                    @forelse($belumDitempatkan as $index => $formulir)
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
                                             <td>{{ $formulir->nis ?? '-' }}</td>
@@ -97,18 +97,94 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted">Maaf, data tidak ditemukan</td>
-                                    </tr>
-                                    {{-- Loop data siswa di sini --}}
+                                    @forelse($sudahDitempatkan as $index => $siswa) 
+                                    <tr> 
+                                        <td>{{ $index + 1 }}</td> 
+                                        <td>{{ $siswa->nis ?? '-' }}</td> 
+                                        <td>{{ $siswa->nama_lengkap }}</td> 
+                                        <td>{{ $siswa->kelas_tujuan }}</td> 
+                                    </tr> 
+                                    @empty 
+                                    <tr> 
+                                        <td colspan="4" class="text-center text-muted">Tidak ada data</td> 
+                                    </tr> 
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    <div class="mt-3">
+    <button type="button" id="btnTempatkan" class="btn btn-primary" style="display:none;">
+        Tempatkan Kelas
+    </button>
+</div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    
+    let pilihKelas = document.getElementById('pilih_kelas');
+    let btnTempatkan = document.getElementById('btnTempatkan');
+
+    // Saat ganti pilihan kelas
+    pilihKelas.addEventListener('change', function() {
+        if (this.value) {
+            btnTempatkan.style.display = 'inline-block'; // munculkan
+        } else {
+            btnTempatkan.style.display = 'none'; // sembunyikan lagi
+        }
+    });
+
+    // Check all
+    document.getElementById('checkAll').addEventListener('change', function() {
+        let checkboxes = document.querySelectorAll('input[name="siswa_id[]"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+
+    // Tombol submit
+    document.getElementById('btnTempatkan').addEventListener('click', function() {
+        let kelasTujuan = document.getElementById('pilih_kelas').value;
+        let siswaIds = Array.from(document.querySelectorAll('input[name="siswa_id[]"]:checked'))
+            .map(cb => cb.value);
+
+        if (!kelasTujuan) {
+            alert("Pilih kelas tujuan dulu!");
+            return;
+        }
+
+        if (siswaIds.length === 0) {
+            alert("Checklist minimal 1 siswa!");
+            return;
+        }
+
+        // Kirim ke backend via fetch/AJAX
+        fetch("{{ route('admin.kesiswaan.ppdb.penempatan-kelas.update-kelas') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                kelas_tujuan: kelasTujuan,
+                siswa_id: siswaIds
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("Siswa berhasil ditempatkan!");
+                location.reload();
+            } else {
+                alert("Gagal: " + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Terjadi error!");
+        });
+    });
+</script>
 @endsection

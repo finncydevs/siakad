@@ -115,6 +115,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             // Penempatan Kelas
             Route::resource('penempatan-kelas', PenempatanKelasController::class);
+            Route::post('penempatan-kelas/update-kelas', 
+                [PenempatanKelasController::class, 'updateKelas']
+            )->name('penempatan-kelas.update-kelas');
+
 
             // Laporan
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
