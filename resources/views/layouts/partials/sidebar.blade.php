@@ -114,7 +114,7 @@
                     </a>
                 </li>
                 <li class="menu-item {{ request()->is('admin/akademik/mapel*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                    <a href="{{ route('admin.akademik.mapel.index') }}" class="menu-link">
                         <div data-i18n="Semester">Mapel</div>
                     </a>
                 </li>

@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\Akademik\TapelController;
 use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
 use App\Http\Controllers\Admin\Akademik\PaketKeahlianController; 
 use App\Http\Controllers\Admin\Akademik\JurusanController;
+use App\Http\Controllers\Admin\Akademik\MapelController; 
 use App\Http\Controllers\Admin\Akademik\EkstrakurikulerController;
 
 // Controller Kesiswaan
@@ -81,6 +82,7 @@ Route::prefix('akademik')->name('akademik.')->group(function () {
     Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
     Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
     Route::resource('jurusan', JurusanController::class)->only(['index']);
+    Route::get('mapel', [MapelController::class, 'index'])->name('mapel.index'); 
     Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index'])->name('ekskul.index');
 });
 
