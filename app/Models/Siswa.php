@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
+
 class Siswa extends Model
 {
     use HasFactory;
@@ -25,7 +26,7 @@ class Siswa extends Model
         'rombongan_belajar_id', 'tingkat_pendidikan_id', 'nama_rombel', 'kurikulum_id',
         'kurikulum_id_str', 'kebutuhan_khusus',
         'status',
-        'foto',   
+        'foto',
     ];
 
     protected $casts = [
@@ -45,10 +46,10 @@ class Siswa extends Model
      * Ini sangat penting agar view tidak error saat memanggil $siswa->rombel.
      * Asumsi: foreign key di tabel siswas adalah 'rombongan_belajar_id'.
      */
-    public function rombel()
-    {
-        return $this->belongsTo(Rombel::class, 'rombongan_belajar_id');
-    }
+    // public function rombel()
+    // {
+    //     return $this->belongsTo(Rombel::class, 'rombongan_belajar_id');
+    // }
 
     public function getFotoUrlAttribute()
     {

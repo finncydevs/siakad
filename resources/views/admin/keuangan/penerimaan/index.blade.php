@@ -138,7 +138,7 @@
 
                         <!-- Tab Formulir Transaksi -->
                         <div class="tab-pane fade" id="form-transaksi" role="tabpanel">
-                           <form class="card-body" action="{{ route('keuangan.penerimaan.store') }}" method="POST"> {{-- Menambahkan padding di sini --}}
+                           <form class="card-body" action="{{ route('admin.keuangan.penerimaan.store') }}" method="POST"> {{-- Menambahkan padding di sini --}}
                                 @csrf
                                 <input type="hidden" name="siswa_id" value="{{ $siswaDipilih->id }}">
                                 <div class="row">

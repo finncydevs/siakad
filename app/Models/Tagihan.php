@@ -5,41 +5,39 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class KasMutasi extends Model
+class Tagihan extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel yang terhubung dengan model ini.
-     *
-     * @var string
-     */
-    protected $table = 'kas_mutasis';
-
-    /**
-     * Mass assignment protection.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * Tipe data native untuk atribut.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'tanggal' => 'date',
+    protected $table = 'tagihans';
+    protected $fillable = [
+        'siswa_id', 'iuran_id', 'tahun_ajaran_id', 'periode',
+        'jumlah_tagihan', 'sisa_tagihan', 'status'
     ];
-    public function masterKas(): BelongsTo
+
+    /**
+     * Relasi ke siswa yang memiliki tagihan ini.
+     */
+    public function siswa(): BelongsTo
     {
-        return $this->belongsTo(MasterKas::class);
+        return $this->belongsTo(Siswa::class);
     }
 
-    public function sumber(): MorphTo
+    /**
+     * Relasi ke jenis iuran.
+     */
+    public function iuran(): BelongsTo
     {
-        return $this->morphTo(__FUNCTION__, 'sumber_transaksi', 'transaksi_id');
+        return $this->belongsTo(Iuran::class);
+    }
+
+    /**
+     * Relasi ke semua pembayaran yang melunasi tagihan ini.
+     */
+    public function pembayarans(): HasMany
+    {
+        return $this->hasMany(Pembayaran::class);
     }
 }
