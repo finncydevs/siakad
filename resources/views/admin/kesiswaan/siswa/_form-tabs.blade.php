@@ -27,8 +27,8 @@
         </button>
     </li>
     <li class="nav-item">
-        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#kesehatan" aria-controls="kesehatan" aria-selected="false">
-            <i class="bx bx-health me-1"></i> Kesehatan
+        <button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#Periodik" aria-controls="Periodik" aria-selected="false">
+            <i class="bx bx-health me-1"></i> Periodik
         </button>
     </li>
 </ul>
@@ -185,8 +185,8 @@
         </div>
     </div>
 
-    <!-- Kesehatan Tab -->
-    <div class="tab-pane fade" id="kesehatan" role="tabpanel">
+    <!-- Periodik Tab -->
+    <div class="tab-pane fade" id="Periodik" role="tabpanel">
         <div class="row">
             <div class="col-md-6 mb-3">
                 <label for="tinggi_badan" class="form-label">Tinggi Badan (cm)</label>

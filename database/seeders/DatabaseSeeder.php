@@ -16,7 +16,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SemesterSeeder::class,
+<<<<<<< HEAD
             UserSeeder::class, // <-- 2. Panggil UserSeeder di sini
+=======
+            PengaturanAbsensiSeeder::class,       
+>>>>>>> origin/modul/absensi
         ]);
 
         // User::factory()->create([ ... ]); // <-- 3. Baris ini dihapus karena sudah ditangani oleh UserSeeder

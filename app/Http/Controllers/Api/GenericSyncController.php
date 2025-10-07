@@ -61,17 +61,26 @@ class GenericSyncController extends Controller
 
             if ($tableName === 'siswas') {
 
+                // --- INI PERUBAHAN UTAMANYA ---
+                // 1. Ambil data siswa yang ada, atau buat instance baru jika tidak ada.
                 $siswa = Siswa::firstOrNew([
                     $identifierColumn => $row[$identifierColumn]
                 ]);
 
+                // 2. Isi data siswa dengan data DARI DAPODIK.
+                // Metode fill() hanya akan mengisi kolom yang ada di $row.
+                // Kolom 'foto' yang ada di database tidak akan tersentuh.
                 $siswa->fill($row);
                 $siswa->save();
+                // --- AKHIR PERUBAHAN ---
+
+                // Cek apakah siswa ini BARU DIBUAT dan belum punya token
                 if ($siswa->wasRecentlyCreated && is_null($siswa->qr_token)) {
                     $siswa->qr_token = Str::uuid()->toString();
                     $siswa->save();
                 }
             } else {
+                // Untuk tabel lain, gunakan metode yang sudah ada
                 DB::table($tableName)->updateOrInsert(
                     [$identifierColumn => $row[$identifierColumn]],
                     $row
@@ -87,6 +96,7 @@ class GenericSyncController extends Controller
             'details' => count($dataFromDapodik) . ' data berhasil diproses.'
         ]);
     }
+}
 
     /**
      * Helper untuk menebak kolom mana yang menjadi Primary Key dari Dapodik
