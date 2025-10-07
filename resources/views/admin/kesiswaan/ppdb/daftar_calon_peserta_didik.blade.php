@@ -106,20 +106,31 @@
                 </td>
 
                 <td class="text-center">
-                  <div class="d-flex justify-content-center gap-2">
-                    <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}" 
-                       class="btn btn-sm btn-icon btn-outline-primary" title="Edit">
-                      <i class="bx bx-edit"></i>
-                    </a>
-                    <form action="{{-- {{ route('admin.kesiswaan.ppdb.formulir.destroy', $calon->id) }} --}}" method="POST" onsubmit="return confirm('Yakin hapus?')">
-                      @csrf
-                      @method('DELETE')
-                      <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus">
-                        <i class="bx bx-trash"></i>
-                      </button>
-                    </form>
-                  </div>
+                    @if($calon->status != 3)
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}" 
+                               class="btn btn-sm btn-icon btn-outline-primary" title="Edit">
+                              <i class="bx bx-edit"></i>
+                            </a>
+                          
+                            {{-- Tombol Cetak Resi --}}
+                            <a href="{{ route('admin.kesiswaan.ppdb.daftar_calon.resi', $calon->id) }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-icon btn-outline-secondary" title="Cetak Resi">
+                              <i class="bx bx-printer"></i>
+                            </a>
+
+                            <form action="{{ route('admin.kesiswaan.ppdb.daftar-calon-peserta-didik.destroy', $calon->id) }} " method="POST" onsubmit="return confirm('Yakin hapus?')">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus">
+                                <i class="bx bx-trash"></i>
+                              </button>
+                            </form>
+                        </div>
+                    @endif
                 </td>
+
               </tr>
             @empty
               <tr>

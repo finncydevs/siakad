@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\CalonSiswa;
 use App\Models\TahunPelajaran;
+use App\Models\ProfilSekolah;
 
 class DaftarCalonPesertaDidikController extends Controller
 {
@@ -28,51 +29,25 @@ class DaftarCalonPesertaDidikController extends Controller
         return view('admin.kesiswaan.ppdb.daftar_calon_peserta_didik', compact('formulirs', 'tahunAktif'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function resi($id)
     {
-        //
+        // Ambil data calon siswa + relasi
+        $calon = CalonSiswa::with(['jalurPendaftaran', 'syarat'])
+            ->findOrFail($id);
+
+        
+        $profilSekolah = ProfilSekolah::first(); // ambil data profil
+
+        // Kirim ke view khusus resi
+        return view('admin.kesiswaan.ppdb.resi_calon', compact('calon','profilSekolah'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+    public function destroy($id)
+{
+    $calon = CalonSiswa::findOrFail($id);
+    $calon->delete();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+    return redirect()->back()->with('success', 'Data berhasil dihapus');
+}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 }

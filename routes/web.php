@@ -117,6 +117,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
             )->name('pemberian-nis.generate');
             Route::resource('pemberian-nis', PemberianNisController::class);
 
+            Route::get('daftar-calon/resi/{id}', [DaftarCalonPesertaDidikController::class, 'resi'])->name('daftar_calon.resi');
 
             // Data Peserta Didik
             Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
