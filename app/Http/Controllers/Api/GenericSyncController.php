@@ -96,7 +96,6 @@ class GenericSyncController extends Controller
             'details' => count($dataFromDapodik) . ' data berhasil diproses.'
         ]);
     }
-}
 
     /**
      * Helper untuk menebak kolom mana yang menjadi Primary Key dari Dapodik
