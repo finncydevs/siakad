@@ -71,6 +71,15 @@
                 <div data-i18n="Profil Sekolah">Profil Sekolah</div>
             </a>
         </li>
+        <!-- Pengaturan Dasar (Profil Sekolah) -->
+        {{-- <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan</span></li> --}}
+    <li class="menu-item {{ request()->is('admin/pengaturan*') ? 'active' : '' }}">
+        {{-- UBAH BAGIAN INI --}}
+        <a href="{{ route('admin.pengaturan.sekolah.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons bx bxs-school"></i>
+            <div data-i18n="Data Sekolah">Data Sekolah</div>
+        </a>
+    </li>
 
         <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -78,11 +87,13 @@
                 <div data-i18n="Kepegawaian">Kepegawaian</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('admin/kepegawaian/pegawai*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.kepegawaian.pegawai.index') }}" class="menu-link">
-                        <div data-i18n="Data Pegawai">Data Pegawai</div>
-                    </a>
-                </li>
+                <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'active' : '' }}">
+        {{-- UBAH BAGIAN INI --}}
+        <a href="{{ route('admin.kepegawaian.gtk.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons bx bxs-user-badge"></i>
+            <div data-i18n="Data GTK">Data GTK</div>
+        </a>
+    </li>
                 <li class="menu-item {{ request()->is('admin/kepegawaian/tugas-pegawai*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.tugas-pegawai.index') }}" class="menu-link">
                         <div data-i18n="Tugas Pegawai">Tugas Pegawai</div>

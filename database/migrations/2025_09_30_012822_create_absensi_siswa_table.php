@@ -10,12 +10,12 @@ return new class extends Migration
     {
         Schema::create('absensi_siswa', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('jadwal_id')->constrained('jadwal_pelajaran')->onDelete('cascade');
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
+            $table->unsignedBigInteger('jadwal_id');
+            $table->unsignedBigInteger('siswa_id');
             $table->date('tanggal');
             $table->enum('status', ['Hadir', 'Sakit', 'Izin', 'Alfa']);
             $table->text('keterangan')->nullable();
-            $table->foreignId('dicatat_oleh')->constrained('penggunas')->onDelete('cascade');
+            $table->unsignedBigInteger('dicatat_oleh');
             $table->timestamps();
         });
     }

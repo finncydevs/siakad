@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('jadwal_pelajaran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rombel_id')->constrained('rombels')->onDelete('cascade');
+            $table->unsignedBigInteger('rombel_id');
             $table->string('ptk_id'); // Merujuk ke ptk_id di tabel gtks
             $table->string('mata_pelajaran');
             $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);

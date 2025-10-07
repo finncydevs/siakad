@@ -5,10 +5,9 @@
     use Illuminate\Database\Eloquent\Factories\HasFactory;
     use Illuminate\Database\Eloquent\Model;
 
-    class Gtk extends Model
+    class Sekolah extends Model
     {
         use HasFactory;
 
-        protected $table = 'gtks'; // Menentukan nama tabel secara eksplisit
         protected $guarded = [];
     }

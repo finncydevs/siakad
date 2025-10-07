@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('absensi_gtk', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('gtk_id')->constrained('gtks')->onDelete('cascade');
+            $table->unsignedBigInteger('gtk_id');
             $table->date('tanggal');
             $table->time('jam_masuk')->nullable();
             $table->time('jam_pulang')->nullable();
