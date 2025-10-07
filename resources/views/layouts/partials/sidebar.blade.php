@@ -103,14 +103,31 @@
                         <div data-i18n="Tahun Pelajaran">Tahun Pelajaran</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
                         <div data-i18n="Semester">Semester</div>
                     </a>
-                </li>
+                </li> --}}
                 <li class="menu-item {{ request()->is('admin/akademik/jadwal*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.jadwal.index') }}" class="menu-link">
                         <div data-i18n="Jadwal Pelajaran">Jadwal Pelajaran</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li class="menu-item {{ request()->is('admin/akademik/jurusan*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.jurusan.index') }}" class="menu-link">
+                        <div data-i18n="Jurusan">Konsentrasi Keahlian</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/akademik/mapel*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Mapel</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/akademik/ekstarakulikuler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Ekstrakulikuler</div>
                     </a>
                 </li>
             </ul>
@@ -136,6 +153,9 @@
                         <div data-i18n="Scan Absensi QR">Scan Absensi QR</div>
                     </a>
                 </li>
+                <li class="menu-item {{ request()->is('admin/akademik/ekstarakulikuler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
+                        <div data-i18n="Semester">Ekstrakulikuler</div>
                 {{-- AKHIR MENU BARU --}}
                 <li class="menu-item {{ request()->is('admin/absensi/izin-siswa*') ? 'active' : '' }}">
                 <a href="{{ route('admin.absensi.izin-siswa.index') }}" class="menu-link">
