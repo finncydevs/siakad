@@ -48,14 +48,16 @@
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">Sekull</span>
         </a>
+
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="bx bx-chevron-left bx-sm align-middle"></i>
         </a>
     </div>
+
     <div class="menu-inner-shadow"></div>
+
     <ul class="menu-inner py-1">
 
-        <!-- Dashboard -->
         <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
             <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -63,7 +65,6 @@
             </a>
         </li>
 
-        <!-- Pengaturan Dasar (Profil Sekolah) -->
         <li class="menu-item {{ request()->is('admin/pengaturan/profil_sekolah*') ? 'active' : '' }}">
             <a href="{{ route('admin.pengaturan.profil_sekolah.edit') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-school"></i>
@@ -71,7 +72,6 @@
             </a>
         </li>
 
-        <!-- Kepegawaian -->
         <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-user-badge"></i>
@@ -91,7 +91,6 @@
             </ul>
         </li>
 
-        <!-- Akademik -->
         <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
@@ -111,7 +110,6 @@
             </ul>
         </li>
 
-        <!-- Kesiswaan -->
         <li class="menu-item {{ request()->is('admin/kesiswaan*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
@@ -184,40 +182,6 @@
                 <li class="menu-item {{ request()->is('admin/kesiswaan/siswa*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kesiswaan.siswa.index') }}" class="menu-link">
                         <div data-i18n="Data Siswa">Data Siswa</div>
-                    </a>
-                </li>
-            </ul>
-        </li>
-
-         <li class="menu-item {{ request()->routeIs('admin.keuangan.*') ? 'open' : '' }}">
-            <a href="javascript:void(0);" class="menu-link menu-toggle">
-                <i class="menu-icon tf-icons ti ti-cash"></i>
-                <div data-i18n="Keuangan">Keuangan</div>
-            </a>
-            <ul class="menu-sub">
-                <li class="menu-item {{ request()->routeIs('admin.keuangan.penerimaan.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.keuangan.penerimaan.index') }}" class="menu-link">
-                        <div data-i18n="Penerimaan">Penerimaan</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->routeIs('admin.keuangan.pengeluaran.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.keuangan.pengeluaran.index') }}" class="menu-link">
-                        <div data-i18n="Pengeluaran">Pengeluaran</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->routeIs('admin.keuangan.kas.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.keuangan.kas.index') }}" class="menu-link">
-                        <div data-i18n="Buku Kas">Buku Kas</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->routeIs('admin.keuangan.iuran.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.keuangan.iuran.index') }}" class="menu-link">
-                        <div data-i18n="Pengaturan Iuran">Pengaturan Iuran</div>
-                    </a>
-                </li>
-                 <li class="menu-item {{ request()->routeIs('admin.keuangan.voucher.index') ? 'active' : '' }}">
-                    <a href="{{ route('admin.keuangan.voucher.index') }}" class="menu-link">
-                        <div data-i18n="Manajemen Voucher">Manajemen Voucher</div>
                     </a>
                 </li>
             </ul>

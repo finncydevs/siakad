@@ -29,6 +29,8 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            // 'role' => ['required', 'string'], // <-- HAPUS ATAU BERI KOMENTAR BARIS INI
+            'tahun_pelajaran' => ['required', 'string'], // Pastikan validasi tahun pelajaran tetap ada jika diperlukan
         ];
     }
 

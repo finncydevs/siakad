@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use Database\Seeders\SemesterSeeder;
-
+use Database\Seeders\UserSeeder; // <-- 1. Import UserSeeder
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -15,13 +15,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            SemesterSeeder::class,       
+            SemesterSeeder::class,
+            UserSeeder::class, // <-- 2. Panggil UserSeeder di sini
         ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-        
+        // User::factory()->create([ ... ]); // <-- 3. Baris ini dihapus karena sudah ditangani oleh UserSeeder
     }
 }
