@@ -29,6 +29,12 @@ use App\Http\Controllers\Admin\Rombel\RombelEkstrakurikulerController;
 use App\Http\Controllers\Admin\Rombel\RombelMapelPilihanController;
 use App\Http\Controllers\Admin\Rombel\RombelWaliController;
 
+use App\Http\Controllers\Admin\Keuangan\IuranController;
+use App\Http\Controllers\Admin\Keuangan\KasController;
+use App\Http\Controllers\Admin\Keuangan\PembayaranController;
+use App\Http\Controllers\Admin\Keuangan\PengeluaranController;
+use App\Http\Controllers\Admin\Keuangan\VoucherController;
+
 // Controller Pengaturan
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 

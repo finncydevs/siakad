@@ -71,7 +71,7 @@ class StudentController extends Controller
         // Rule 'unique' harus mengabaikan NIS milik siswa yang sedang diedit
         'nis' => 'required|string|max:15|unique:students,nis,' . $student->id,
         'class' => 'required|string|max:255',
-        'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
     if ($validator->fails()) {
@@ -99,7 +99,7 @@ class StudentController extends Controller
     // 5. Kembalikan respons redirect dengan pesan sukses
     return to_route('students.page')->with('message', 'Data siswa berhasil diperbarui!');
 }
-    
+
     // DELETE
     public function destroy(Student $student)
     {
@@ -120,7 +120,7 @@ class StudentController extends Controller
         '*.peserta_didik_id' => 'required|string',
         '*.nama' => 'required|string',
         '*.nisn' => 'nullable|string',
-        '*.nama_rombel' => 'required|string',
+        '*.nama' => 'required|string',
     ]);
 
     if ($validator->fails()) {
@@ -133,7 +133,7 @@ class StudentController extends Controller
 
     $dataFromDapodik = $request->all();
     $totalDiterima = count($dataFromDapodik);
-    
+
     $createdCount = 0;
     $updatedCount = 0;
     $skippedCount = 0;
@@ -143,7 +143,7 @@ class StudentController extends Controller
             $skippedCount++;
             continue;
         }
-        
+
         // Data yang akan dimasukkan atau diperbarui
         $studentData = [
             'name'  => $siswaDapodik['nama'],
@@ -177,6 +177,6 @@ class StudentController extends Controller
         'details' => $detailsMessage,
     ]);
 
-    
+
 }
 }

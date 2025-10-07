@@ -31,6 +31,7 @@ class Siswa extends Model
 
     protected $casts = [
         'riwayat_penyakit' => 'array',
+        
         'data_ayah' => 'array',
         'data_ibu' => 'array',
         'data_wali_laki' => 'array',
@@ -46,17 +47,18 @@ class Siswa extends Model
      * Ini sangat penting agar view tidak error saat memanggil $siswa->rombel.
      * Asumsi: foreign key di tabel siswas adalah 'rombongan_belajar_id'.
      */
-    // public function rombel()
-    // {
-    //     return $this->belongsTo(Rombel::class, 'rombongan_belajar_id');
-    // }
+    public function rombel()
+    {
+        return $this->belongsTo(Rombel::class, 'rombongan_belajar_id');
+    }
 
     public function getFotoUrlAttribute()
     {
         if ($this->foto && Storage::disk('public')->exists($this->foto)) {
             return Storage::disk('public')->url($this->foto);
         }
-        return asset('images/default-avatar.png');
+      return  Storage::url('default_avatar.webp');
+
     }
 
     public function scopeAktif($query)

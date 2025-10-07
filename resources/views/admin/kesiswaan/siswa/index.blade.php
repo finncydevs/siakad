@@ -7,85 +7,86 @@
 
 {{-- Notifikasi --}}
 @if (session('success'))
-    <div class="alert alert-success d-flex align-items-center" role="alert">
-        <span class="alert-icon text-success me-2"><i class="ti ti-check ti-xs"></i></span>
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <strong>Sukses!</strong> {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
 @endif
 
+{{-- Card Container --}}
 <div class="card">
     <div class="card-header">
-        <div class="d-flex justify-content-between align-items-center row py-2 gap-3 gap-md-0">
-            <div class="col-md-4">
-                 <a href="{{ route('admin.kesiswaan.siswa.create') }}" class="btn btn-primary">
-                    <i class="ti ti-plus me-1"></i> Tambah Siswa
-                </a>
-            </div>
-            <div class="col-md-8">
-                <form action="{{ route('admin.kesiswaan.siswa.index') }}" method="GET" class="d-flex justify-content-end align-items-center">
-                    <label for="rombel_id" class="me-2">Kelas:</label>
-                    <select name="rombel_id" id="rombel_id" class="form-select" onchange="this.form.submit()" style="width: 250px;">
-                        <option value="">Semua Kelas</option>
-                        @foreach($rombels as $rombel)
-                        <option value="{{ $rombel->id }}" {{ request('rombel_id') == $rombel->id ? 'selected' : '' }}>
-                            {{ $rombel->nama_rombel }}
-                        </option>
-                        @endforeach
-                    </select>
-                </form>
-            </div>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+            <form action="{{ route('admin.kesiswaan.siswa.index') }}" method="GET" class="d-flex">
+                <input type="text" name="search" id="search" class="form-control me-2" placeholder="Cari nama, NIS/NISN..." value="{{ request('search') }}">
+                <select name="rombel_id" id="rombel_id" class="form-select me-2" style="width: 200px;">
+                    <option value="">Semua Kelas</option>
+                    @foreach($rombels as $rombel)
+                    <option value="{{ $rombel->id }}" {{ request('rombel_id') == $rombel->id ? 'selected' : '' }}>
+                        {{ $rombel->nama }}
+                    </option>
+                    @endforeach
+                </select>
+                <button type="submit" class="btn btn-secondary">Cari</button>
+            </form>
         </div>
     </div>
-    <div class="table-responsive text-nowrap">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>No</th>
-                    <th>Foto</th>
-                    <th>Nama Lengkap</th>
-                    <th>NIS / NISN</th>
-                    <th>L/P</th>
-                    <th>Kelas Aktif</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="table-border-bottom-0">
-                @forelse($siswas as $key => $siswa)
-                <tr>
-                    <td>{{ $key + 1 }}</td>
-                    <td>
-                        <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
-                            <li data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="top" class="avatar avatar-sm pull-up" title="{{ $siswa->nama }}">
-                                <img src="{{ $siswa->foto_url }}" alt="Avatar" class="rounded-circle">
-                            </li>
-                        </ul>
-                    </td>
-                    <td><strong>{{ $siswa->nama }}</strong></td>
-                    <td>{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</td>
-                    <td>{{ $siswa->jenis_kelamin == 'Laki-laki' ? 'L' : 'P' }}</td>
-                    <td>
-                        <span class="badge bg-label-primary me-1">{{ $siswa->rombel?->nama_rombel ?? 'N/A' }}</span>
-                    </td>
-                    <td>
-                        <div class="dropdown">
-                            <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{ route('admin.kesiswaan.siswa.show', $siswa->id) }}"><i class="ti ti-eye me-1"></i> Lihat</a>
-                                <a class="dropdown-item" href="{{ route('admin.kesiswaan.siswa.edit', $siswa->id) }}"><i class="ti ti-pencil me-1"></i> Edit</a>
-                                <form action="{{ route('admin.kesiswaan.siswa.destroy', $siswa->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data siswa ini? Semua data terkait (tagihan, pembayaran) juga akan terhapus.');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="dropdown-item"><i class="ti ti-trash me-1"></i> Hapus</button>
-                                </form>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="7" class="text-center">Tidak ada data untuk ditampilkan.</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+
+    {{-- Tabel Data --}}
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>No</th>
+                        <th>Foto</th>
+                        <th>Nama Lengkap</th>
+                        <th>NIS / NISN</th>
+                        <th>L/P</th>
+                        <th>Kelas Aktif</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($siswas as $key => $siswa)
+                    <tr>
+                        {{-- Penomoran yang disesuaikan dengan paginasi --}}
+                        <td>{{ ($siswas->currentPage() - 1) * $siswas->perPage() + $loop->iteration }}</td>
+                        <td>
+                            <img src="{{ $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://placehold.co/100x100/EFEFEF/AAAAAA?text=Foto' }}" alt="Avatar" style="width: 40px; height: 40px;" class="rounded-circle object-cover">
+                        </td>
+                        <td><strong>{{ $siswa->nama }}</strong></td>
+                        <td>{{ $siswa->nis ?? '-' }} / {{ $siswa->nisn ?? '-' }}</td>
+                        <td>{{ $siswa->jenis_kelamin == 'Laki-laki' ? 'L' : 'P' }}</td>
+                        <td>
+                            <span class="badge bg-primary">
+                                {{ $siswa->rombel?->nama_rombel ?? 'N/A' }}
+                            </span>
+                        </td>
+                        <td>
+                           <a href="{{ route('admin.kesiswaan.siswa.show', $siswa->id) }}" class="btn btn-info btn-sm" title="Lihat">
+                                <i class="fa fa-eye"></i>
+                           </a>
+                           <a href="{{ route('admin.kesiswaan.siswa.edit', $siswa->id) }}" class="btn btn-warning btn-sm" title="Edit">
+                                <i class="fa fa-edit"></i>
+                           </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center">Tidak ada data untuk ditampilkan.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Pagination Links --}}
+        <div class="mt-3 d-flex justify-content-end">
+            {{-- appends() digunakan agar parameter search dan filter tetap ada saat pindah halaman --}}
+            {{ $siswas->appends(request()->query())->links() }}
+        </div>
     </div>
 </div>
 @endsection
+
