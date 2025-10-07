@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Kesiswaan;
+namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;

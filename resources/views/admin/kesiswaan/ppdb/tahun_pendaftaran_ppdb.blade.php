@@ -21,7 +21,7 @@
                 </tr>
               </thead>
               <tbody class="table-border-bottom-0">
-                  @foreach ($tahunPelajaran as $index => $tahun)
+                  @forelse ($tahunPelajaran as $index => $tahun)
                   <tr>
                       <td>{{ $index + 1 }}</td>
                       <td>{{ $tahun->tahun_pelajaran }}</td>
@@ -59,7 +59,11 @@
                       </td>
 
                   </tr>
-                  @endforeach
+                  @empty
+                  <tr>
+                    <td colspan="5" class="text-center">Belum ada tahun pendaftaran</td>
+                  </tr>
+                  @endforelse
               </tbody>
 
             </table>

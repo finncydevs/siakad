@@ -79,7 +79,7 @@
                             <label for="tahunPendaftaran" class="form-label">Tahun Pendaftaran</label>
                             <input type="text" id="tahunPendaftaran" class="form-control" 
                                    value="{{ $tahunPpdb?->tahun_pelajaran ?? 'Tahun Pendaftaran Tidak ada yang aktif' }}" readonly>
-                            <input type="hidden" name="tahun_id" value="{{ $tahunPpdb?->id }}">
+                            <input type="hidden" name="tahun_id" value="{{ $tahunPpdb ? $tahunPpdb->id : '' }}">
                         </div>
                         <div class="col">
                             <label for="keahlian" class="form-label">Keahlian</label>

@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Admin\Kesiswaan;
+namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-class LaporanQuotaController extends Controller
+class LaporanPendaftaranController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.laporan_quota');
+        return view('admin.kesiswaan.ppdb.laporan_pendaftaran');
     }
 
     /**
