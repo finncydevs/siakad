@@ -51,15 +51,15 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 10px;
+            font-size: 14px; /* PERUBAHAN: Diperbesar dari 12px */
             font-weight: bold;
             color: #333;
             flex-shrink: 0;
         }
         
         .school-logo {
-            width: 24px;
-            height: 24px;
+            width: 32px; /* PERUBAHAN: Diperbesar dari 28px */
+            height: 32px; /* PERUBAHAN: Diperbesar dari 28px */
         }
 
         .card-photo-area {
@@ -68,24 +68,13 @@
             background-size: cover;
             background-position: center;
         }
-
-        .card-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, rgba(0,0,0,0.85) 20%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.1) 100%);
-            z-index: 1;
-        }
         
         .card-content {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            /* PERUBAHAN: Padding bawah ditambah untuk memberi ruang QR code yang lebih besar */
-            padding: 0 12px 95px 12px; 
+            padding: 0 12px 95px 12px;
             box-sizing: border-box;
             z-index: 2;
             color: white;
@@ -96,15 +85,15 @@
             font-weight: bold;
             text-transform: uppercase;
             margin-bottom: 2px;
-            text-shadow: 1px 1px 4px rgba(0,0,0,1);
+            text-shadow: 1px 1px 5px rgba(0,0,0,1);
         }
         
         .student-info .nisn {
             font-size: 11px;
-            background-color: rgba(255, 255, 255, 0.25);
-            padding: 2px 6px;
-            border-radius: 4px;
+            background-color: transparent;
+            padding: 2px 0;
             display: inline-block;
+            text-shadow: 1px 1px 3px rgba(0,0,0,1);
         }
 
         .qr-code {
@@ -112,10 +101,12 @@
             bottom: 15px;
             right: 15px;
             z-index: 2;
+            background: white;
+            padding: 4px;
+            border-radius: 4px;
         }
         
         .qr-code svg {
-            /* PERUBAHAN: Ukuran QR code diperbesar lagi */
             width: 22mm;
             height: 22mm;
             display: block;
@@ -153,7 +144,6 @@
                 </div>
                 
                 <div class="card-photo-area" style="background-image: url('{{ $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://via.placeholder.com/400x600' }}');">
-                    <div class="card-overlay"></div>
 
                     <div class="card-content">
                         <div class="student-info">
@@ -163,13 +153,7 @@
                     </div>
 
                     <div class="qr-code">
-                        @php
-                            $svg = QrCode::size(150)->generate($siswa->qr_token);
-                            $svg = preg_replace('/<rect.*?fill="#ffffff".*?\/>/', '', $svg);
-                            $svg = str_replace('fill="#000000"', 'fill="#ffffff"', $svg);
-                        @endphp
-                        
-                        {!! $svg !!}
+                        {!! QrCode::size(150)->generate($siswa->qr_token) !!}
                     </div>
                 </div>
             </div>

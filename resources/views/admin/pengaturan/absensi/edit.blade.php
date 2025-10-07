@@ -15,10 +15,10 @@
                 @foreach ($pengaturan as $item)
                 <div class="card accordion-item">
                     <h2 class="accordion-header" id="heading-{{ $item->hari }}">
-                        <button type="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $item->hari }}" aria-expanded="false" aria-controls="collapse-{{ $item->hari }}">
-                            <i class='bx bxs-calendar-edit me-2'></i>
-                            <strong>Pengaturan Hari {{ $item->hari }}</strong>
-                        </button>
+                        <a href="#" role="button" class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#collapse-{{ $item->hari }}" aria-expanded="false" aria-controls="collapse-{{ $item->hari }}">
+    <i class='bx bxs-calendar-edit me-2'></i>
+    <strong>Pengaturan Hari {{ $item->hari }}</strong>
+</a>
                     </h2>
                     <div id="collapse-{{ $item->hari }}" class="accordion-collapse collapse" data-bs-parent="#accordionPengaturan">
                         <div class="card-body">

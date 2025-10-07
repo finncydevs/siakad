@@ -421,33 +421,41 @@ document.addEventListener('DOMContentLoaded', function () {
             return response.json();
         })
         .then(data => {
-            if (data.success) {
-                let statusType = 'success';
-                let statusMessage = '';
-                
-                // --- LOGIKA BARU UNTUK MENENTUKAN TIPE NOTIFIKASI ---
-                const status = data.status;
-                if (status === 'Terlambat') {
-                    statusType = 'warning';
-                    statusMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
-                } else if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') {
-                    statusType = 'success';
-                    statusMessage = 'Status: Kehadiran Tercatat.';
-                } else if (status === 'Pulang' || status === 'Pulang Awal' || status === 'Pulang Awal (Izin)') {
-                    statusType = 'info';
-                    statusMessage = 'Status: Absen Pulang Tercatat.';
-                } else { // Untuk pesan info lain seperti "Izin keluar dikonfirmasi" atau "Selamat datang kembali"
-                    statusType = 'info';
-                    statusMessage = 'Status: Aksi Berhasil Dicatat.';
-                }
+            if (data.success) {
+                let statusType = 'success';
+                let mainMessage;
+                let subMessage;
+                
+                const status = data.status;
+                const studentName = data.siswa?.nama;
 
-                showFeedback(statusType, data.message, data.siswa?.nama || '', statusMessage, data.foto);
-                fetchInitialScans();
-            } else {
-                const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
-                showFeedback('danger', 'Gagal', data.message, 'Silakan coba lagi.', photoPlaceholder);
-            }
-        })
+                if (status === 'Terlambat') {
+                    statusType = 'warning';
+                    mainMessage = studentName;
+                    subMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
+                } else if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') {
+                    statusType = 'success';
+                    mainMessage = studentName;
+                    subMessage = 'Status: Kehadiran Tercatat.';
+                } else if (status === 'Pulang' || status === 'Pulang Awal' || status === 'Pulang Awal (Izin)') {
+                    statusType = 'info';
+                    mainMessage = studentName;
+                    subMessage = 'Status: Absen Pulang Tercatat.';
+                } else { 
+                    // PERBAIKAN: Untuk pesan custom seperti Izin Keluar atau Kembali
+                    statusType = 'info';
+                    mainMessage = data.message; // Jadikan pesan dari backend sebagai judul utama
+                    subMessage = studentName || 'Status: Aksi Berhasil Dicatat.'; // Jadikan nama siswa (jika ada) sebagai sub-judul
+                }
+
+                // Menggunakan variabel yang sudah disiapkan untuk ditampilkan di modal
+                showFeedback(statusType, data.message, mainMessage, subMessage, data.foto);
+                fetchInitialScans();
+            } else {
+                const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
+                showFeedback('danger', 'Gagal', data.message, 'Silakan coba lagi.', photoPlaceholder);
+            }
+        })
         .catch(error => {
             console.error('Scan Error:', error);
             if (error.data && error.data.siswa) {
