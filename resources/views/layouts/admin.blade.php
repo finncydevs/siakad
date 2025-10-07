@@ -42,8 +42,6 @@
         </div>
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
