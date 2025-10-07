@@ -43,8 +43,8 @@ class Siswa extends Model
         'nomor_telepon_rumah',
         'nomor_telepon_selular',
         'nama_ayah',
-        // Tambahkan kolom lain dari tabel siswa yang ingin Anda kelola
-        'anggota_rombel_id',
+        // Kolom relasi yang benar
+        'rombongan_belajar_id',
         'nama_rombel',
     ];
 
@@ -63,18 +63,16 @@ class Siswa extends Model
      */
     public function rombel()
     {
-        // Relasi ini mengasumsikan 'anggota_rombel_id' di tabel 'siswa'
-        // berelasi dengan 'id' di tabel 'rombels'.
-        return $this->belongsTo(Rombel::class, 'anggota_rombel_id', 'id');
+        // Relasi yang sudah diperbaiki sesuai struktur tabel
+        return $this->belongsTo(Rombel::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
     }
 
     /**
      * Mendapatkan semua riwayat pelanggaran yang dimiliki siswa ini.
-     * Ini adalah relasi kebalikan dari yang ada di PelanggaranNilai.
      */
     public function pelanggaran()
     {
-        return $this->hasMany(PelanggaranNilai::class, 'NIS', 'nis');
+        // Relasi yang sudah diperbaiki (menggunakan 'nipd' sebagai kunci lokal)
+        return $this->hasMany(PelanggaranNilai::class, 'NIS', 'nipd');
     }
 }
-

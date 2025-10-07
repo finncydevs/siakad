@@ -14,9 +14,8 @@ use App\Models\PelanggaranSanksi;
 use App\Models\PelanggaranNilai;
 use App\Models\Siswa;
 use App\Models\Rombel;
-use App\Models\Tapel;      // Asumsi model Tahun Pelajaran sudah ada
-use App\Models\Semester;  // Asumsi model Semester sudah ada
-use App\Models\Mapel;     // Asumsi model Mata Pelajaran sudah ada
+use App\Models\TahunPelajaran as Tapel;
+use App\Models\Semester;
 
 class IndisiplinerSiswaController extends Controller
 {
@@ -103,7 +102,7 @@ class IndisiplinerSiswaController extends Controller
 
     public function updateSanksi(Request $request, PelanggaranSanksi $pelanggaranSanksi)
     {
-         $request->validate([
+        $request->validate([
             'poin_min' => 'required|integer|min:0',
             'poin_max' => 'required|integer|gte:poin_min',
             'nama' => 'required|string|max:255',
@@ -126,43 +125,62 @@ class IndisiplinerSiswaController extends Controller
 
     public function daftarIndex(Request $request)
     {
-        $rombels = Rombel::pluck('nama', 'id');
-        $query = PelanggaranNilai::with('siswa', 'detailPoin.kategori', 'rombel')->latest('tanggal')->latest('jam');
+        // Data untuk filter dan form modal
+        $tapels = Tapel::orderBy('tahun_pelajaran', 'desc')->get();
+        $semesters = Semester::all();
+        
+        // ====================================================================
+        // INI ADALAH BARIS YANG TELAH DIPERBAIKI
+        $rombels = Rombel::select('id', 'nama')->orderBy('nama')->get()->unique('nama');
+        // ====================================================================
 
+        $kategoriList = PelanggaranKategori::with('pelanggaranPoin')->orderBy('nama')->get();
+        $siswaList = collect();
+
+        if ($request->filled('rombel_id')) {
+            $siswaList = Siswa::where('anggota_rombel_id', $request->rombel_id)->orderBy('nama')->get();
+        }
+
+        $query = PelanggaranNilai::with(['siswa', 'detailPoin.kategori', 'rombel'])->latest('tanggal')->latest('jam');
+        
+        if ($request->filled('tapel_id')) {
+            $query->where('IDtapel', $request->tapel_id);
+        }
+        if ($request->filled('semester_id')) {
+            $query->where('IDsemester', $request->semester_id);
+        }
         if ($request->filled('rombel_id')) {
             $query->where('IDkelas', $request->rombel_id);
         }
-        if ($request->filled('tanggal_awal') && $request->filled('tanggal_akhir')) {
-            $query->whereBetween('tanggal', [$request->tanggal_awal, $request->tanggal_akhir]);
+        if ($request->filled('nis')) {
+            $query->where('NIS', $request->nis);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('NIS', 'like', "%{$search}%")
+                    ->orWhereHas('siswa', function ($subq) use ($search) {
+                        $subq->where('nama', 'like', "%{$search}%");
+                    });
+            });
         }
 
-        $pelanggaranList = $query->paginate(20);
+        $pelanggaranList = $query->paginate(10)->appends($request->query());
 
-        return view('admin.indisipliner.siswa.daftar.index', compact('pelanggaranList', 'rombels'));
-    }
-
-    public function createPelanggaran()
-    {
-        $tapels = Tapel::all();
-        $semesters = Semester::all();
-        $rombels = Rombel::orderBy('nama')->get();
-        $kategoriList = PelanggaranKategori::with('pelanggaranPoin')->orderBy('nama')->get();
-        $mapels = Mapel::orderBy('nama')->get();
-
-        return view('admin.indisipliner.siswa.daftar.create', compact('tapels', 'semesters', 'rombels', 'kategoriList', 'mapels'));
+        return view('admin.indisipliner.siswa.daftar.index', compact('pelanggaranList', 'rombels', 'siswaList', 'tapels', 'semesters', 'kategoriList'));
     }
 
     public function storePelanggaran(Request $request)
     {
         $request->validate([
-            'IDtapel' => 'required',
-            'IDsemester' => 'required',
+            'IDtapel' => 'required|exists:tahun_pelajarans,id',
+            'IDsemester' => 'required|exists:semesters,id',
             'tanggal' => 'required|date',
             'jam' => 'required',
             'IDkelas' => 'required|exists:rombels,id',
-            'NIS' => 'required|exists:siswas,nis',
+            'NIS' => 'required|exists:siswas,nipd',
             'IDpelanggaran_poin' => 'required|exists:pelanggaran_poin,ID',
-            'IDmapel' => 'nullable|exists:mapels,id'
+            'IDmapel' => 'nullable'
         ]);
 
         $poin = PelanggaranPoin::findOrFail($request->IDpelanggaran_poin);
@@ -179,7 +197,7 @@ class IndisiplinerSiswaController extends Controller
             'IDmapel' => $request->IDmapel,
         ]);
 
-        return redirect()->route('admin.indisipliner.siswa.daftar.index')->with('success', 'Data pelanggaran berhasil disimpan.');
+        return back()->with('success', 'Data pelanggaran berhasil disimpan.');
     }
 
     public function destroyPelanggaran(PelanggaranNilai $pelanggaranNilai)
@@ -189,10 +207,18 @@ class IndisiplinerSiswaController extends Controller
     }
 
     public function getSiswaByRombel(Rombel $rombel)
-    {
-        $siswa = $rombel->siswa()->orderBy('nama')->get(['nis', 'nama']);
-        return response()->json($siswa);
-    }
+{
+    // Ambil ID Dapodik dari rombel yang ditemukan
+    $rombonganBelajarId = $rombel->rombongan_belajar_id;
+
+    // Cari siswa secara manual menggunakan ID tersebut
+    $siswa = Siswa::where('rombongan_belajar_id', $rombonganBelajarId)
+                    ->orderBy('nama')
+                    ->get(['nipd', 'nama']);
+
+    return response()->json($siswa);
+}
+    
 
     // =================================================================================
     // REKAPITULASI
@@ -207,25 +233,24 @@ class IndisiplinerSiswaController extends Controller
         $sanksiAktif = null;
 
         if ($request->filled('nis')) {
-            $siswa = Siswa::with('rombel')->where('nis', $request->nis)->first();
+            $siswa = Siswa::with('rombel')->where('nipd', $request->nis)->first();
 
             if ($siswa) {
-                $pelanggaranSiswa = PelanggaranNilai::where('NIS', $siswa->nis)
-                                    ->with('detailPoin')
-                                    ->orderBy('tanggal', 'desc')
-                                    ->get();
+                $pelanggaranSiswa = PelanggaranNilai::where('NIS', $siswa->nipd)
+                                        ->with('detailPoin')
+                                        ->orderBy('tanggal', 'desc')
+                                        ->get();
                 
                 $totalPoin = $pelanggaranSiswa->sum('poin');
 
                 $sanksiAktif = PelanggaranSanksi::where('poin_min', '<=', $totalPoin)
-                                ->where('poin_max', '>=', $totalPoin)
-                                ->first();
+                                        ->where('poin_max', '>=', $totalPoin)
+                                        ->first();
             } else {
-                return back()->withErrors(['nis' => 'Siswa dengan NIS tersebut tidak ditemukan.'])->withInput();
+                return back()->withErrors(['nis' => 'Siswa dengan NIPD tersebut tidak ditemukan.'])->withInput();
             }
         }
 
         return view('admin.indisipliner.siswa.rekapitulasi.index', compact('siswaList', 'siswa', 'pelanggaranSiswa', 'totalPoin', 'sanksiAktif'));
     }
 }
-

@@ -9,32 +9,10 @@ class PelanggaranNilai extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 'pelanggaran_nilai';
-
-    /**
-     * The primary key associated with the table.
-     *
-     * @var string
-     */
     protected $primaryKey = 'ID';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'NIS',
         'IDtapel',
@@ -57,11 +35,10 @@ class PelanggaranNilai extends Model
 
     /**
      * Mendapatkan data siswa yang terkait dengan pelanggaran.
-     * Relasi ini menggunakan kolom 'NIS' di tabel ini dan 'nis' di tabel 'siswas'.
      */
     public function siswa()
     {
-        return $this->belongsTo(Siswa::class, 'NIS', 'nis');
+        return $this->belongsTo(Siswa::class, 'NIS', 'nipd');
     }
     
     /**
@@ -69,9 +46,18 @@ class PelanggaranNilai extends Model
      */
     public function rombel()
     {
-        // Relasi ini mengasumsikan 'IDkelas' di tabel ini
-        // berelasi dengan 'id' di tabel 'rombels'.
         return $this->belongsTo(Rombel::class, 'IDkelas', 'id');
     }
+
+    /**
+     * (NONAKTIF) Mendapatkan data mata pelajaran yang terkait dengan pelanggaran.
+     * Relasi ini akan diaktifkan kembali setelah model Mapel dibuat.
+     */
+    /*
+    public function mapel()
+    {
+        return $this->belongsTo(Mapel::class, 'IDmapel', 'id');
+    }
+    */
 }
 
