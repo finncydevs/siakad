@@ -5,8 +5,18 @@
     <span class="text-muted fw-light">Kepegawaian /</span> Detail GTK yang Dipilih
 </h4>
 
-<div class="d-flex justify-content-end mb-3">
-    {{-- PERUBAHAN DI SINI: Menggunakan javascript untuk kembali --}}
+<div class="d-flex justify-content-end mb-3 gap-2">
+    {{-- Tombol Cetak PDF --}}
+    @if($gtks->isNotEmpty())
+    <a href="{{ route('admin.kepegawaian.gtk.cetak_pdf', ['id' => $gtks->first()->id]) }}" 
+       class="btn btn-primary" 
+       id="cetak-pdf-btn"
+       target="_blank">
+        <i class="bx bx-printer me-1"></i> Cetak PDF
+    </a>
+    @endif
+
+    {{-- Tombol Kembali --}}
     <a href="javascript:history.back()" class="btn btn-secondary">
         <i class="bx bx-arrow-back me-1"></i> Kembali
     </a>
@@ -36,7 +46,8 @@
         {{-- KOLOM DETAIL GTK --}}
         <div class="col-md-8 col-lg-9">
             @foreach ($gtks as $gtk)
-                <div class="card gtk-detail-content" id="gtk-detail-{{ $gtk->id }}" style="{{ !$loop->first ? 'display: none;' : '' }}">
+                {{-- PENAMBAHAN data-id DI SINI --}}
+                <div class="card gtk-detail-content" id="gtk-detail-{{ $gtk->id }}" data-id="{{ $gtk->id }}" style="{{ !$loop->first ? 'display: none;' : '' }}">
                     <div class="card-body">
                         <h5 class="card-title text-primary mb-4">Detail Lengkap: {{ $gtk->nama }}</h5>
 
@@ -121,7 +132,6 @@
                                     <td>: {{ $gtk->pangkat_golongan_terakhir ?? '-' }}</td>
                                 </tr>
                                 
-                                {{-- AWAL PERUBAHAN: Menampilkan Riwayat Pendidikan Formal --}}
                                 <tr>
                                     <td class="align-top"><strong>Riwayat Pendidikan</strong></td>
                                     <td>
@@ -150,9 +160,7 @@
                                         @endif
                                     </td>
                                 </tr>
-                                {{-- AKHIR PERUBAHAN --}}
 
-                                {{-- AWAL PERUBAHAN: Menampilkan Riwayat Kepangkatan --}}
                                 <tr>
                                     <td class="align-top"><strong>Riwayat Kepangkatan</strong></td>
                                     <td>
@@ -181,7 +189,6 @@
                                         @endif
                                     </td>
                                 </tr>
-                                {{-- AKHIR PERUBAHAN --}}
                             </tbody>
                         </table>
                     </div>
@@ -203,6 +210,7 @@
 
 @endsection
 
+{{-- BAGIAN BARU ADA DI SINI --}}
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -211,6 +219,7 @@
         if (navItems.length === 0) return;
 
         const detailContents = document.querySelectorAll('.gtk-detail-content');
+        const cetakBtn = document.getElementById('cetak-pdf-btn');
 
         navItems.forEach(item => {
             item.addEventListener('click', function() {
@@ -231,6 +240,14 @@
                 const targetContent = document.getElementById(targetId);
                 if (targetContent) {
                     targetContent.style.display = 'block';
+
+                    // Perbarui link tombol cetak jika tombolnya ada
+                    if(cetakBtn) {
+                        const gtkId = targetContent.getAttribute('data-id');
+                        let baseUrl = "{{ route('admin.kepegawaian.gtk.cetak_pdf', ['id' => ':id']) }}";
+                        let newUrl = baseUrl.replace(':id', gtkId);
+                        cetakBtn.setAttribute('href', newUrl);
+                    }
                 }
             });
         });

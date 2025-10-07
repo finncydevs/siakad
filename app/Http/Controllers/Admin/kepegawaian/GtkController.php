@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin\Kepegawaian;
 
 use App\Models\Gtk;
+use App\Models\Sekolah; // INI BARU
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf; // INI BARU
 
 class GtkController extends Controller
 {
@@ -61,6 +63,32 @@ class GtkController extends Controller
         $gtks = Gtk::whereIn('id', $ids)->get();
 
         return view('admin.kepegawaian.gtk.show_multiple', compact('gtks'));
+    }
+
+    /**
+     * ====================================================================
+     * FUNGSI BARU UNTUK CETAK PDF DITAMBAHKAN DI SINI
+     * ====================================================================
+     */
+    public function cetakPdf($id)
+    {
+        // Ambil data GTK yang akan dicetak
+        $gtk = Gtk::findOrFail($id);
+        
+        // Ambil data sekolah untuk kop surat
+        $sekolah = Sekolah::first();
+
+        // Data untuk QR Code (contoh: NUPTK atau NIK)
+        $qrCodeData = "Nama: " . $gtk->nama . "\nNUPTK: " . ($gtk->nuptk ?? '-');
+
+        // Buat PDF dari view 'gtk_pdf.blade.php'
+        $pdf = Pdf::loadView('admin.kepegawaian.gtk.gtk_pdf', compact('gtk', 'sekolah', 'qrCodeData'));
+        
+        // Atur nama file saat di-download
+        $fileName = 'Profil GTK - ' . $gtk->nama . '.pdf';
+
+        // Tampilkan PDF di browser (stream)
+        return $pdf->stream($fileName);
     }
 
     /**

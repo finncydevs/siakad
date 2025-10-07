@@ -56,7 +56,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // --- GRUP PENGATURAN ---
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
-        Route::get('/sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
+       Route::get('sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
+    Route::put('sekolah', [SekolahController::class, 'update'])->name('sekolah.update');
         Route::get('/webservice', [ApiSettingsController::class, 'index'])->name('webservice.index');
     });
 
@@ -76,7 +77,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         // Route untuk detail multi-GTK
         Route::get('/gtk/show-multiple', [GtkController::class, 'showMultiple'])->name('gtk.show-multiple');
-        
+        Route::get('gtk/cetak-pdf/{id}', [GtkController::class, 'cetakPdf'])->name('gtk.cetak_pdf');
         // Route untuk Tugas Pegawai
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
