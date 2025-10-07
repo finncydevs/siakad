@@ -17,7 +17,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Dashboard Admin Sekolah</title>
     {{-- ... --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css'])
     @stack('styles')
   </head>
   <body>
@@ -42,7 +42,6 @@
         </div>
         <div class="layout-overlay layout-menu-toggle"></div>
     </div>
-    
     <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -70,9 +69,10 @@
                 const toast = new bootstrap.Toast(infoToast);
                 toast.show();
             @endif
-        });
-    </script>
+          });
+          </script>
     @stack('scripts')
+    @vite(['resources/js/app.js'])
   </body>
 </html>
 

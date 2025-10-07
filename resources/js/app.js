@@ -9,6 +9,12 @@ import '~sneat/vendor/libs/jquery/jquery.js'
 import '~sneat/vendor/libs/popper/popper.js'
 import '~sneat/vendor/js/bootstrap.js'
 import '~sneat/vendor/libs/perfect-scrollbar/perfect-scrollbar.js'
+
+// =================================================================
+// ==> TAMBAHKAN BARIS INI, INI ADALAH KUNCINYA <==
+import '~sneat/vendor/js/helpers.js'
+// =================================================================
+
 import '~sneat/vendor/js/menu.js'
 import '~sneat/vendor/libs/apex-charts/apexcharts.js'
 
