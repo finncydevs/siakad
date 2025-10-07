@@ -85,7 +85,14 @@
                         </div>
                         <div class="col">
                             <label for="keahlian" class="form-label">Keahlian</label>
-                            <input type="text" id="keahlian" name="keahlian" class="form-control" placeholder="Contoh : PPLG" required>
+                            <select name="keahlian" class="form-select" required>
+                                <option value="">-- Semua Jurusan --</option>
+                                @foreach($jurusans as $jurusan)
+                                    <option value="{{ $jurusan }}" {{ request('jurusan') == $jurusan ? 'selected' : '' }}>
+                                        {{ $jurusan }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 
@@ -128,7 +135,12 @@
                     </div>
                     <div class="mb-3">
                         <label>Keahlian</label>
-                        <input type="text" id="editKeahlian" name="keahlian" class="form-control" required>
+                        <select name="keahlian" id="editKeahlian" class="form-select" required>
+                            <option value="">-- Pilih Keahlian --</option>
+                            @foreach($jurusans as $jurusan)
+                                <option value="{{ $jurusan }}">{{ $jurusan }}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label>Jumlah Kelas</label>

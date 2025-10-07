@@ -15,8 +15,10 @@ use App\Http\Controllers\Admin\Akademik\TapelController;
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarPesertaDidikBaruController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarCalonPesertaDidikController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\PemberianNisController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\FormulirPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\JalurController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\TingkatPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanQuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\PenempatanKelasController;
@@ -93,6 +95,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('jalur-ppdb', JalurController::class);
             Route::post('/jalur-ppdb/{id}/toggle-active', [JalurController::class, 'toggleActive'])->name('jalur-ppdb.toggleActive');
 
+            // Tingkat Pendaftaran
+            Route::resource('tingkat-ppdb', TingkatPendaftaranController::class);
+            Route::post('/tingkat-ppdb/{id}/toggle-active', [TingkatPendaftaranController::class, 'toggleActive'])->name('tingkat-ppdb.toggleActive');
+
             // Quota Pendaftaran
             Route::resource('quota-ppdb', QuotaController::class);
 
@@ -102,11 +108,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
             // Formulir Pendaftaran
             Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
-            
-
             Route::get('/get-syarat/{jalurId}', [SyaratController::class, 'getByJalur'])->name('admin.kesiswaan.ppdb.get-syarat');
+            Route::patch('update-status/{id}', [FormulirPendaftaranController::class, 'updateStatus'])->name('updateStatus');
 
-
+            // Pemberian NIS
+            Route::get('pemberian-nis/generate', 
+                [PemberianNisController::class, 'generate']
+            )->name('pemberian-nis.generate');
+            Route::resource('pemberian-nis', PemberianNisController::class);
 
 
             // Data Peserta Didik

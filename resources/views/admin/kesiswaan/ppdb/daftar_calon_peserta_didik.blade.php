@@ -40,30 +40,71 @@
                 </td>
                 <td>{{ $calon->created_at->translatedFormat('d F Y') }}</td>
                 <td>
-                  @php
-                      $totalSyarat = $calon->jalurPendaftaran
-                          ? $calon->jalurPendaftaran->syaratPendaftaran()->count()
-                          : 0;
+                    @php
+                        // ambil semua syarat wajib dari jalur
+                        $semuaSyarat = $calon->jalurPendaftaran
+                            ? $calon->jalurPendaftaran->syaratPendaftaran()->get()
+                            : collect();
 
-                      $syaratTerpenuhi = $calon->syarat->where('pivot.is_checked', true)->count();
-                  @endphp
+                        // ambil ID syarat yang sudah dipenuhi
+                        $syaratTerpenuhiIds = $calon->syarat
+                            ->where('pivot.is_checked', true)
+                            ->pluck('id')
+                            ->toArray();
 
-                  <ul class="mb-0 ps-3 list-unstyled">
-                      @foreach($calon->syarat as $syarat)
-                          <li class="d-flex align-items-center {{ $syarat->pivot->is_checked ? 'text-success' : 'text-danger' }}">
-                              <i class="bx {{ $syarat->pivot->is_checked ? 'bx-check' : 'bx-x' }} me-2"></i>
-                              {{ $syarat->syarat }}
-                          </li>
-                      @endforeach
-                  </ul>
+                        // ambil syarat yang belum terpenuhi
+                        $syaratBelum = $semuaSyarat->whereNotIn('id', $syaratTerpenuhiIds);
+                    @endphp
+
+                    @if($syaratBelum->count() > 0)
+                        <ul class="mb-0 ps-3 list-unstyled">
+                            @foreach($syaratBelum as $syarat)
+                                <li class="d-flex align-items-center text-danger">
+                                    <i class="bx bx-x me-2"></i>
+                                    {{ $syarat->syarat }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <span class="badge bg-success border-0 px-2 py-2">syarat sudah lengkap</span>
+                    @endif
                 </td>
+
+
                 <td class="text-center">
-                  @if($totalSyarat > 0 && $syaratTerpenuhi == $totalSyarat)
-                      <span class="badge bg-success">Syarat Lengkap</span>
-                  @else
-                      <span class="badge bg-warning text-dark">Syarat Belum Lengkap</span>
-                  @endif
+                    @if($calon->status == 0)
+                        {{-- Status 0: syarat belum lengkap --}}
+                        <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}"
+                           class="badge bg-warning text-dark text-decoration-none  px-2 py-2" title="klik untuk melengkapi persyaratan">
+                            Syarat Belum Lengkap
+                        </a>
+                      
+                    @elseif($calon->status == 1)
+                        {{-- Status 1: unregistered --}}
+                        <form action="{{ route('admin.kesiswaan.ppdb.updateStatus', $calon->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="2">
+                            <button type="submit" class="badge bg-danger border-0 px-2 py-2" title="klik untuk daftar ulang">Unregistered</button>
+                        </form>
+                      
+                    @elseif($calon->status == 2)
+                        {{-- Status 2: registered --}}
+                        <form action="{{ route('admin.kesiswaan.ppdb.updateStatus', $calon->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="1">
+                            <button type="submit" class="badge bg-success border-0 px-2 py-2" title="klik untuk membatalkan daftar ulang">Registered</button>
+                        </form>
+                    
+                    @elseif ($calon->status == 3)
+                        {{-- Status 3: Sudah Pemberian NIS --}}
+                        <span class="badge bg-primary border-0 px-2 py-2" >Sudah diberi NIS</span>
+
+                    @endif
+                    
                 </td>
+
                 <td class="text-center">
                   <div class="d-flex justify-content-center gap-2">
                     <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}" 

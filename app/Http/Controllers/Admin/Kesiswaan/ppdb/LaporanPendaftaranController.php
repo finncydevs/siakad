@@ -4,62 +4,71 @@ namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CalonSiswa;
+use App\Models\TahunPelajaran;
+use App\Models\JalurPendaftaran;
+use App\Models\Rombel;
 
 class LaporanPendaftaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.laporan_pendaftaran');
-    }
+        $tahunAktif = TahunPelajaran::where('is_active', true)->first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $tp = $p = $l = 0;
+        $laporanJalur = collect();
+        $laporanJurusan = collect();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($tahunAktif) {
+            // === Total umum ===
+            $tp = CalonSiswa::where('tahun_id', $tahunAktif->id)->count();
+            $p  = CalonSiswa::where('tahun_id', $tahunAktif->id)->where('jenis_kelamin', 'P')->count();
+            $l  = CalonSiswa::where('tahun_id', $tahunAktif->id)->where('jenis_kelamin', 'L')->count();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+            // === Laporan per jalur ===
+            $jalurAktif = JalurPendaftaran::where('is_active', true)->get();
+            $laporanJalur = $jalurAktif->map(function ($jalur) use ($tahunAktif) {
+                $jumlah = CalonSiswa::where('tahun_id', $tahunAktif->id)
+                    ->where('jalur_id', $jalur->id)
+                    ->count();
+                return [
+                    'nama' => $jalur->nama_jalur ?? 'Tanpa Nama',
+                    'jumlah' => $jumlah,
+                ];
+            });
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            // === Laporan per jurusan (berdasarkan rombel) ===
+            $jurusans = Rombel::select('jurusan_id_str')
+                ->distinct()
+                ->orderBy('jurusan_id_str')
+                ->pluck('jurusan_id_str');
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            $laporanJurusan = $jurusans->map(function ($jurusan) use ($tahunAktif) {
+                $jumlah = CalonSiswa::where('tahun_id', $tahunAktif->id)
+                    ->where('jurusan', $jurusan)
+                    ->count();
+                return [
+                    'nama' => $jurusan,
+                    'jumlah' => $jumlah,
+                ];
+            });
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            // === Laporan calon siswa registrasi (status = 3) berdasarkan jurusan ===
+            $laporanJurusanRegistrasi = $jurusans->map(function ($jurusan) use ($tahunAktif) {
+                $jumlah = \App\Models\CalonSiswa::where('tahun_id', $tahunAktif->id)
+                    ->where('jurusan', $jurusan)
+                    ->where('status', 3)
+                    ->count();
+                return [
+                    'nama' => $jurusan,
+                    'jumlah' => $jumlah,
+                ];
+            });
+
+        }
+
+        return view('admin.kesiswaan.ppdb.laporan_pendaftaran', compact(
+            'tp', 'p', 'l', 'laporanJalur', 'laporanJurusan', 'laporanJurusanRegistrasi', 'tahunAktif'
+        ));
     }
 }

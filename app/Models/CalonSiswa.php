@@ -34,7 +34,8 @@ class CalonSiswa extends Model
         'kelas_tujuan',
         'jurusan', 
         'ukuran_pakaian', 
-        'pembayaran'
+        'pembayaran',
+        'status'
     ];
 
     // Relasi ke Tahun Pelajaran

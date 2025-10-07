@@ -23,70 +23,76 @@
                         <tr>
                             <td><strong>1</strong></td>
                             <td>Total Pendaftaran</td>
-                            <td>120</td>
+                            <td>{{ $tp }}</td>
                         </tr>
                         <tr>
                             <td><strong>2</strong></td>
                             <td>Jumlah Pendaftar Laki-Laki</td>
-                            <td>65</td>
+                            <td>{{ $l }}</td>
                         </tr>
                         <tr>
                             <td><strong>3</strong></td>
                             <td>Jumlah Pendaftar Perempuan</td>
-                            <td>55</td>
+                            <td>{{ $p }}</td>
                         </tr>
+
+                        {{-- Jalur --}}
                         <tr class="table-active">
                             <td><strong>4</strong></td>
                             <td colspan="2"><strong>Laporan berdasarkan jalur pendaftaran</strong></td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Jalur Prestasi</td>
-                            <td>40</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Jalur Reguler</td>
-                            <td>80</td>
-                        </tr>
+                        @forelse ($laporanJalur as $jalur)
+                            <tr>
+                                <td></td>
+                                <td class="ps-4">- {{ $jalur['kode'] }}</td>
+                                <td>{{ $jalur['jumlah'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td></td>
+                                <td class="ps-4 text-muted">Tidak ada jalur aktif</td>
+                                <td>0</td>
+                            </tr>
+                        @endforelse
+
+                        {{-- Laporan Jurusan --}}
                         <tr class="table-active">
                             <td><strong>5</strong></td>
-                            <td colspan="2"><strong>Laporan berdasarkan jurusan</strong></td>
+                            <td colspan="2"><strong>Laporan berdasarkan Jurusan</strong></td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Rekayasa Perangkat Lunak</td>
-                            <td>60</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Akuntansi</td>
-                            <td>30</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- TKJ</td>
-                            <td>30</td>
-                        </tr>
+                        @forelse ($laporanJurusan as $jur)
+                            <tr>
+                                <td></td>
+                                <td class="ps-4">- {{ $jur['nama'] }}</td>
+                                <td>{{ $jur['jumlah'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td></td>
+                                <td class="ps-4 text-muted">Tidak ada jurusan terdaftar di rombel</td>
+                                <td>0</td>
+                            </tr>
+                        @endforelse
+
+                        {{-- Laporan Jurusan yang sudah memenuhi syarat --}}
                         <tr class="table-active">
                             <td><strong>6</strong></td>
                             <td colspan="2"><strong>Laporan calon siswa registrasi (syarat lengkap) berdasarkan jurusan</strong></td>
                         </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Rekayasa Perangkat Lunak</td>
-                            <td>50</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- Akuntansi</td>
-                            <td>25</td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <td class="ps-4">- TKJ</td>
-                            <td>20</td>
-                        </tr>
+                        @forelse ($laporanJurusanRegistrasi as $jur)
+                            <tr>
+                                <td></td>
+                                <td class="ps-4">- {{ $jur['nama'] }}</td>
+                                <td>{{ $jur['jumlah'] }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td></td>
+                                <td class="ps-4 text-muted">Belum ada data registrasi</td>
+                                <td>0</td>
+                            </tr>
+                        @endforelse
+
                     </tbody>
                 </table>
             </div>

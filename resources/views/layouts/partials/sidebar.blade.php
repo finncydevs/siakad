@@ -136,6 +136,12 @@
                             </a>
                         </li>
                         <li
+                            class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.tingkat-ppdb.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.kesiswaan.ppdb.tingkat-ppdb.index') }}" class="menu-link">
+                                <div data-i18n="Pengaturan Tingkat">Pengaturan Tingkat</div>
+                            </a>
+                        </li>
+                        <li
                             class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.quota-ppdb.index') ? 'active' : '' }}">
                             <a href="{{ route('admin.kesiswaan.ppdb.quota-ppdb.index') }}" class="menu-link">
                                 <div data-i18n="Quota">Quota Pendaftaran</div>
@@ -158,6 +164,13 @@
                             <a href="{{ route('admin.kesiswaan.ppdb.daftar-calon-peserta-didik.index') }}"
                                 class="menu-link">
                                 <div data-i18n="Calon Peserta Didik">Calon Peserta Didik</div>
+                            </a>
+                        </li>
+                        <li
+                            class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.pemberian-nis.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.kesiswaan.ppdb.pemberian-nis.index') }}"
+                                class="menu-link">
+                                <div data-i18n="Calon Peserta Didik">Pemberian NIS</div>
                             </a>
                         </li>
                         <li

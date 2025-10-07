@@ -12,49 +12,6 @@ use App\Models\Rombel;
 
 class FormulirPendaftaranController extends Controller
 {
-    // ===== Helper Generate NIS =====
-    private function generateNis($tahunPelajaranId, $jalurId)
-{
-    $tahun = TahunPelajaran::findOrFail($tahunPelajaranId);
-
-    $tp = $tahun->tahun_pelajaran;
-
-    if (strpos($tp, '-') !== false) {
-        [$awal, $akhir] = array_map('trim', explode('-', $tp));
-        $awal  = (int) $awal;
-        $akhir = (int) $akhir;
-    } else {
-        $awal  = (int) trim($tp);
-        $akhir = $awal + 1;
-    }
-
-    // format 4 digit
-    $awal  = str_pad($awal, 4, '0', STR_PAD_LEFT);
-    $akhir = str_pad($akhir, 4, '0', STR_PAD_LEFT);
-
-    $awal2  = substr($awal, -2);   // 25
-    $akhir2 = substr($akhir, -2); // 26
-
-    // Tambahkan kode jalur biar beda tiap jalur
-    $base   = $awal2 . $akhir2 . str_pad($jalurId, 2, '0', STR_PAD_LEFT); 
-    // contoh: 252601 (jalur 1), 252602 (jalur 2)
-
-    $last = CalonSiswa::whereNotNull('nis')
-        ->where('tahun_id', $tahunPelajaranId)
-        ->where('jalur_id', $jalurId) // <--- penting biar urutan per jalur
-        ->orderByDesc('nis')
-        ->first();
-
-    if ($last) {
-        $lastNumber = (int) substr($last->nis, -3);
-        $urutan = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
-    } else {
-        $urutan = "001";
-    }
-
-    return $base . $urutan;
-}
-
 
 
     public function index()
@@ -182,10 +139,13 @@ class FormulirPendaftaranController extends Controller
             ->count();
 
         if ($syaratTerpenuhi >= $syaratWajib) {
-            $calon->nis = $this->generateNis($tahunId, $jalurId);
-            $calon->save();
+            // $calon->nis = $this->generateNis($tahunId, $jalurId);
+            $calon->status = 1;
+        } else {
+            $calon->status = 0;
         }
-
+        
+        $calon->save();
 
         return redirect()->back()->with('success', 'Formulir calon peserta didik berhasil disimpan.');
     }
@@ -267,10 +227,13 @@ class FormulirPendaftaranController extends Controller
 
         $syaratTerpenuhi = $calon->syarat()->wherePivot('is_checked', true)->count();
 
-        if ($syaratTerpenuhi >= $syaratWajib && !$calon->nis) {
-            $calon->nis = $this->generateNis($tahunId, $validated['jalur_id']);
-            $calon->save();
+        if ($syaratTerpenuhi >= $syaratWajib) {
+            // $calon->nis = $this->generateNis($tahunId, $validated['jalur_id']);
+            $calon->status = 1;
+        } else {
+            $calon->status= 0;
         }
+        $calon->save();
 
 
         return redirect()->route('admin.kesiswaan.ppdb.daftar-calon-peserta-didik.index')
@@ -285,4 +248,14 @@ class FormulirPendaftaranController extends Controller
         return redirect()->route('admin.kesiswaan.ppdb.formulir.index')
             ->with('success', 'Formulir pendaftaran berhasil dihapus.');
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $calon = CalonSiswa::findOrFail($id);
+        $calon->status = $request->status;
+        $calon->save();
+
+        return back()->with('success', 'Status berhasil diperbarui!');
+    }
+
 }
