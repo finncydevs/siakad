@@ -44,7 +44,7 @@
                         @forelse ($laporanJalur as $jalur)
                             <tr>
                                 <td></td>
-                                <td class="ps-4">- {{ $jalur['kode'] }}</td>
+                                <td class="ps-4">- {{ $jalur['nama'] ?? '-' }}</td>
                                 <td>{{ $jalur['jumlah'] }}</td>
                             </tr>
                         @empty

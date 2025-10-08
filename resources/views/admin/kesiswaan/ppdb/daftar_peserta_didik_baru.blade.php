@@ -41,7 +41,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Belum ada peserta didik baru</td>
+                                <td colspan="10" class="text-center">Belum ada peserta didik baru</td>
                             </tr>
                         @endforelse
                     </tbody>

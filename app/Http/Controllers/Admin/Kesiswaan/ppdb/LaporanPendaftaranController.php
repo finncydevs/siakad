@@ -32,7 +32,7 @@ class LaporanPendaftaranController extends Controller
                     ->where('jalur_id', $jalur->id)
                     ->count();
                 return [
-                    'nama' => $jalur->nama_jalur ?? 'Tanpa Nama',
+                    'nama' => $jalur->jalur ?? 'Tanpa Nama',
                     'jumlah' => $jumlah,
                 ];
             });
