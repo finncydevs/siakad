@@ -71,6 +71,7 @@
             @endif
           });
           </script>
+          
     @stack('scripts')
     @vite(['resources/js/app.js'])
   </body>

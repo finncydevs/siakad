@@ -131,7 +131,7 @@
                 
                 {{-- INI MENU BARU UNTUK QR SCANNER --}}
                 <li class="menu-item {{ request()->routeIs('admin.absensi.siswa.show_scanner') ? 'active' : '' }}">
-                    <a href="{{ route('admin.absensi.siswa.show_scanner') }}" class="menu-link">
+                    <a target="_blank" href="{{ route('admin.absensi.siswa.show_scanner') }}" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-qr-scan"></i>
                         <div data-i18n="Scan Absensi QR">Scan Absensi QR</div>
                     </a>
