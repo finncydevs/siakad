@@ -4,8 +4,6 @@
 
 @section('content')
     <div class="container-xxl flex-grow-1 container-p-y">
-
-        {{-- 1. Breadcrumb --}}
         <div class="mb-4">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-0">
@@ -16,18 +14,12 @@
                 </ol>
             </nav>
         </div>
-
-        {{-- 2. Header Utama --}}
         <h4 class="fw-bold mb-4">
             <span class="text-muted fw-light">Akademik /</span> Daftar Mata Pelajaran
         </h4>
-
         <div class="card">
-            {{-- CARD HEADER: Dihilangkan bg-primary, hanya menggunakan border dan padding Sneat standar --}}
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">Daftar Mata Pelajaran</h5>
-
-                {{-- FORM PENCARIAN RINGKAS (diletakkan di kanan header) --}}
                 <form method="GET" action="{{ route('admin.akademik.mapel.index') }}" class="d-flex"
                     style="max-width: 300px;">
                     <div class="input-group input-group-sm">
@@ -47,8 +39,6 @@
             </div>
 
             <div class="card-body">
-
-                {{-- Tabel Data --}}
                 <div class="table-responsive text-nowrap">
                     <table class="table table-bordered table-striped table-hover align-middle">
                         <thead class="table-light">
@@ -80,8 +70,6 @@
                         </tbody>
                     </table>
                 </div>
-
-                {{-- Pagination Links & Result Count (FIXED: Diposisikan dalam satu baris) --}}
                 <div class="card-footer d-flex justify-content-end py-2">
                     {{ $mapels->links() }}
                 </div>
