@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
-            'name' => 'Operator Admin',
+            'name' => 'Operator Admin', 
             'email' => 'operator@gmail.com',
             'password' => Hash::make('password'), // Ganti 'password' dengan password aman
             'role' => 'operator',

@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             SemesterSeeder::class,
-            PengaturanAbsensiSeeder::class,
+            // PengaturanAbsensiSeeder::class,
             UserSeeder::class, // <-- 2. Panggil UserSeeder di sini
         ]);
 
