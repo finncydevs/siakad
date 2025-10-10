@@ -29,25 +29,38 @@ class GenericSyncController extends Controller
         // 2. Ambil semua nama kolom dari data pertama yang dikirim
         $dapodikColumns = array_keys($dataFromDapodik[0]);
 
-        // 3. Cek apakah tabel sudah ada. Jika belum, buat tabelnya.
+        // 3. Cek apakah tabel sudah ada. Jika belum, buat tabel dan pastikan kolom `ptk_id` ada.
         if (!Schema::hasTable($tableName)) {
-            Schema::create($tableName, function ($table) use ($dapodikColumns) {
+            Schema::create($tableName, function ($table) use ($dapodikColumns, $tableName) {
                 $table->id(); // Kolom ID utama
 
                 // Loop untuk membuat semua kolom secara dinamis
                 foreach ($dapodikColumns as $column) {
                     $this->defineColumnType($table, $column);
                 }
+
+                // Logika tambahan khusus untuk tabel 'rombels'
+                if ($tableName === 'rombels' && !in_array('ptk_id', $dapodikColumns)) {
+                    $table->unsignedBigInteger('ptk_id')->nullable()->index();
+                }
+
                 $table->timestamps();
             });
         } else {
+            // 4. Jika tabel sudah ada, cek dan tambahkan kolom baru jika diperlukan.
             $existingColumns = Schema::getColumnListing($tableName);
             $newColumns = array_diff($dapodikColumns, $existingColumns);
 
-            if (!empty($newColumns)) {
-                Schema::table($tableName, function ($table) use ($newColumns) {
+            // Cek juga apakah kolom `ptk_id` perlu ditambahkan
+            if (!empty($newColumns) || ($tableName === 'rombels' && !in_array('ptk_id', $existingColumns))) {
+                Schema::table($tableName, function ($table) use ($newColumns, $tableName, $existingColumns) {
                     foreach ($newColumns as $column) {
                         $this->defineColumnType($table, $column);
+                    }
+                    
+                    // Logika tambahan khusus untuk tabel 'rombels'
+                    if ($tableName === 'rombels' && !in_array('ptk_id', $existingColumns)) {
+                        $table->unsignedBigInteger('ptk_id')->nullable()->index();
                     }
                 });
             }
@@ -57,42 +70,55 @@ class GenericSyncController extends Controller
         $identifierColumn = $this->getIdentifierColumn($dapodikColumns, $entity);
 
         foreach ($dataFromDapodik as $row) {
+            // Ubah nilai array menjadi format JSON
             foreach ($row as $key => $value) {
                 if (is_array($value)) {
                     $row[$key] = json_encode($value, JSON_UNESCAPED_UNICODE);
                 }
             }
             
-            if ($tableName === 'siswas') {
+            // =============================================================
+            // --- PEMBARUAN UTAMA: LOGIKA KHUSUS UNTUK SINKRONISASI ROMBELS ---
+            // =============================================================
+            if ($tableName === 'rombels') {
+                $gtkId = null; // Inisialisasi ID guru sebagai null
+
+                // Cek jika ada data nama wali kelas ('ptk_id_str')
+                if (!empty($row['ptk_id_str'])) {
+                    // Cari ID di tabel 'gtks' yang namanya sama persis
+                    $gtkId = DB::table('gtks')->where('nama', $row['ptk_id_str'])->value('id');
+                }
                 
-                // --- INI PERUBAHAN UTAMANYA ---
-                // 1. Ambil data siswa yang ada, atau buat instance baru jika tidak ada.
+                // Tambahkan key 'ptk_id' dengan nilai yang ditemukan (atau null) ke dalam array data
+                // Ini akan memastikan kolom ptk_id diisi saat proses updateOrInsert
+                $row['ptk_id'] = $gtkId;
+            }
+            // =============================================================
+            // --- AKHIR PEMBARUAN UTAMA ---
+            // =============================================================
+            
+            // Logika khusus untuk tabel siswa agar tidak menimpa data 'foto'
+            if ($tableName === 'siswas') {
                 $siswa = Siswa::firstOrNew([
                     $identifierColumn => $row[$identifierColumn]
                 ]);
 
-                // 2. Isi data siswa dengan data DARI DAPODIK.
-                // Metode fill() hanya akan mengisi kolom yang ada di $row.
-                // Kolom 'foto' yang ada di database tidak akan tersentuh.
                 $siswa->fill($row);
                 $siswa->save();
-                // --- AKHIR PERUBAHAN ---
 
-                // Cek apakah siswa ini BARU DIBUAT dan belum punya token
+                // Generate QR Token jika siswa baru dibuat
                 if ($siswa->wasRecentlyCreated && is_null($siswa->qr_token)) {
                     $siswa->qr_token = Str::uuid()->toString();
                     $siswa->save();
                 }
             } else {
-                // Untuk tabel lain, gunakan metode yang sudah ada
+                // Untuk tabel lain, gunakan metode updateOrInsert biasa
                 DB::table($tableName)->updateOrInsert(
                     [$identifierColumn => $row[$identifierColumn]],
                     $row
                 );
             }
         }
-            // --- AKHIR BAGIAN YANG DIPERBARUI ---
-        
 
         return response()->json([
             'success' => true,
@@ -106,14 +132,12 @@ class GenericSyncController extends Controller
      */
     private function getIdentifierColumn(array $columns, string $entity)
     {
-        // Daftar prioritas kolom ID unik dari Dapodik
         $identifiers = [
             'peserta_didik_id',
             'gtk_id',
             'sekolah_id',
             'rombongan_belajar_id',
             'pengguna_id',
-
         ];
 
         foreach ($identifiers as $id) {
@@ -122,13 +146,11 @@ class GenericSyncController extends Controller
             }
         }
 
-        // Fallback jika tidak ada, gunakan ID unik entitas (misal: 'siswa_id')
         $fallbackId = Str::snake($entity) . '_id';
         if(in_array($fallbackId, $columns)) {
             return $fallbackId;
         }
 
-        // Jika semua gagal, asumsikan kolom pertama adalah ID (sangat berisiko)
         return $columns[0];
     }
 
@@ -140,7 +162,7 @@ class GenericSyncController extends Controller
         if (Str::endsWith($column, '_id_str')) {
             $table->text($column)->nullable();
         } elseif (Str::endsWith($column, '_id')) {
-            $table->string($column, 191)->nullable()->index(); // Gunakan string dengan index
+            $table->string($column, 191)->nullable()->index();
         } elseif (str_contains($column, 'tanggal')) {
             $table->date($column)->nullable();
         } else {
