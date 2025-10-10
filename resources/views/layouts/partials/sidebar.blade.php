@@ -91,7 +91,7 @@
             </ul>
         </li> --}}
 
-        <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
+        {{-- <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
                 <div data-i18n="Akademik">Akademik</div>
@@ -128,7 +128,7 @@
                     </a>
                 </li>
             </ul>
-        </li>
+        </li> --}}
 
         <!-- Absensi -->
         <li class="menu-item {{ request()->is('admin/absensi*') || request()->is('guru/absensi*') ? 'open' : '' }}">

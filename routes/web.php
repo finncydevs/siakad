@@ -6,9 +6,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 use App\Http\Controllers\Admin\Settings\SekolahController;
 
-// Controller Kepegawaian
+use App\Http\Controllers\ProfilSekolahController;
+use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\TugasPegawaiController;
+use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
 use App\Http\Controllers\Admin\Kepegawaian\GtkController;
-// use App\Http\Controllers\Admin\Kesiswaan\Admin\Kepegawaian\TugasPegawaiController;
 
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
@@ -24,7 +26,6 @@ use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
 use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
 use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
 
@@ -41,7 +42,11 @@ use App\Http\Controllers\Admin\Keuangan\PembayaranController;
 use App\Http\Controllers\Admin\Keuangan\PengeluaranController;
 use App\Http\Controllers\Admin\Keuangan\VoucherController;
 
-use App\Http\Controllers\ProfilSekolahController;
+use App\Http\Controllers\Admin\Absensi\AbsensiSiswaController;
+use App\Http\Controllers\Admin\Pengaturan\HariLiburController;
+use App\Http\Controllers\Admin\Pengaturan\PengaturanAbsensiController;
+use App\Http\Controllers\Admin\Laporan\LaporanAbsensiController;
+
 
 
 /*
@@ -65,6 +70,9 @@ Route::prefix('guru')->middleware(['auth'])->name('guru.')->group(function () {
     Route::post('/absensi/kelas', [App\Http\Controllers\Guru\GuruAbsensiController::class, 'store'])->name('absensi.store');
 });
 
+
+
+
 /*
 |--------------------------------------------------------------------------
 | Grup Rute untuk Panel Admin
@@ -75,6 +83,12 @@ Route::prefix('guru')->middleware(['auth'])->name('guru.')->group(function () {
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', function () { return view('admin.dashboard'); })->name('dashboard');
+     Route::prefix('laporan')->name('laporan.')->group(function() {
+    Route::get('absensi', [LaporanAbsensiController::class, 'index'])->name('absensi.index');
+    Route::get('absensi/dashboard', [LaporanAbsensiController::class, 'dashboard'])->name('absensi.dashboard');
+    Route::get('absensi/export', [LaporanAbsensiController::class, 'export'])->name('absensi.export');
+        Route::get('absensi/tanpa-pulang', [LaporanAbsensiController::class, 'laporanTanpaPulang'])->name('absensi.tanpa_pulang');
+});
 
     // --- GRUP PENGATURAN ---
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
@@ -162,6 +176,38 @@ Route::prefix('admin')->name('admin.')->group(function () {
  Route::resource('/voucher', VoucherController::class)->only(['index', 'store', 'destroy']);
  Route::resource('/pengeluaran', PengeluaranController::class)->except(['create', 'edit', 'show']);
 });
+
+  Route::prefix('absensi')->name('absensi.')->group(function () {
+
+
+        // --- Grup Absensi Siswa (BAGIAN YANG DIPERBAIKI) ---
+        // Kita definisikan rute satu per satu untuk kejelasan
+        Route::prefix('siswa')->name('siswa.')->group(function() {
+            Route::get('/todays-scans', [AbsensiSiswaController::class, 'getTodaysScans'])->name('get_todays_scans');
+
+            // Rute untuk menampilkan halaman PILIH KELAS
+            // URL: /admin/absensi/siswa
+            Route::get('/', [AbsensiSiswaController::class, 'index'])->name('index');
+
+            // Rute untuk menampilkan FORM ABSENSI untuk kelas & tanggal tertentu
+            // URL: /admin/absensi/siswa/form?rombel_id=...&tanggal=...
+            Route::get('/form', [AbsensiSiswaController::class, 'show'])->name('show_form');
+
+            // Rute untuk MENYIMPAN data absensi dari form
+            // URL: /admin/absensi/siswa (Method: POST)
+            Route::post('/', [AbsensiSiswaController::class, 'store'])->name('store');
+
+            // Rute untuk scanner QR Code
+            // URL: /admin/absensi/siswa/scanner
+            Route::get('/scanner', [AbsensiSiswaController::class, 'showScanner'])->name('show_scanner');
+
+            // Rute untuk menangani data dari scanner
+            // URL: /admin/absensi/siswa/handle-scan (Method: POST)
+            Route::post('/handle-scan', [AbsensiSiswaController::class, 'handleScan'])->name('handle_scan');
+        });
+        Route::resource('izin-siswa', \App\Http\Controllers\Admin\Absensi\IzinSiswaController::class);
+    });
+
 });
 
 require __DIR__.'/auth.php';
