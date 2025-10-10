@@ -66,6 +66,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::prefix('laporan')->name('laporan.')->group(function() {
     Route::get('absensi', [LaporanAbsensiController::class, 'index'])->name('absensi.index');
+    Route::get('absensi/dashboard', [LaporanAbsensiController::class, 'dashboard'])->name('absensi.dashboard');
     Route::get('absensi/export', [LaporanAbsensiController::class, 'export'])->name('absensi.export');
         Route::get('absensi/tanpa-pulang', [LaporanAbsensiController::class, 'laporanTanpaPulang'])->name('absensi.tanpa_pulang');
 });
@@ -106,6 +107,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         Route::get('absensi', [PengaturanAbsensiController::class, 'edit'])->name('absensi.edit');
         Route::put('absensi', [PengaturanAbsensiController::class, 'update'])->name('absensi.update');
+
 
         // Rute untuk Manajemen Hari Libur
         Route::resource('hari-libur', HariLiburController::class)->except(['show', 'edit', 'update']);

@@ -67,7 +67,7 @@
         .clock-date { font-size: 1.1rem; color: var(--kiosk-text-secondary); }
         .scanner-viewport { width: 100%; max-width: 400px; margin: 0 auto; position: relative; aspect-ratio: 1 / 1; border-radius: 0.5rem; overflow: hidden; border: 2px solid var(--kiosk-border-color); }
         #qr-reader { width: 100%; height: 100%; }
-        #qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover; }
+        #qr-reader video { width: 100% !important; height: 100% !important; object-fit: cover; transform: scaleX(-1);}
         #qr-reader > div:first-of-type { border: none !important; }
         .scanner-viewport::after { content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, var(--kiosk-primary), transparent); box-shadow: 0 0 10px var(--kiosk-primary); animation: scanline 3s linear infinite; z-index: 10; }
         @keyframes scanline { 0% { top: 0; } 100% { top: 100%; } }
@@ -106,7 +106,7 @@
         <div class="row">
             <div class="col-lg-7 mb-4 mb-lg-0">
                 <div class="card kiosk-card">
-                     <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Kios Absensi QR</h5>
                         <div class="text-secondary fw-light">Tekan 'ESC' untuk keluar</div>
                     </div>
@@ -115,6 +115,60 @@
                             <div id="clock-time" class="clock-time">00:00:00</div>
                             <div id="clock-date" class="clock-date">Memuat...</div>
                         </div>
+
+                        {{-- ====================================================== --}}
+                        {{-- |    KODE JADWAL HARI INI YANG SUDAH DIPERBAIKI      | --}}
+                        {{-- ====================================================== --}}
+
+                        {{-- Cek dulu apakah jadwal untuk hari ini ada DAN aktif --}}
+                        @if ($jadwalHariIni && $jadwalHariIni->is_active)
+                            <div class="text-center p-3 mb-4" style="background-color: #f7f7f9; border-radius: 0.5rem; border: 1px solid #e1e3e8;">
+                                <h5 class="mb-3">
+                                    Jadwal Hari Ini ({{ $jadwalHariIni->hari }})
+                                </h5>
+                                <div class="d-flex justify-content-around align-items-center">
+                                    
+                                    {{-- Info Jam Masuk --}}
+                                    <div class="px-2">
+                                        <i class='bx bx-log-in-circle bx-md text-primary'></i>
+                                        <div class="small text-muted mt-1">Masuk</div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
+                                            {{ date('H:i', strtotime($jadwalHariIni->jam_masuk_sekolah)) }}
+                                        </div>
+                                    </div>
+
+                                    {{-- Info Jam Pulang --}}
+                                    <div class="px-2">
+                                        <i class='bx bx-log-out-circle bx-md text-info'></i>
+                                        <div class="small text-muted mt-1">Pulang</div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
+                                            {{ date('H:i', strtotime($jadwalHariIni->jam_pulang_sekolah)) }}
+                                        </div>
+                                    </div>
+
+                                    {{-- Info Toleransi --}}
+                                    <div class="px-2">
+                                        <i class='bx bx-time bx-md text-warning'></i>
+                                        <div class="small text-muted mt-1">Toleransi</div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
+                                            {{ $jadwalHariIni->batas_toleransi_terlambat }} <span class="fs-6 fw-normal">menit</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        @else
+                            {{-- Tampilan jika hari ini libur atau tidak ada jadwal --}}
+                            <div class="alert alert-success text-center" role="alert">
+                                <i class='bx bx-calendar-star me-2'></i>
+                                <strong>Hari ini tidak ada jadwal absensi. Selamat beristirahat!</strong>
+                            </div>
+                        @endif
+
+                        {{-- ====================================================== --}}
+                        {{-- |                AKHIR DARI KODE BARU                  | --}}
+                        {{-- ====================================================== --}}
+
                         <div class="scanner-viewport">
                             <div id="qr-reader"></div>
                         </div>
@@ -149,7 +203,6 @@
         </div>
     </div>
 
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             @if(session('success'))
@@ -326,6 +379,7 @@
                 if (data.success) {
                     let statusType = 'success', mainMessage, subMessage;
                     const status = data.status, studentName = data.siswa?.nama;
+                    const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=696cff&color=fff&size=120`;
                     if (status === 'Terlambat') {
                         statusType = 'warning'; mainMessage = studentName; subMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
                     } else if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') {
@@ -335,7 +389,7 @@
                     } else {
                         statusType = 'info'; mainMessage = data.message; subMessage = studentName || 'Status: Aksi Berhasil Dicatat.';
                     }
-                    showFeedback(statusType, data.message, mainMessage, subMessage, data.foto);
+                    showFeedback(statusType, data.message, mainMessage, subMessage, fotoUrl);
                     fetchInitialScans();
                 } else {
                     const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;

@@ -138,10 +138,19 @@ class AbsensiSiswaController extends Controller
     /**
      * Menampilkan halaman Kios Absensi QR Code.
      */
-    public function showScanner()
-    {
-        return view('admin.absensi.siswa.scanner');
-    }
+public function showScanner()
+{
+    // Dapatkan nama hari ini dalam Bahasa Indonesia (e.g., "Kamis")
+    $namaHariIni = Carbon::now()->isoFormat('dddd');
+
+    // Ambil HANYA jadwal untuk hari ini dari database
+    $jadwalHariIni = DB::table('pengaturan_absensi')
+                        ->where('hari', $namaHariIni)
+                        ->first(); // Gunakan first() untuk mengambil satu baris data saja
+
+    // Kirim data jadwal hari ini ke view
+    return view('admin.absensi.siswa.scanner', compact('jadwalHariIni'));
+}
 
     /**
      * Menangani logika saat QR Code dipindai.

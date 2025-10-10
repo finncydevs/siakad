@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin\Laporan;
 
 use App\Http\Controllers\Controller;
 use App\Models\AbsensiSiswa;
+use App\Models\Siswa;
 use App\Models\Rombel;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class LaporanAbsensiController extends Controller
 {
@@ -80,5 +82,61 @@ class LaporanAbsensiController extends Controller
 
         // Arahkan ke file view baru yang akan kita buat
         return view('admin.laporan.absensi.tanpa_pulang', compact('laporan', 'title'));
+    }
+
+    public function dashboard()
+    {
+        $today = Carbon::today();
+        
+        // --- DATA UNTUK GAUGE/KARTU STATISTIK ---
+        $totalSiswa = Siswa::count();
+        $hadirHariIni = AbsensiSiswa::whereDate('tanggal', $today)
+                                    ->whereIn('status', ['Hadir', 'Terlambat']) // Anggap Terlambat juga Hadir
+                                    ->distinct('siswa_id')
+                                    ->count();
+        
+        // Hindari pembagian dengan nol jika tidak ada siswa
+        $persentaseKehadiran = $totalSiswa > 0 ? round(($hadirHariIni / $totalSiswa) * 100) : 0;
+
+        // --- DATA UNTUK PIE CHART ---
+        $rekapStatusHariIni = AbsensiSiswa::whereDate('tanggal', $today)
+            ->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status'); // Hasilnya: ['Hadir' => 150, 'Sakit' => 5, ...]
+
+        // --- DATA UNTUK BAR CHART (TREN 7 HARI TERAKHIR) ---
+        $startDate = Carbon::now()->subDays(6)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+        
+        $trenAbsensi = AbsensiSiswa::whereBetween('tanggal', [$startDate, $endDate])
+            ->whereIn('status', ['Sakit', 'Izin', 'Alfa']) // Fokus pada absensi negatif
+            ->select(DB::raw('DATE(tanggal) as tanggal'), DB::raw('count(*) as total'))
+            ->groupBy('tanggal')
+            ->orderBy('tanggal', 'asc')
+            ->get();
+            
+        // Proses data untuk Chart.js: pisahkan label (tanggal) dan data (total)
+        $labelsTren = [];
+        $dataTren = [];
+        // Buat rentang tanggal 7 hari agar hari yang tidak ada absensi tetap muncul (nilai 0)
+        $period = new \DatePeriod($startDate, new \DateInterval('P1D'), $endDate);
+        foreach ($period as $date) {
+            $formattedDate = $date->format('Y-m-d');
+            $labelsTren[] = Carbon::parse($formattedDate)->isoFormat('dd, D MMM'); // Format: Rab, 7 Okt
+            
+            // Cari data absensi untuk tanggal ini
+            $found = $trenAbsensi->firstWhere('tanggal', $formattedDate);
+            $dataTren[] = $found ? $found->total : 0;
+        }
+
+        // Kirim semua data ke view
+        return view('admin.laporan.absensi.dashboard', compact(
+            'totalSiswa',
+            'hadirHariIni',
+            'persentaseKehadiran',
+            'rekapStatusHariIni',
+            'labelsTren',
+            'dataTren'
+        ));
     }
 }
