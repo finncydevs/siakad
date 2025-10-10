@@ -9,17 +9,16 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::create('formulir_syarat', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('formulir_id')->constrained('formulir_pendaftarans')->onDelete('cascade');
-            $table->foreignId('syarat_id')->constrained('syarat_pendaftarans')->onDelete('cascade');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('formulir_id')->index('formulir_syarat_formulir_id_foreign');
+            $table->unsignedBigInteger('syarat_id')->index('formulir_syarat_syarat_id_foreign');
             $table->boolean('is_checked')->default(false);
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

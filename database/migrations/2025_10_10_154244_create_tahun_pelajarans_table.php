@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('jalur_pendaftarans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tahunPelajaran_id')->constrained('tahun_pelajarans')->onDelete('cascade');
-            $table->string('kode')->nullable();
-            $table->string('jalur')->nullable();
-            $table->string('keterangan')->nullable();
+        Schema::create('tahun_pelajarans', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('tahun_pelajaran')->unique();
+            $table->text('keterangan')->nullable();
             $table->boolean('is_active')->default(false);
+            $table->boolean('active')->default(false);
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('jalur_pendaftarans');
+        Schema::dropIfExists('tahun_pelajarans');
     }
 };

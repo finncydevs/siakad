@@ -9,13 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    // database/migrations/xxxx_xx_xx_create_formulir_pendaftarans_table.php
-    public function up()
+    public function up(): void
     {
         Schema::create('formulir_pendaftarans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('tahun_id')->constrained('tahun_pelajarans')->onDelete('cascade');
-            $table->foreignId('jalur_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('tahun_id')->index('formulir_pendaftarans_tahun_id_foreign');
+            $table->unsignedBigInteger('jalur_id')->index('formulir_pendaftarans_jalur_id_foreign');
             $table->string('nama_lengkap');
             $table->string('nisn')->nullable();
             $table->string('npun')->nullable();
@@ -35,11 +34,10 @@ return new class extends Migration
             $table->string('kelas')->nullable();
             $table->string('jurusan')->nullable();
             $table->string('ukuran_pakaian')->nullable();
-            $table->decimal('pembayaran', 12, 2)->default(0);
+            $table->decimal('pembayaran', 12)->default(0);
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.

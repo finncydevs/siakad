@@ -6,11 +6,14 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('absensi_gtk', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('gtk_id')->constrained('gtks')->onDelete('cascade');
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('gtk_id')->index('absensi_gtk_gtk_id_foreign');
             $table->date('tanggal');
             $table->time('jam_masuk')->nullable();
             $table->time('jam_pulang')->nullable();
@@ -20,6 +23,9 @@ return new class extends Migration
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('absensi_gtk');

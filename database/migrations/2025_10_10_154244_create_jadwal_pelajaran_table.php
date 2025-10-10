@@ -6,12 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('jadwal_pelajaran', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('rombel_id')->constrained('rombels')->onDelete('cascade');
-            $table->string('ptk_id'); // Merujuk ke ptk_id di tabel gtks
+            $table->bigIncrements('id');
+            $table->unsignedBigInteger('rombel_id')->index('jadwal_pelajaran_rombel_id_foreign');
+            $table->string('ptk_id');
             $table->string('mata_pelajaran');
             $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
             $table->time('jam_mulai');
@@ -19,12 +22,12 @@ return new class extends Migration
             $table->string('tahun_ajaran_id');
             $table->string('semester_id');
             $table->timestamps();
-
-            // Opsional: tambahkan foreign key jika Anda punya tabel GTK dengan primary key 'id'
-            // $table->foreign('ptk_id')->references('id')->on('gtks')->onDelete('cascade');
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('jadwal_pelajaran');
