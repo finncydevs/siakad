@@ -78,35 +78,31 @@ class GenericSyncController extends Controller
             }
             
             // =============================================================
-            // --- PEMBARUAN UTAMA: LOGIKA KHUSUS UNTUK SINKRONISASI ROMBELS ---
+            // --- PEMBARUAN UTAMA V2: PENCARIAN NAMA YANG LEBIH FLEKSIBEL ---
             // =============================================================
-            if ($tableName === 'rombels') {
-                $gtkId = null; // Inisialisasi ID guru sebagai null
-
-                // Cek jika ada data nama wali kelas ('ptk_id_str')
-                if (!empty($row['ptk_id_str'])) {
-                    // Cari ID di tabel 'gtks' yang namanya sama persis
-                    $gtkId = DB::table('gtks')->where('nama', $row['ptk_id_str'])->value('id');
-                }
+            if ($tableName === 'rombels' && !empty($row['ptk_id_str'])) {
                 
-                // Tambahkan key 'ptk_id' dengan nilai yang ditemukan (atau null) ke dalam array data
-                // Ini akan memastikan kolom ptk_id diisi saat proses updateOrInsert
-                $row['ptk_id'] = $gtkId;
+                // 1. Bersihkan nama dari Dapodik (hapus gelar, spasi berlebih)
+                $cleanedName = trim(preg_replace('/,.*$/', '', $row['ptk_id_str']));
+
+                // 2. Cari di database dengan mencocokkan nama yang sudah dibersihkan
+                $gtk = DB::table('gtks')
+                         ->whereRaw('TRIM(REGEXP_REPLACE(nama, ",.*$", "")) LIKE ?', ["%{$cleanedName}%"])
+                         ->select('id')
+                         ->first();
+
+                // 3. Tetapkan ID jika ditemukan, jika tidak, biarkan null
+                $row['ptk_id'] = $gtk ? $gtk->id : null;
             }
             // =============================================================
-            // --- AKHIR PEMBARUAN UTAMA ---
+            // --- AKHIR PEMBARUAN UTAMA V2 ---
             // =============================================================
             
             // Logika khusus untuk tabel siswa agar tidak menimpa data 'foto'
             if ($tableName === 'siswas') {
-                $siswa = Siswa::firstOrNew([
-                    $identifierColumn => $row[$identifierColumn]
-                ]);
-
+                $siswa = Siswa::firstOrNew([$identifierColumn => $row[$identifierColumn]]);
                 $siswa->fill($row);
                 $siswa->save();
-
-                // Generate QR Token jika siswa baru dibuat
                 if ($siswa->wasRecentlyCreated && is_null($siswa->qr_token)) {
                     $siswa->qr_token = Str::uuid()->toString();
                     $siswa->save();

@@ -19,39 +19,42 @@ class AbsensiSiswaController extends Controller
     /**
      * Menampilkan halaman untuk memilih kelas (Absensi Harian).
      */
-    public function index(Request $request)
-{
-    $tanggal = $request->input('tanggal', Carbon::now()->toDateString());
+public function index(Request $request)
+    {
+        $tanggal = $request->input('tanggal', Carbon::now()->toDateString());
 
-    $query = Rombel::whereNotNull('ptk_id')->with('waliKelas');
-    
-    // Ambil data dan filter untuk nama yang unik
-    $uniqueRombels = $query->get()->unique('nama');
+        // =============================================================
+        // --- PEMBARUAN SEMENTARA: AMBIL SEMUA ROMBEL ---
+        // =============================================================
+        // Query ini diubah dari 'whereNotNull('ptk_id')' agar menampilkan semua kelas,
+        // meskipun ptk_id-nya masih NULL. Ini memastikan halaman tidak kosong.
+        $query = Rombel::with('waliKelas');
+        // =============================================================
+        
+        // Ambil data dan filter untuk nama yang unik
+        $uniqueRombels = $query->get()->unique('nama');
 
-    // Lakukan pengurutan custom
-    $rombels = $uniqueRombels->sortBy(function($rombel) {
-        $nama = $rombel->nama;
-        // Prioritas 1: Kelas XII
-        if (str_starts_with($nama, 'XII')) {
-            // BENAR: Menggunakan titik (.) untuk penggabungan string
-            return '300' . substr($nama, 4); 
-        }
-        // Prioritas 2: Kelas XI
-        if (str_starts_with($nama, 'XI')) {
-            // BENAR: Menggunakan titik (.) untuk penggabungan string
-            return '200' . substr($nama, 3);
-        }
-        // Prioritas 3: Kelas X
-        if (str_starts_with($nama, 'X')) {
-            // BENAR: Menggunakan titik (.) untuk penggabungan string
-            return '100' . substr($nama, 2);
-        }
-        // Untuk kelas lain, letakkan di akhir
-        return '400'; 
-    });
+        // Lakukan pengurutan custom
+        $rombels = $uniqueRombels->sortBy(function($rombel) {
+            $nama = $rombel->nama;
+            // Prioritas 1: Kelas XII
+            if (str_starts_with($nama, 'XII')) {
+                return '300' . substr($nama, 4); 
+            }
+            // Prioritas 2: Kelas XI
+            if (str_starts_with($nama, 'XI')) {
+                return '200' . substr($nama, 3);
+            }
+            // Prioritas 3: Kelas X
+            if (str_starts_with($nama, 'X')) {
+                return '100' . substr($nama, 2);
+            }
+            // Untuk kelas lain, letakkan di akhir
+            return '400'; 
+        });
 
-    return view('admin.absensi.siswa.index', compact('rombels', 'tanggal'));
-}
+        return view('admin.absensi.siswa.index', compact('rombels', 'tanggal'));
+    }
 
     /**
      * Menampilkan formulir absensi untuk kelas dan tanggal yang dipilih.
