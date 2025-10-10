@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\Settings\SekolahController;
 
 // Controller Kepegawaian
 use App\Http\Controllers\Admin\Kepegawaian\GtkController;
-use App\Http\Controllers\Admin\Kesiswaan\Admin\Kepegawaian\TugasPegawaiController;
+// use App\Http\Controllers\Admin\Kesiswaan\Admin\Kepegawaian\TugasPegawaiController;
 
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
@@ -40,6 +40,8 @@ use App\Http\Controllers\Admin\Keuangan\KasController;
 use App\Http\Controllers\Admin\Keuangan\PembayaranController;
 use App\Http\Controllers\Admin\Keuangan\PengeluaranController;
 use App\Http\Controllers\Admin\Keuangan\VoucherController;
+
+use App\Http\Controllers\ProfilSekolahController;
 
 
 /*
@@ -87,7 +89,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
         Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
         Route::resource('gtk', GtkController::class);
-        Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
+        // Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
 
     // --- GRUP AKADEMIK ---

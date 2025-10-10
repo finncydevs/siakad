@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin\Kepegawaian;
 
+
 use App\Models\Gtk;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -19,7 +20,7 @@ class GtkController extends Controller
         }
 
         $gtks = $query->latest()->paginate(15);
-        
+
         return view('admin.kepegawaian.gtk.index', compact('gtks'));
     }
 
@@ -35,7 +36,7 @@ class GtkController extends Controller
             $ids = explode(',', $request->input('ids'));
             $query->whereIn('id', $ids);
         }
-        
+
         $gtks = $query->latest()->get();
 
         $fileName = 'Data_Lengkap_GTK_Sekull.csv';
@@ -49,7 +50,7 @@ class GtkController extends Controller
 
         $callback = function() use($gtks) {
             $file = fopen('php://output', 'w');
-            
+
             fputcsv($file, [
                 'Nama Lengkap', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'NIK',
                 'Status Kepegawaian', 'NIP', 'NUPTK', 'Jenis PTK', 'Jabatan', 'Tanggal Surat Tugas', 'Status Induk',

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Student;
@@ -52,15 +52,15 @@ class AttendanceController extends Controller
                 'data' => $student,
             ], 409); // 409 Conflict
         }
-        
+
         // 5. Tentukan status berdasarkan pengecualian atau waktu
         $status = '';
-        
+
         // 5a. Cek apakah siswa punya pengecualian untuk hari ini
         $hasException = AttendanceException::where('student_id', $student->id)
                                            ->whereDate('exception_date', $today)
                                            ->exists();
-        
+
         if ($hasException) {
             // Jika punya pengecualian, statusnya langsung "Hadir" tidak peduli jam berapa
             $status = 'Hadir';
@@ -68,7 +68,7 @@ class AttendanceController extends Controller
             // Jika tidak ada pengecualian, jalankan logika waktu seperti biasa
             $now = Carbon::now();
             $cutoffTime = Carbon::parse($session->session_date . ' ' . $session->end_time);
-            
+
             $status = $now->lte($cutoffTime) ? 'Hadir' : 'Terlambat';
         }
 
