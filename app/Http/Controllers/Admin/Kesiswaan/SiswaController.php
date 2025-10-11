@@ -150,7 +150,7 @@ class SiswaController extends Controller
 
     public function showCetakMassalIndex()
     {
-        $rombels = Rombel::orderBy('nama', 'asc')->get();
+        $rombels = Rombel::orderBy('nama', 'asc')->get()->unique('nama');
         return view('admin.kesiswaan.siswa.cetak_massal_index', compact('rombels'));
     }
 

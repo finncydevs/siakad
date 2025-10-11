@@ -23,6 +23,14 @@ class DatabaseSeeder extends Seeder
 >>>>>>> origin/modul/absensi
         ]);
 
+<<<<<<< HEAD
         // User::factory()->create([ ... ]); // <-- 3. Baris ini dihapus karena sudah ditangani oleh UserSeeder
+=======
+        User::factory()->create([
+            'name' => 'admin',
+            'email' => 'admin@gmail.com',
+        ]);
+        
+>>>>>>> origin/modul/absensi
     }
 }
