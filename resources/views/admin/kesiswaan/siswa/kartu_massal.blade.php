@@ -25,10 +25,12 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            padding: 5mm 9mm; 
-            gap: 1mm 6mm;
             box-sizing: border-box;
             justify-items: center;
+            
+            /* Penyesuaian untuk margin printer yang lebih aman */
+            padding: 5mm 9mm;
+            gap: 1mm 6mm;
         }
         
         .page-break {
@@ -51,23 +53,35 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px; /* PERUBAHAN: Diperbesar dari 12px */
+            font-size: 14px;
             font-weight: bold;
             color: #333;
             flex-shrink: 0;
         }
         
         .school-logo {
-            width: 32px; /* PERUBAHAN: Diperbesar dari 28px */
-            height: 32px; /* PERUBAHAN: Diperbesar dari 28px */
+            width: 32px;
+            height: 32px;
         }
+
+        /* --- PERUBAHAN CSS DIMULAI DI SINI --- */
 
         .card-photo-area {
             flex-grow: 1;
             position: relative;
-            background-size: cover;
-            background-position: center;
+            /* Properti background-* dihapus dari sini */
+            overflow: hidden; /* Pastikan gambar terpotong rapi */
         }
+
+        /* CSS BARU untuk tag <img> di dalam area foto */
+        .card-photo-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Membuat gambar menutupi area tanpa distorsi */
+            object-position: center; /* Memposisikan gambar di tengah */
+        }
+        
+        /* --- PERUBAHAN CSS SELESAI --- */
         
         .card-content {
             position: absolute;
@@ -143,7 +157,8 @@
                     <span>KARTU PESERTA DIDIK</span>
                 </div>
                 
-                <div class="card-photo-area" style="background-image: url('{{ $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://via.placeholder.com/400x600' }}');">
+                <div class="card-photo-area">
+                    <img src="{{ $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://via.placeholder.com/400x600' }}" alt="Foto {{ $siswa->nama }}">
 
                     <div class="card-content">
                         <div class="student-info">
@@ -156,7 +171,7 @@
                         {!! QrCode::size(150)->generate($siswa->qr_token) !!}
                     </div>
                 </div>
-            </div>
+                </div>
             @endforeach
         </div>
     @empty
