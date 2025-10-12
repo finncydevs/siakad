@@ -251,7 +251,7 @@ public function handleScan(Request $request)
         
         } else { // Proses Masuk Normal
             $batasMasuk = Carbon::parse($pengaturan->jam_masuk_sekolah);
-            $batasTerlambat = $batasMasuk->copy()->addMinutes($pengaturan->batas_toleransi_terlambat);
+            $batasTerlambat = $batasMasuk->copy()->addMinutes((int) $pengaturan->batas_toleransi_terlambat);
             $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60);
             if (!$waktuScan->between($batasAwalMasuk, $batasTerlambat)) {
                 $pesan = $waktuScan->lt($batasAwalMasuk) ? 'Belum waktunya untuk absen masuk!' : 'Waktu untuk absen masuk sudah berakhir.';
