@@ -25,8 +25,8 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            padding: 5mm 9mm; 
-            gap: 1mm 6mm;
+            padding: 3mm 10mm; 
+            gap: 3mm 5mm; 
             box-sizing: border-box;
             justify-items: center;
         }
