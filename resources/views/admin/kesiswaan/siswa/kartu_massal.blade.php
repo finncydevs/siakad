@@ -27,8 +27,6 @@
             grid-template-rows: repeat(3, 1fr);
             box-sizing: border-box;
             justify-items: center;
-            
-            /* Penyesuaian untuk margin printer yang lebih aman */
             padding: 5mm 9mm;
             gap: 1mm 6mm;
         }
@@ -64,24 +62,18 @@
             height: 32px;
         }
 
-        /* --- PERUBAHAN CSS DIMULAI DI SINI --- */
-
         .card-photo-area {
             flex-grow: 1;
             position: relative;
-            /* Properti background-* dihapus dari sini */
-            overflow: hidden; /* Pastikan gambar terpotong rapi */
+            overflow: hidden;
         }
 
-        /* CSS BARU untuk tag <img> di dalam area foto */
         .card-photo-area img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Membuat gambar menutupi area tanpa distorsi */
-            object-position: center; /* Memposisikan gambar di tengah */
+            object-fit: cover;
+            object-position: center;
         }
-        
-        /* --- PERUBAHAN CSS SELESAI --- */
         
         .card-content {
             position: absolute;
@@ -109,6 +101,17 @@
             display: inline-block;
             text-shadow: 1px 1px 3px rgba(0,0,0,1);
         }
+
+        /* --- ATURAN BARU UNTUK KONDISI TANPA FOTO --- */
+        .card-photo-area.no-photo .card-content {
+            color: #333; /* Ubah warna teks menjadi gelap */
+        }
+
+        .card-photo-area.no-photo .student-info .nama,
+        .card-photo-area.no-photo .student-info .nisn {
+            text-shadow: none; /* Hapus bayangan teks */
+        }
+        /* --- AKHIR ATURAN BARU --- */
 
         .qr-code {
             position: absolute;
@@ -157,7 +160,7 @@
                     <span>KARTU PESERTA DIDIK</span>
                 </div>
                 
-                <div class="card-photo-area">
+                <div class="card-photo-area {{ !$siswa->foto ? 'no-photo' : '' }}">
                     <img src="{{ $siswa->foto ? asset('storage/' . $siswa->foto) : 'https://via.placeholder.com/400x600' }}" alt="Foto {{ $siswa->nama }}">
 
                     <div class="card-content">
@@ -171,7 +174,8 @@
                         {!! QrCode::size(150)->generate($siswa->qr_token) !!}
                     </div>
                 </div>
-                </div>
+
+            </div>
             @endforeach
         </div>
     @empty
