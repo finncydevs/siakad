@@ -251,6 +251,14 @@ public function handleScan(Request $request)
         
         } else { // Proses Masuk Normal
             $batasMasuk = Carbon::parse($pengaturan->jam_masuk_sekolah);
+            dd(
+        'Tipe Data Asli:', 
+        gettype($pengaturan->batas_toleransi_terlambat),
+        'Nilai Asli:',
+        $pengaturan->batas_toleransi_terlambat,
+        'Hasil setelah di-cast ke (int):',
+        (int) $pengaturan->batas_toleransi_terlambat
+    );
             $batasTerlambat = $batasMasuk->copy()->addMinutes((int) $pengaturan->batas_toleransi_terlambat);
             $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60);
             if (!$waktuScan->between($batasAwalMasuk, $batasTerlambat)) {
