@@ -3,42 +3,134 @@
 namespace App\Http\Controllers\Admin\Kepegawaian;
 
 use App\Models\Gtk;
+use App\Models\Sekolah; // INI BARU
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Response;
+use Barryvdh\DomPDF\Facade\Pdf; // INI BARU
 
 class GtkController extends Controller
 {
-    public function index(Request $request)
+    /**
+     * Menampilkan daftar Guru.
+     */
+    public function indexGuru(Request $request)
     {
-        $query = Gtk::query();
+        $query = Gtk::query()->where('jenis_ptk_id_str', 'Guru');
 
-        if ($request->filled('search')) {
-            $query->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('nip', 'like', '%' . $request->search . '%')
-                  ->orWhere('nik', 'like', '%' . $request->search . '%');
-        }
+        $query->when($request->search, function ($q, $search) {
+            return $q->where(function ($sub) use ($search) {
+                $sub->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%");
+            });
+        });
 
-        $gtks = $query->latest()->paginate(15);
+        $gurus = $query->latest()->paginate(15);
         
-        return view('admin.kepegawaian.gtk.index', compact('gtks'));
+        return view('admin.kepegawaian.gtk.index_guru', compact('gurus'));
     }
 
     /**
-     * Menangani permintaan untuk export data ke Excel (CSV) dengan SEMUA kolom.
+     * Menampilkan daftar Tenaga Kependidikan.
      */
-    public function exportExcel(Request $request)
+    public function indexTendik(Request $request)
     {
-        $query = Gtk::query();
+        $query = Gtk::query()->where('jenis_ptk_id_str', 'Tenaga Kependidikan');
+        
+        $query->when($request->search, function ($q, $search) {
+            return $q->where(function ($sub) use ($search) {
+                $sub->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%");
+            });
+        });
 
-        // PERUBAHAN DI SINI: Cek apakah ada ID yang dikirim untuk di-export
+        $tendiks = $query->latest()->paginate(15);
+        
+        return view('admin.kepegawaian.gtk.index_tendik', compact('tendiks'));
+    }
+
+    /**
+     * Menampilkan detail untuk satu atau lebih GTK yang dipilih.
+     */
+    public function showMultiple(Request $request)
+    {
+        $request->validate(['ids' => 'required|string']);
+        
+        $ids = explode(',', $request->input('ids'));
+
+        $gtks = Gtk::whereIn('id', $ids)->get();
+
+        return view('admin.kepegawaian.gtk.show_multiple', compact('gtks'));
+    }
+
+    /**
+     * ====================================================================
+     * FUNGSI BARU UNTUK CETAK PDF DITAMBAHKAN DI SINI
+     * ====================================================================
+     */
+    public function cetakPdf($id)
+    {
+        // Ambil data GTK yang akan dicetak
+        $gtk = Gtk::findOrFail($id);
+        
+        // Ambil data sekolah untuk kop surat
+        $sekolah = Sekolah::first();
+
+        // Data untuk QR Code (contoh: NUPTK atau NIK)
+        $qrCodeData = "Nama: " . $gtk->nama . "\nNUPTK: " . ($gtk->nuptk ?? '-');
+
+        // Buat PDF dari view 'gtk_pdf.blade.php'
+        $pdf = Pdf::loadView('admin.kepegawaian.gtk.gtk_pdf', compact('gtk', 'sekolah', 'qrCodeData'));
+        
+        // Atur nama file saat di-download
+        $fileName = 'Profil GTK - ' . $gtk->nama . '.pdf';
+
+        // Tampilkan PDF di browser (stream)
+        return $pdf->stream($fileName);
+    }
+
+    /**
+     * Menangani export data Guru ke Excel.
+     */
+    public function exportGuruExcel(Request $request)
+    {
+        $query = Gtk::query()->where('jenis_ptk_id_str', 'Guru');
+        return $this->generateExport($request, $query, 'Data_Guru_Sekull.csv');
+    }
+
+    /**
+     * Menangani export data Tenaga Kependidikan ke Excel.
+     */
+    public function exportTendikExcel(Request $request)
+    {
+        $query = Gtk::query()->where('jenis_ptk_id_str', 'Tenaga Kependidikan');
+        return $this->generateExport($request, $query, 'Data_Tendik_Sekull.csv');
+    }
+
+    /**
+     * Logika utama untuk generate file CSV.
+     */
+    private function generateExport(Request $request, $query, $fileName)
+    {
+        // Filter berdasarkan ID yang dipilih
         if ($request->has('ids')) {
             $ids = explode(',', $request->input('ids'));
             $query->whereIn('id', $ids);
         }
+        // Filter berdasarkan pencarian yang sedang aktif
+        elseif ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($sub) use ($search) {
+                $sub->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
         
         $gtks = $query->latest()->get();
 
-        $fileName = 'Data_Lengkap_GTK_Sekull.csv';
         $headers = [
             "Content-type"        => "text/csv",
             "Content-Disposition" => "attachment; filename=$fileName",
@@ -59,36 +151,19 @@ class GtkController extends Controller
 
             foreach ($gtks as $gtk) {
                 fputcsv($file, [
-                    $gtk->nama,
-                    $gtk->jenis_kelamin,
-                    $gtk->tempat_lahir,
-                    $gtk->tanggal_lahir,
-                    $gtk->agama_id_str,
-                    $gtk->nik,
-                    $gtk->status_kepegawaian_id_str,
-                    $gtk->nip,
-                    $gtk->nuptk,
-                    $gtk->jenis_ptk_id_str,
-                    $gtk->jabatan_ptk_id_str,
-                    $gtk->tanggal_surat_tugas,
-                    $gtk->ptk_induk == 1 ? 'Induk' : 'Non-Induk',
-                    $gtk->pendidikan_terakhir,
-                    $gtk->bidang_studi_terakhir,
-                    $gtk->pangkat_golongan_terakhir,
-                    $gtk->rwy_pend_formal,
-                    $gtk->rwy_kepangkatan
+                    $gtk->nama, $gtk->jenis_kelamin, $gtk->tempat_lahir, $gtk->tanggal_lahir,
+                    $gtk->agama_id_str, $gtk->nik, $gtk->status_kepegawaian_id_str, $gtk->nip,
+                    $gtk->nuptk, $gtk->jenis_ptk_id_str, $gtk->jabatan_ptk_id_str, $gtk->tanggal_surat_tugas,
+                    $gtk->ptk_induk == 1 ? 'Induk' : 'Non-Induk', $gtk->pendidikan_terakhir,
+                    $gtk->bidang_studi_terakhir, $gtk->pangkat_golongan_terakhir,
+                    $gtk->rwy_pend_formal, $gtk->rwy_kepangkatan
                 ]);
             }
 
             fclose($file);
         };
 
-        return response()->stream($callback, 200, $headers);
-    }
-
-    public function show(Gtk $gtk)
-    {
-        return view('admin.kepegawaian.gtk.show', compact('gtk'));
+        return Response::stream($callback, 200, $headers);
     }
 }
 

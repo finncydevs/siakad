@@ -112,11 +112,26 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // --- GRUP KEPEGAWAIAN ---
-    Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
-        Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
-        Route::resource('gtk', GtkController::class);
+     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
+        // Route untuk Guru
+        Route::prefix('guru')->name('guru.')->controller(GtkController::class)->group(function () {
+            Route::get('/', 'indexGuru')->name('index');
+            Route::get('/export/excel', 'exportGuruExcel')->name('export.excel');
+        });
+
+        // Route untuk Tenaga Kependidikan
+        Route::prefix('tenaga-kependidikan')->name('tendik.')->controller(GtkController::class)->group(function () {
+            Route::get('/', 'indexTendik')->name('index');
+            Route::get('/export/excel', 'exportTendikExcel')->name('export.excel');
+        });
+
+        // Route untuk detail multi-GTK
+        Route::get('/gtk/show-multiple', [GtkController::class, 'showMultiple'])->name('gtk.show-multiple');
+        Route::get('gtk/cetak-pdf/{id}', [GtkController::class, 'cetakPdf'])->name('gtk.cetak_pdf');
+        // Route untuk Tugas Pegawai
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
+
 
     // --- GRUP AKADEMIK ---
     Route::prefix('akademik')->name('akademik.')->group(function () {
