@@ -72,7 +72,7 @@
             </a>
         </li>
 
-        {{-- <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-user-badge"></i>
                 <div data-i18n="Kepegawaian">Kepegawaian</div>
@@ -89,9 +89,9 @@
                     </a>
                 </li>
             </ul>
-        </li> --}}
+        </li>
 
-        {{-- <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
+        <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
                 <div data-i18n="Akademik">Akademik</div>
@@ -128,7 +128,7 @@
                     </a>
                 </li>
             </ul>
-        </li> --}}
+        </li>
 
         <!-- Absensi -->
         <li class="menu-item {{ request()->is('admin/absensi*') || request()->is('guru/absensi*') ? 'open' : '' }}">
@@ -247,7 +247,6 @@
             </ul>
         </li>
 
-<<<<<<< HEAD
          <li class="menu-item {{ request()->is('admin/rombel*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-group"></i>
@@ -317,7 +316,6 @@
         </li>
 
 
-=======
         <!-- Laporan -->
 <li class="menu-item {{ request()->is('admin/laporan*') ? 'open' : '' }}">
     <a href="javascript:void(0);" class="menu-link menu-toggle">
@@ -342,7 +340,6 @@
     </ul>
 </li>
 
->>>>>>> origin/modul/absensi
         <!-- PENGATURAN SISTEM (DI BAWAH SENDIRI) -->
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
         <!-- Pengaturan Absensi (Submenu Baru) -->

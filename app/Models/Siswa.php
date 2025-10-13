@@ -40,7 +40,7 @@ class Siswa extends Model
      */
     public function rombel()
     {
-        return $this->belongsTo(Rombel::class, 'rombongan_belajar_id');
+          return $this->belongsTo(Rombel::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
     }
 
     public function getFotoUrlAttribute()
