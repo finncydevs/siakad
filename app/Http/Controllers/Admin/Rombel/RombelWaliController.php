@@ -3,35 +3,35 @@
 namespace App\Http\Controllers\Admin\Rombel;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rombel;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class RombelWaliController extends Controller
 {
     /**
-     * Menampilkan form untuk menambah data wali kelas.
+     * Menampilkan form untuk menambah data wali kelas baru.
      */
     public function create()
     {
+        // Method ini hanya menampilkan halaman form.
         return view('admin.rombel.wali.create');
     }
 
     /**
-     * Menampilkan halaman utama dengan daftar wali kelas.
+     * Menampilkan halaman utama dengan daftar rombel yang sudah memiliki wali kelas.
      */
     public function index()
     {
-        $data = collect([]); // Data dikosongkan
+        // 1. Ambil data dari model Rombel.
+        // 2. Gunakan whereNotNull('wali_id') untuk memfilter HANYA rombel yang sudah punya wali kelas.
+        // 3. Gunakan with(['wali', 'jurusan']) untuk mengambil data relasi (nama wali dan nama jurusan) secara efisien.
+        // 4. Urutkan dari yang terbaru dan buat paginasi.
+        $rombels = Rombel::whereNotNull('wali_id')
+                         ->with(['wali', 'jurusan'])
+                         ->latest()
+                         ->paginate(10);
 
-        $perPage = 10;
-        $currentPage = request()->input('page', 1);
-        $pagedData = $data->slice(($currentPage - 1) * $perPage, $perPage)->all();
-
-        $walis = new LengthAwarePaginator($pagedData, count($data), $perPage, $currentPage, [
-            'path' => request()->url(),
-            'query' => request()->query(),
-        ]);
-
-        return view('admin.rombel.wali.index', compact('walis'));
+        // 5. Kirim data $rombels ke view.
+        return view('admin.rombel.wali.index', compact('rombels'));
     }
 }

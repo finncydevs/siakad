@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin\Rombel;
 
 use App\Http\Controllers\Controller;
+use App\Models\Rombel; // Menggunakan model Rombel yang sudah ada
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class RombelMapelPilihanController extends Controller
 {
@@ -13,25 +13,22 @@ class RombelMapelPilihanController extends Controller
      */
     public function create()
     {
+        // Logika untuk menampilkan form tambah data
         return view('admin.rombel.mapel-pilihan.create');
     }
 
     /**
-     * Menampilkan halaman utama dengan daftar mapel pilihan.
+     * Menampilkan halaman utama dengan daftar rombel mapel pilihan.
      */
     public function index()
     {
-        $data = collect([]); // Data dikosongkan
-
-        $perPage = 10;
-        $currentPage = request()->input('page', 1);
-        $pagedData = $data->slice(($currentPage - 1) * $perPage, $perPage)->all();
-
-        $rombels = new LengthAwarePaginator($pagedData, count($data), $perPage, $currentPage, [
-            'path' => request()->url(),
-            'query' => request()->query(),
-        ]);
-
+        // Mengambil data dari tabel 'rombels' dan memfilternya
+        // hanya untuk yang jenisnya 'Mapel Pilihan'.
+        $rombels = Rombel::with(['wali', 'jurusan', 'kurikulum'])
+                         ->where('jenis_rombel', 'Mapel Pilihan')
+                         ->latest()
+                         ->paginate(10);
+        
         return view('admin.rombel.mapel-pilihan.index', compact('rombels'));
     }
 }
