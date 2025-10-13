@@ -15,7 +15,6 @@ return new class extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('formulir_id')->index('formulir_syarat_formulir_id_foreign');
             $table->unsignedBigInteger('syarat_id')->index('formulir_syarat_syarat_id_foreign');
-            $table->timestamps();
         });
     }
 
@@ -24,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('formulir_syarat');
+        Schema::dropIfExists('calon_siswa_syarat');
     }
 };
 

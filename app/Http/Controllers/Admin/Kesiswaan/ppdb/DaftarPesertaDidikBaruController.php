@@ -4,62 +4,26 @@ namespace App\Http\Controllers\Admin\Kesiswaan\ppdb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\CalonSiswa;
+use App\Models\TahunPelajaran;
 
 class DaftarPesertaDidikBaruController extends Controller
 {
-     /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.daftar_peserta_didik_baru');
-    }
+        // Ambil tahun aktif
+        $tahunAktif = TahunPelajaran::where('is_active', true)->first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $pesertaDidik = collect();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($tahunAktif) {
+            $pesertaDidik = CalonSiswa::with(['jalurPendaftaran'])
+                ->where('tahun_id', $tahunAktif->id)
+                ->whereNotNull('nis')   // ✅ sudah punya NIS
+                ->whereNull('kelas_tujuan')    // ✅ belum punya kelas
+                ->get();
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('admin.kesiswaan.ppdb.daftar_peserta_didik_baru', compact('pesertaDidik', 'tahunAktif'));
     }
 }

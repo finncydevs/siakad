@@ -6,17 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\QuotaPendaftaran;
 use App\Models\TahunPelajaran;
+use App\Models\Rombel;
 
 class QuotaController extends Controller
 {
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)->first();
         $quotas = $tahunPpdb
             ? QuotaPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)->get()
             : collect(); // jika tidak ada tahun aktif, koleksi kosong
 
-        return view('admin.kesiswaan.ppdb.quota_pendaftaran', compact('quotas', 'tahunPpdb'));
+        
+        // Ambil jurusan untuk filter
+        $jurusans = Rombel::select('jurusan_id_str')
+                    ->distinct()
+                    ->orderBy('jurusan_id_str')
+                    ->pluck('jurusan_id_str');
+
+        return view('admin.kesiswaan.ppdb.quota_pendaftaran', compact('quotas', 'tahunPpdb','jurusans'));
     }
 
     public function store(Request $request)

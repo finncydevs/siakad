@@ -24,8 +24,10 @@ use App\Http\Controllers\Admin\Akademik\JurusanController;
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarPesertaDidikBaruController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarCalonPesertaDidikController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\PemberianNisController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\FormulirPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\JalurController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\TingkatPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanPendaftaranController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanQuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\PenempatanKelasController;
@@ -58,6 +60,7 @@ use App\Http\Controllers\Admin\Rombel\RombelWaliController;
 Route::get('/', function () {
     // Arahkan ke dashboard admin saat membuka halaman utama
     return redirect()->route('admin.dashboard');
+})->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -137,25 +140,67 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     // --- GRUP KESISWAAN ---
+    // Kesiswaan
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
         Route::get('/siswa/{siswa}/cetak-kartu', [SiswaController::class, 'cetakKartu'])->name('siswa.cetak_kartu');
         Route::get('/cetak-kartu-massal', [SiswaController::class, 'showCetakMassalIndex'])->name('siswa.cetak_massal_index');
         Route::get('/cetak-kartu-massal/{rombel}', [SiswaController::class, 'cetakKartuMassal'])->name('siswa.cetak_massal_show');
         Route::resource('siswa', SiswaController::class);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Kesiswaan (PPDB)
+        |--------------------------------------------------------------------------
+        */
         Route::prefix('ppdb')->name('ppdb.')->group(function () {
+            // Tahun Pelajaran PPDB
             Route::resource('tahun-ppdb', TahunPpdbController::class);
             Route::post('/tahun-ppdb/{id}/toggle-active', [TahunPpdbController::class, 'toggleActive'])->name('tahun-ppdb.toggleActive');
+
+            // Jalur Pendaftaran
             Route::resource('jalur-ppdb', JalurController::class);
             Route::post('/jalur-ppdb/{id}/toggle-active', [JalurController::class, 'toggleActive'])->name('jalur-ppdb.toggleActive');
+
+            // Tingkat Pendaftaran
+            Route::resource('tingkat-ppdb', TingkatPendaftaranController::class);
+                Route::prefix('kesiswaan')->name('kesiswaan.')->group(function () {
+
+            // Quota Pendaftaran
             Route::resource('quota-ppdb', QuotaController::class);
+
+            // Syarat Pendaftaran
             Route::resource('syarat-ppdb', SyaratController::class);
             Route::post('/syarat-ppdb/{id}/toggle-active', [SyaratController::class, 'toggleActive'])->name('syarat-ppdb.toggleActive');
+
+            // Formulir Pendaftaran
             Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
+            Route::get('/get-syarat/{jalurId}', [SyaratController::class, 'getByJalur'])->name('admin.kesiswaan.ppdb.get-syarat');
+            Route::patch('update-status/{id}', [FormulirPendaftaranController::class, 'updateStatus'])->name('updateStatus');
+
+            // Pemberian NIS
+            Route::get('pemberian-nis/generate',
+                [PemberianNisController::class, 'generate']
+            )->name('pemberian-nis.generate');
+            Route::resource('pemberian-nis', PemberianNisController::class);
+
+            Route::get('daftar-calon/resi/{id}', [DaftarCalonPesertaDidikController::class, 'resi'])->name('daftar_calon.resi');
+
+            // Data Peserta Didik
             Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
             Route::resource('daftar-peserta-didik-baru', DaftarPesertaDidikBaruController::class);
+
+            // Penempatan Kelas
             Route::resource('penempatan-kelas', PenempatanKelasController::class);
+            Route::post('penempatan-kelas/update-kelas',
+                [PenempatanKelasController::class, 'updateKelas']
+            )->name('penempatan-kelas.update-kelas');
+
+
+            // Laporan
             Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
             Route::resource('laporan-quota', LaporanQuotaController::class);
+
+
         });
     });
 
@@ -183,105 +228,5 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
-    // --- GRUP PENGATURAN ---
-    Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
-        Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
-        Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
-        // --- PENGATURAN WEB SERVICE BARU ---
-        Route::prefix('webservice')->name('webservice.')->group(function () {
-            Route::get('/', [ApiSettingsController::class, 'index'])->name('index');
-        });
-        Route::get('/sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
-        Route::get('/webservice', [ApiSettingsController::class, 'index'])->name('webservice.index');
     });
-
-    // --- GRUP KEPEGAWAIAN ---
-    Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
-        Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
-        Route::resource('gtk', GtkController::class);
-        Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
-    });
-
-    // --- GRUP AKADEMIK ---
-    Route::prefix('akademik')->name('akademik.')->group(function () {
-        Route::resource('tapel', TapelController::class)->only(['index', 'store', 'destroy']);
-        Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
-        Route::resource('semester', SemesterController::class)->only(['index']);
-        Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
-        Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
-        Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
-        Route::resource('jurusan', JurusanController::class)->only(['index']);
-        Route::controller(TapelController::class)->prefix('tapel')->name('tapel.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::delete('/{tapel}', 'destroy')->name('destroy');
-            Route::patch('/{tapel}/toggle', 'toggleStatus')->name('toggle');
-        });
-
-        Route::controller(SemesterController::class)->prefix('semester')->name('semester.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::patch('/{semester}/toggle', 'toggle')->name('toggle');
-        });
-    });
-
-    // --- GRUP KESISWAAN ---
-    Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
-        Route::get('/siswa/{siswa}/cetak-kartu', [SiswaController::class, 'cetakKartu'])->name('siswa.cetak_kartu');
-        // Rute untuk menampilkan halaman pemilihan kelas
-        Route::get('/cetak-kartu-massal', [SiswaController::class, 'showCetakMassalIndex'])->name('siswa.cetak_massal_index');
-        // Rute untuk menampilkan halaman cetak untuk kelas yang dipilih
-        Route::get('/cetak-kartu-massal/{rombel}', [SiswaController::class, 'cetakKartuMassal'])->name('siswa.cetak_massal_show');
-        Route::resource('siswa', SiswaController::class);
-
-        Route::prefix('ppdb')->name('ppdb.')->group(function () {
-            Route::resource('tahun-ppdb', TahunPpdbController::class);
-            Route::post('/tahun-ppdb/{id}/toggle-active', [TahunPpdbController::class, 'toggleActive'])->name('tahun-ppdb.toggleActive');
-
-            Route::resource('jalur-ppdb', JalurController::class);
-            Route::post('/jalur-ppdb/{id}/toggle-active', [JalurController::class, 'toggleActive'])->name('jalur-ppdb.toggleActive');
-
-            Route::resource('quota-ppdb', QuotaController::class);
-
-            Route::resource('syarat-ppdb', SyaratController::class);
-            Route::post('/syarat-ppdb/{id}/toggle-active', [SyaratController::class, 'toggleActive'])->name('syarat-ppdb.toggleActive');
-
-            Route::resource('formulir-ppdb', FormulirPendaftaranController::class);
-            Route::resource('daftar-calon-peserta-didik', DaftarCalonPesertaDidikController::class);
-            Route::resource('daftar-peserta-didik-baru', DaftarPesertaDidikBaruController::class);
-            Route::resource('penempatan-kelas', PenempatanKelasController::class);
-            Route::resource('laporan-pendaftaran', LaporanPendaftaranController::class);
-            Route::resource('laporan-quota', LaporanQuotaController::class);
-        });
-    });
-
-    // --- GRUP ROMBONGAN BELAJAR ---
-    Route::prefix('rombel')->name('rombel.')->group(function () {
-        // Reguler
-        Route::get('/reguler/create', [RombelRegulerController::class, 'create'])->name('reguler.create');
-        Route::get('/reguler', [RombelRegulerController::class, 'index'])->name('reguler.index');
-
-        // Praktik (ROUTE BARU DITAMBAHKAN)
-        Route::get('/praktik/create', [RombelPraktikController::class, 'create'])->name('praktik.create');
-        Route::get('/praktik', [RombelPraktikController::class, 'index'])->name('praktik.index');
-
-        // Ekstrakurikuler (ROUTE BARU DITAMBAHKAN)
-        Route::get('/ekstrakurikuler/create', [RombelEkstrakurikulerController::class, 'create'])->name('ekstrakurikuler.create');
-        Route::get('/ekstrakurikuler', [RombelEkstrakurikulerController::class, 'index'])->name('ekstrakurikuler.index');
-
-        // Mapel Pilihan (ROUTE BARU DITAMBAHKAN)
-        Route::get('/mapel-pilihan/create', [RombelMapelPilihanController::class, 'create'])->name('mapel-pilihan.create');
-        Route::get('/mapel-pilihan', [RombelMapelPilihanController::class, 'index'])->name('mapel-pilihan.index');
-
-        // Wali (ROUTE BARU DITAMBAHKAN)
-        Route::get('/wali/create', [RombelWaliController::class, 'create'])->name('wali.create');
-        Route::get('/wali', [RombelWaliController::class, 'index'])->name('wali.index');
-    });
-});
-
-require __DIR__.'/auth.php';
-
-
-// Anda bisa menambahkan route untuk auth di sini jika perlu
-// require __DIR__.'/auth.php';
 

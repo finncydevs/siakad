@@ -12,21 +12,25 @@ class SyaratController extends Controller
 {
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
-        $syaratPendaftaran = $tahunPpdb
-            ? SyaratPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)
-                ->with(['tahunPpdb', 'jalurPendaftaran'])
-                ->get()
-            : collect();
-
-        $jalursAktif = JalurPendaftaran::where('is_active', true)->get();
-
+        // cari tahun aktif
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)
+            ->with([
+                'jalurs' => fn($q) => $q->where('is_active', true), // jalur aktif
+                'syarats.jalurPendaftaran' // syarat beserta jalurnya
+            ])
+            ->first();
+            
+        // kalau ada tahun aktif, ambil data relasi
+        $syaratPendaftaran = $tahunPpdb ? $tahunPpdb->syarats : collect();
+        $jalursAktif = $tahunPpdb ? $tahunPpdb->jalurs : collect();
+            
         return view('admin.kesiswaan.ppdb.syarat_pendaftaran', compact(
             'tahunPpdb',
             'syaratPendaftaran',
             'jalursAktif'
         ));
     }
+
 
     public function store(Request $request)
     {
@@ -105,4 +109,26 @@ class SyaratController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan saat mengubah status syarat.');
         }
     }
+    
+    
+    public function getByJalur($jalurId)
+{
+    // Cari tahun pelajaran yang aktif
+    $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+
+    if (! $tahunAktif) {
+        return response()->json([]);
+    }
+
+    // Ambil syarat berdasarkan tahun aktif + jalur
+    $syarat = SyaratPendaftaran::where('tahunPelajaran_id', $tahunAktif->id)
+                ->where('jalurPendaftaran_id', $jalurId)
+                ->where('is_active', true) // kalau mau hanya syarat aktif
+                ->get(['id', 'syarat']);
+
+    return response()->json($syarat);
+}
+
+
+
 }

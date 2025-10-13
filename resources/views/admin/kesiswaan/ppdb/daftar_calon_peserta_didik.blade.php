@@ -23,41 +23,120 @@
             </tr>
           </thead>
           <tbody>
-            {{-- Contoh 1 data dummy --}}
-            <tr>
-              <td>1</td>
-              <td>
-                <strong class="text-primary">137-250930.001</strong><br>
-                <small class="text-muted">Zonasi / IPA</small>
-              </td>
-              <td>
-                <strong>Ahmad Fauzi (L)</strong><br>
-                <small class="text-muted">Ttl: Padang, 12 Januari 2010</small><br>
-                <small class="text-muted">Telp: 081234567890</small><br>
-                <small class="text-muted">Asal: SMPN 1 Padang</small>
-              </td>
-              <td>30 September 2025</td>
-              <td>
-                <ul class="mb-0 ps-3 text-danger">
-                  <li>&times; Fotokopi KK</li>
-                  <li>&times; Ijazah</li>
-                </ul>
-              </td>
-              <td class="text-center">
-                <span class="badge bg-warning text-dark">Syarat Belum Lengkap</span>
-              </td>
-              <td class="text-center">
-                <div class="d-flex justify-content-center gap-2">
-                  <a href="{{ url('admin/kesiswaan/ppdb/formulir?id=137-250930.001') }}" 
-                     class="btn btn-sm btn-icon btn-outline-primary" title="Edit">
-                    <i class="bx bx-edit"></i>
-                  </a>
-                  <button type="button" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus">
-                    <i class="bx bx-trash"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
+            @forelse($formulirs as $i => $calon)
+              <tr>
+                <td>{{ $i+1 }}</td>
+                <td>
+                  <strong class="text-primary">{{ $calon->nomor_resi }}</strong><br>
+                  <small class="text-muted">{{ $calon->jurusan ?? '-' }}</small>
+                </td>
+                <td>
+                  <strong>{{ $calon->nama_lengkap }} ({{ $calon->jenis_kelamin }})</strong><br>
+                  <small class="text-muted">
+                    Ttl: {{ $calon->tempat_lahir }}, {{ \Carbon\Carbon::parse($calon->tgl_lahir)->translatedFormat('d F Y') }}
+                  </small><br>
+                  <small class="text-muted">Telp: {{ $calon->kontak }}</small><br>
+                  <small class="text-muted">Asal: {{ $calon->asal_sekolah }}</small>
+                </td>
+                <td>{{ $calon->created_at->translatedFormat('d F Y') }}</td>
+                <td>
+                    @php
+                        // ambil semua syarat wajib dari jalur
+                        $semuaSyarat = $calon->jalurPendaftaran
+                            ? $calon->jalurPendaftaran->syaratPendaftaran()->get()
+                            : collect();
+
+                        // ambil ID syarat yang sudah dipenuhi
+                        $syaratTerpenuhiIds = $calon->syarat
+                            ->where('pivot.is_checked', true)
+                            ->pluck('id')
+                            ->toArray();
+
+                        // ambil syarat yang belum terpenuhi
+                        $syaratBelum = $semuaSyarat->whereNotIn('id', $syaratTerpenuhiIds);
+                    @endphp
+
+                    @if($syaratBelum->count() > 0)
+                        <ul class="mb-0 ps-3 list-unstyled">
+                            @foreach($syaratBelum as $syarat)
+                                <li class="d-flex align-items-center text-danger">
+                                    <i class="bx bx-x me-2"></i>
+                                    {{ $syarat->syarat }}
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <span class="badge bg-success border-0 px-2 py-2">syarat sudah lengkap</span>
+                    @endif
+                </td>
+
+
+                <td class="text-center">
+                    @if($calon->status == 0)
+                        {{-- Status 0: syarat belum lengkap --}}
+                        <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}"
+                           class="badge bg-warning text-dark text-decoration-none  px-2 py-2" title="klik untuk melengkapi persyaratan">
+                            Syarat Belum Lengkap
+                        </a>
+                      
+                    @elseif($calon->status == 1)
+                        {{-- Status 1: unregistered --}}
+                        <form action="{{ route('admin.kesiswaan.ppdb.updateStatus', $calon->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="2">
+                            <button type="submit" class="badge bg-danger border-0 px-2 py-2" title="klik untuk daftar ulang">Unregistered</button>
+                        </form>
+                      
+                    @elseif($calon->status == 2)
+                        {{-- Status 2: registered --}}
+                        <form action="{{ route('admin.kesiswaan.ppdb.updateStatus', $calon->id) }}" method="POST" class="d-inline">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="1">
+                            <button type="submit" class="badge bg-success border-0 px-2 py-2" title="klik untuk membatalkan daftar ulang">Registered</button>
+                        </form>
+                    
+                    @elseif ($calon->status == 3)
+                        {{-- Status 3: Sudah Pemberian NIS --}}
+                        <span class="badge bg-primary border-0 px-2 py-2" >Sudah diberi NIS</span>
+
+                    @endif
+                    
+                </td>
+
+                <td class="text-center">
+                    @if($calon->status != 3)
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{{ route('admin.kesiswaan.ppdb.formulir-ppdb.edit', $calon->id) }}" 
+                               class="btn btn-sm btn-icon btn-outline-primary" title="Edit">
+                              <i class="bx bx-edit"></i>
+                            </a>
+                          
+                            {{-- Tombol Cetak Resi --}}
+                            <a href="{{ route('admin.kesiswaan.ppdb.daftar_calon.resi', $calon->id) }}" 
+                               target="_blank" 
+                               class="btn btn-sm btn-icon btn-outline-secondary" title="Cetak Resi">
+                              <i class="bx bx-printer"></i>
+                            </a>
+
+                            <form action="{{ route('admin.kesiswaan.ppdb.daftar-calon-peserta-didik.destroy', $calon->id) }} " method="POST" onsubmit="return confirm('Yakin hapus?')">
+                              @csrf
+                              @method('DELETE')
+                              <button type="submit" class="btn btn-sm btn-icon btn-outline-danger" title="Hapus">
+                                <i class="bx bx-trash"></i>
+                              </button>
+                            </form>
+                        </div>
+                    @endif
+                </td>
+
+              </tr>
+            @empty
+              <tr>
+                <td colspan="7" class="text-center text-muted">Belum ada data pendaftar</td>
+              </tr>
+            @endforelse
           </tbody>
         </table>
       </div>

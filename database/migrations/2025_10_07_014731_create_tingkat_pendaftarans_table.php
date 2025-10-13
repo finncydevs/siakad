@@ -11,10 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('formulir_syarat', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->unsignedBigInteger('formulir_id')->index('formulir_syarat_formulir_id_foreign');
-            $table->unsignedBigInteger('syarat_id')->index('formulir_syarat_syarat_id_foreign');
+        Schema::create('tingkat_pendaftarans', function (Blueprint $table) {
+            $table->id();
+            $table->string('tingkat')->nullable();
+            $table->string('keterangan')->nullable();
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }
@@ -24,7 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('formulir_syarat');
+        Schema::dropIfExists('tingkat_pendaftarans');
     }
 };
-

@@ -3,63 +3,44 @@
 namespace App\Http\Controllers\Admin\Kesiswaan\Ppdb;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\TahunPelajaran;
+use App\Models\Rombel;
+use App\Models\CalonSiswa;
 
 class LaporanQuotaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('admin.kesiswaan.ppdb.laporan_quota');
-    }
+        $tahunAktif = TahunPelajaran::where('is_active', true)->first();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $rombels = Rombel::select('jurusan_id_str')
+            ->distinct()
+            ->orderBy('jurusan_id_str')
+            ->get();
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $laporan = $rombels->map(function ($rombel) use ($tahunAktif) {
+            $paket = $rombel->jurusan_id_str;
+            $jumlahKelas = Rombel::where('jurusan_id_str', $paket)->count();
+            $quota = $jumlahKelas * 48; // contoh quota per kelas 48
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+            $jumlahPendaftar = CalonSiswa::where('tahun_id', $tahunAktif->id)
+                ->where('jurusan', $paket)
+                ->count();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+            $jumlahRegistrasi = CalonSiswa::where('tahun_id', $tahunAktif->id)
+                ->where('jurusan', $paket)
+                ->where('status', 3)
+                ->count();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            return (object)[
+                'paket_keahlian' => $paket,
+                'jumlah_kelas' => $jumlahKelas,
+                'quota' => $quota,
+                'jumlah_pendaftar' => $jumlahPendaftar,
+                'jumlah_registrasi' => $jumlahRegistrasi,
+            ];
+        });
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('admin.kesiswaan.ppdb.laporan_quota', compact('laporan', 'tahunAktif'));
     }
 }

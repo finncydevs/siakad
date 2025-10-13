@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\TahunPelajaran;
 use App\Models\JalurPendaftaran;
+use Illuminate\Validation\Rule;
+
 
 class JalurController extends Controller
 {
@@ -14,7 +16,7 @@ class JalurController extends Controller
      */
     public function index()
     {
-        $tahunPpdb = TahunPelajaran::where('active', 1)->first();
+        $tahunPpdb = TahunPelajaran::where('is_active', 1)->first();
 
         $jalurPendaftaran = $tahunPpdb
             ? JalurPendaftaran::where('tahunPelajaran_id', $tahunPpdb->id)->get()
@@ -31,7 +33,12 @@ class JalurController extends Controller
         try {
             $request->validate([
                 'tahun_id'   => 'required|exists:tahun_pelajarans,id',
-                'kode'       => 'required|string|unique:jalur_pendaftarans,kode',
+                'kode'       => [
+                    'required',
+                    'string',
+                    Rule::unique('jalur_pendaftarans', 'kode')
+                        ->where('tahunPelajaran_id', $request->tahun_id),
+                ],
                 'jalur'      => 'required|string',
                 'keterangan' => 'required|string',
             ]);
@@ -59,13 +66,21 @@ class JalurController extends Controller
     {
         try {
             $request->validate([
-                'kode'       => 'required|string|unique:jalur_pendaftarans,kode,' . $id,
+                'tahun_id'   => 'required|exists:tahun_pelajarans,id',
+                'kode'       => [
+                    'required',
+                    'string',
+                    Rule::unique('jalur_pendaftarans', 'kode')
+                        ->where(fn ($query) => $query->where('tahunPelajaran_id', $request->tahun_id))
+                        ->ignore($id), // abaikan data yg sedang diupdate
+                ],
                 'jalur'      => 'required|string',
                 'keterangan' => 'required|string',
             ]);
 
             $jalur = JalurPendaftaran::findOrFail($id);
             $jalur->update([
+                'tahunPelajaran_id' => $request->tahun_id,
                 'kode'       => $request->kode,
                 'jalur'      => $request->jalur,
                 'keterangan' => $request->keterangan,
