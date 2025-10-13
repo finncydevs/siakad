@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class, // <-- 2. Panggil UserSeeder di sini
         ]);
 
-        // User::factory()->create([ ... ]); // <-- 3. Baris ini dihapus karena sudah ditangani oleh UserSeeder
+      
+
     }
 }

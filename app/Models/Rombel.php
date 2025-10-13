@@ -25,6 +25,7 @@ class Rombel extends Model
      */
     public function waliKelas()
     {
-        return $this->belongsTo(Gtk::class, 'ptk_id_str', 'nama');
+        // BENAR: Menggunakan foreign key 'ptk_id' untuk terhubung ke primary key Gtk.
+        return $this->belongsTo(Gtk::class, 'ptk_id');
     }
 }
