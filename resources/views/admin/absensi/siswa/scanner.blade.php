@@ -314,7 +314,7 @@
                 </div>
                 ${statusBadge}
             `;
-            recentScansList.prepend(li);
+            recentScansList.append(li);
             if (recentScansList.children.length > 50) {
                 recentScansList.lastChild.remove();
             }
