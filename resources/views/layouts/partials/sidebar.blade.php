@@ -226,6 +226,37 @@
         </li>
         {{-- END PENGATURAN SISTEM --}}
 
+
+        {{-- Pengaturan Landing --}}
+        <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Landing</span></li>
+        <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bxs-book-content"></i>
+                <div data-i18n="Akademik">Pengaturan Landing</div>
+            </a>
+            <ul class="menu-sub">
+                
+                <li class="menu-item {{ request()->is('admin/kesiswaan/ppdb*') ? 'open' : '' }}">
+                    <a href="javascript:void(0);" class="menu-link menu-toggle">
+                        <div data-i18n="Landing PPDB">Landing PPDB</div>
+                    </a>
+                    <ul class="menu-sub">
+                        <li
+                            class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.tahun-ppdb.index') ? 'active' : '' }}">
+                            <a href="{{ route('admin.kesiswaan.ppdb.tahun-ppdb.index') }}" class="menu-link">
+                                <div data-i18n="Tahun PPDB">Beranda</div>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                {{-- <li class="">
+                    <a href="" class="menu-link">
+                        <div data-i18n=""></div>
+                    </a>
+                </li> --}}
+            </ul>
+        </li>
+        {{-- End Pengaturan Landing --}}
     </ul>
 
 </aside>

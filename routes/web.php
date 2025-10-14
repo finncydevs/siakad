@@ -156,6 +156,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         });
 
+    });
 
+    /*
+        |--------------------------------------------------------------------------
+        | Kesiswaan (PPDB)
+        |--------------------------------------------------------------------------
+        */
+    Route::prefix('ppdb')->name('ppdb.')->group(function () {
+
+        Route::resource('beranda', PpdbBerandaController::class);
     });
 });
