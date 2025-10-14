@@ -6,13 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\TugasPegawaiController;
-use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
-// Controller Settings
-use App\Http\Controllers\Admin\Settings\ApiSettingsController;
-use App\Http\Controllers\Admin\Settings\SekolahController;
-
-// Controller Kepegawaian
-use App\Http\Controllers\Admin\Kepegawaian\GtkController;
+use App\Http\Controllers\SiswaController;
 
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
@@ -35,6 +29,8 @@ use App\Http\Controllers\Admin\Kesiswaan\ppdb\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\TahunPpdbController;
 
+use App\Http\Controllers\Admin\Landing\PpdbController;
+
 
 use App\Http\Controllers\Admin\Absensi\AbsensiSiswaController;
 use App\Http\Controllers\Admin\Absensi\IzinSiswaController; // Added for clarity
@@ -55,17 +51,27 @@ use App\Http\Controllers\Admin\Rombel\RombelWaliController;
 */
 
 Route::get('/', function () {
-    // Arahkan ke dashboard admin saat membuka halaman utama
-    return redirect()->route('admin.dashboard');
-}); // The missing closing parenthesis and semicolon are added here.
+    return view('welcome');
+});
 
 
 /*
 |--------------------------------------------------------------------------
-| Grup Rute untuk Panel Admin
+| Rute Panel Admin
 |--------------------------------------------------------------------------
-| Semua rute di bawah ini akan memiliki prefix 'admin' dan nama 'admin.'
 */
+Route::prefix('ppdb')->name('ppdb.')->group(function() {
+    Route::get('/', [LandingPpdbController::class, 'beranda'])->name('beranda');
+    Route::get('/kompetensi-keahlian', [LandingPpdbController::class, 'kompetensiKeahlian'])->name('kompetensiKeahlian');
+    Route::get('/daftar-calon-siswa', [LandingPpdbController::class, 'daftarCalonSiswa'])->name('daftarCalonSiswa');
+    Route::get('/formulir-pendaftaran', [LandingPpdbController::class, 'formulirPendaftaran'])->name('formulirPendaftaran');
+    Route::get('/kontak', [LandingPpdbController::class, 'kontak'])->name('kontak');
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+
+    });
+});
+
 
 Route::prefix('admin')->name('admin.')->group(function () {
     // Dashboard
