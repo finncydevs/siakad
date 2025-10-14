@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfilSekolahController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\TugasPegawaiController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\LandingPpdbController;
 
 // Controller Akademik
 use App\Http\Controllers\Admin\Akademik\SemesterController;
@@ -36,6 +37,24 @@ use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini d
 */
 Route::get('/', function () {
     return view('welcome');
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Rute Panel Admin
+|--------------------------------------------------------------------------
+*/
+Route::prefix('ppdb')->name('ppdb.')->group(function() {
+    Route::get('/', [LandingPpdbController::class, 'beranda'])->name('beranda');
+    Route::get('/kompetensi-keahlian', [LandingPpdbController::class, 'kompetensiKeahlian'])->name('kompetensiKeahlian');
+    Route::get('/daftar-calon-siswa', [LandingPpdbController::class, 'daftarCalonSiswa'])->name('daftarCalonSiswa');
+    Route::get('/formulir-pendaftaran', [LandingPpdbController::class, 'formulirPendaftaran'])->name('formulirPendaftaran');
+    Route::get('/kontak', [LandingPpdbController::class, 'kontak'])->name('kontak');
+
+    Route::prefix('admin')->name('admin.')->group(function () {
+        
+    });
 });
 
 
