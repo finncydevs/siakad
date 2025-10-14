@@ -17,14 +17,32 @@ class Rombel extends Model
     protected $table = 'rombels';
 
     /**
-     * Mendefinisikan relasi ke model Gtk (wali kelas).
+     * The primary key associated with the table.
      *
-     * Catatan: Berdasarkan struktur database Anda, relasi ini menghubungkan
-     * kolom `ptk_id_str` (yang berisi nama guru) di tabel `rombels`
-     * dengan kolom `nama` di tabel `gtks`.
+     * @var string
      */
-    public function waliKelas()
+    protected $primaryKey = 'id';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'rombongan_belajar_id',
+        'nama',
+        'tingkat_pendidikan_id',
+        'ptk_id', // Wali Kelas
+        'jurusan_id',
+        // Tambahkan kolom lain yang relevan
+    ];
+
+    /**
+     * Mendapatkan semua siswa yang ada di dalam rombel ini.
+     */
+    public function siswa()
     {
+<<<<<<< HEAD
         // BENAR: Menggunakan foreign key 'ptk_id' untuk terhubung ke primary key Gtk.
         return $this->belongsTo(Gtk::class, 'ptk_id');
     }
@@ -39,3 +57,13 @@ class Rombel extends Model
         return $this->belongsTo(Kurikulum::class);
     }
 }
+=======
+        return $this->hasMany(Siswa::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
+    } 
+
+    // public function waliKelas()
+    // {
+    //     return $this->belongsTo(Gtk::class, 'ptk_id_str', 'nama');
+    // }
+}
+>>>>>>> origin/modul/indisipliner

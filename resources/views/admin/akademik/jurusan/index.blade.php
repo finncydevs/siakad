@@ -4,9 +4,6 @@
 
 @section('content')
 <div class="container mt-4">
-    <h4 class="fw-bold mb-4">
-        <span class="text-muted fw-light">Akademik /</span> Daftar Konsentrasi Keahlian
-    </h4>
     <div class="card">
         <div class="card-header  text-white">
             <h5 class="mb-0">Daftar Konsentrasi Keahlian</h5>

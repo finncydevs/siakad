@@ -3,7 +3,17 @@
 @section('content')
 <div class="container-xxl flex-grow-1 container-p-y">
 
-    {{-- Header & Tombol Sinkron --}}
+    <!-- Breadcrumb -->
+    <div class="mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="#">Akademik</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Tahun Pelajaran</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Header & Sinkron Button -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="fw-bold">
             <span class="text-muted fw-light">Akademik /</span> Tahun Pelajaran
@@ -13,7 +23,7 @@
         </a>
     </div>
 
-    {{-- Card Tabel --}}
+    <!-- Table Card -->
     <div class="card">
         <div class="card-header">
             <h5 class="mb-0">Daftar Tahun Pelajaran</h5>
@@ -57,9 +67,12 @@
                             </td>
                         </tr>
                     @endforelse
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
     </div>
+
 </div>
 @endsection
