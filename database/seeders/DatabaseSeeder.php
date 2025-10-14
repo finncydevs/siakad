@@ -17,7 +17,6 @@ class DatabaseSeeder extends Seeder
             PtkSeeder::class,
             JurusanSeeder::class,
             KurikulumSeeder::class,
-            RombelSeeder::class,
             EkstrakurikulerSeeder::class,
         ]);
 

@@ -13,7 +13,7 @@ return new class extends Migration
         $table->string('nama_ekskul');
 
         // PASTIKAN BARIS INI ADA DAN SUDAH BENAR
-        $table->foreignId('pembina_id')->nullable()->constrained('ptk');
+        $table->unsignedBigInteger('pembina_id')->nullable();
 
         $table->string('prasarana')->nullable();
         $table->timestamps();

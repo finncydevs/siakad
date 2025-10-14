@@ -13,8 +13,8 @@ return new class extends Migration
     {
 Schema::create('calon_siswas', function (Blueprint $table) {
     $table->id();
-    $table->foreignId('tahun_id')->constrained('tahun_pelajarans')->onDelete('cascade');
-    $table->foreignId('jalur_id')->constrained('jalur_pendaftarans')->onDelete('cascade');
+    $table->unsignedBigInteger('tahun_id');
+    $table->unsignedBigInteger('jalur_id');
     $table->string('nis')->nullable();
     $table->string('nomor_resi');
     $table->string('nama_lengkap');
