@@ -20,6 +20,8 @@ use App\Http\Controllers\Admin\Akademik\TapelController;
 use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
 use App\Http\Controllers\Admin\Akademik\PaketKeahlianController;
 use App\Http\Controllers\Admin\Akademik\JurusanController;
+use App\Http\Controllers\Admin\Akademik\MapelController;
+use App\Http\Controllers\Admin\Akademik\EkstrakurikulerController;
 
 // Controller Kesiswaan
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarPesertaDidikBaruController;
@@ -121,25 +123,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
 
-    // --- GRUP AKADEMIK ---
-    Route::prefix('akademik')->name('akademik.')->group(function () {
-        // Tahun Pelajaran (Tapel)
-        Route::controller(TapelController::class)->prefix('tapel')->name('tapel.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::post('/', 'store')->name('store');
-            Route::delete('/{tapel}', 'destroy')->name('destroy');
-            Route::patch('/{tapel}/toggle', 'toggleStatus')->name('toggle');
-        });
-        // Semester
-        Route::controller(SemesterController::class)->prefix('semester')->name('semester.')->group(function () {
-            Route::get('/', 'index')->name('index');
-            Route::patch('/{semester}/toggle', 'toggle')->name('toggle');
-        });
-        // Other Akademik Resources
-        Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
-        Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
-        Route::resource('jurusan', JurusanController::class)->only(['index']);
-    });
+// --- GRUP AKADEMIK ---
+Route::prefix('akademik')->name('akademik.')->group(function () {
+    Route::get('tapel', [TapelController::class, 'index'])->name('tapel.index');
+    Route::get('tapel/sinkron', [TapelController::class, 'sinkron'])->name('tapel.sinkron');
+    Route::post('tapel/aktif/{id}', [TapelController::class, 'setAktif'])->name('tapel.aktif');
+    Route::resource('semester', SemesterController::class)->only(['index']);
+    Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
+    Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
+    Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
+    Route::resource('jurusan', JurusanController::class)->only(['index']);
+    Route::get('mapel', [MapelController::class, 'index'])->name('mapel.index');
+    Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index'])->name('ekskul.index');
+});
 
     // --- GRUP KESISWAAN ---
     Route::prefix('kesiswaan')->name('kesiswaan.')->group(function() {
