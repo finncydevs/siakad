@@ -1,0 +1,36 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CsLesYTB.css",
+    "src": "resources/css/app.css",
+    "isEntry": true,
+    "names": [
+      "app.css"
+    ]
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DlBJkIqP.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/sneat/assets/vendor/fonts/boxicons/boxicons.eot": {
+    "file": "assets/boxicons-fqDhfsHa.eot",
+    "src": "resources/sneat/assets/vendor/fonts/boxicons/boxicons.eot"
+  },
+  "resources/sneat/assets/vendor/fonts/boxicons/boxicons.svg": {
+    "file": "assets/boxicons-e1o-z2FJ.svg",
+    "src": "resources/sneat/assets/vendor/fonts/boxicons/boxicons.svg"
+  },
+  "resources/sneat/assets/vendor/fonts/boxicons/boxicons.ttf": {
+    "file": "assets/boxicons-BBsJ98nm.ttf",
+    "src": "resources/sneat/assets/vendor/fonts/boxicons/boxicons.ttf"
+  },
+  "resources/sneat/assets/vendor/fonts/boxicons/boxicons.woff": {
+    "file": "assets/boxicons-kvn6whdv.woff",
+    "src": "resources/sneat/assets/vendor/fonts/boxicons/boxicons.woff"
+  },
+  "resources/sneat/assets/vendor/fonts/boxicons/boxicons.woff2": {
+    "file": "assets/boxicons-i616DiHt.woff2",
+    "src": "resources/sneat/assets/vendor/fonts/boxicons/boxicons.woff2"
+  }
+}

@@ -128,12 +128,7 @@ class IndisiplinerSiswaController extends Controller
         // Data untuk filter dan form modal
         $tapels = Tapel::orderBy('tahun_pelajaran', 'desc')->get();
         $semesters = Semester::all();
-        
-        // ====================================================================
-        // INI ADALAH BARIS YANG TELAH DIPERBAIKI
         $rombels = Rombel::select('id', 'nama')->orderBy('nama')->get()->unique('nama');
-        // ====================================================================
-
         $kategoriList = PelanggaranKategori::with('pelanggaranPoin')->orderBy('nama')->get();
         $siswaList = collect();
 
@@ -159,7 +154,7 @@ class IndisiplinerSiswaController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('NIS', 'like', "%{$search}%")
-                    ->orWhereHas('siswa', function ($subq) use ($search) {
+                  ->orWhereHas('siswa', function ($subq) use ($search) {
                         $subq->where('nama', 'like', "%{$search}%");
                     });
             });
@@ -206,21 +201,57 @@ class IndisiplinerSiswaController extends Controller
         return back()->with('success', 'Data pelanggaran berhasil dihapus.');
     }
 
-    public function getSiswaByRombel(Rombel $rombel)
-{
-    // Ambil ID Dapodik dari rombel yang ditemukan
-    $rombonganBelajarId = $rombel->rombongan_belajar_id;
-
-    // Cari siswa secara manual menggunakan ID tersebut
-    $siswa = Siswa::where('rombongan_belajar_id', $rombonganBelajarId)
-                    ->orderBy('nama')
-                    ->get(['nipd', 'nama']);
-
-    return response()->json($siswa);
-}
-    
-
     // =================================================================================
+    // ==> BAGIAN YANG DIPERBAIKI ADA DI SINI <==
+    // =================================================================================
+
+    public function getSiswaByRombel(Rombel $rombel)
+    {
+        // Panggil relasi 'siswa()' yang sudah kita buat di model Rombel.
+        // Laravel akan otomatis melakukan query yang benar menggunakan 'anggota_rombel_id'.
+        $siswa = $rombel->siswa()
+                        ->orderBy('nama', 'asc')
+                        ->get(['nipd', 'nama']); // Ambil kolom nipd dan nama
+
+        return response()->json($siswa);
+    }
+    
+    // =================================================================================
+    // REKAPITULASI
+    // =================================================================================
+
+    // public function rekapitulasiIndex(Request $request)
+    // {
+    //     $siswaList = Siswa::orderBy('nama')->get();
+    //     $siswa = null;
+    //     $pelanggaranSiswa = null;
+    //     $totalPoin = 0;
+    //     $sanksiAktif = null;
+
+    //     if ($request->filled('nis')) {
+    //         $siswa = Siswa::with('rombel')->where('nipd', $request->nis)->first();
+
+    //         if ($siswa) {
+    //             $pelanggaranSiswa = PelanggaranNilai::where('NIS', $siswa->nipd)
+    //                                     ->with('detailPoin')
+    //                                     ->orderBy('tanggal', 'desc')
+    //                                     ->get();
+                
+    //             $totalPoin = $pelanggaranSiswa->sum('poin');
+
+    //             $sanksiAktif = PelanggaranSanksi::where('poin_min', '<=', $totalPoin)
+    //                                     ->where('poin_max', '>=', $totalPoin)
+    //                                     ->first();
+    //         } else {
+    //             return back()->withErrors(['nis' => 'Siswa dengan NIPD tersebut tidak ditemukan.'])->withInput();
+    //         }
+    //     }
+
+    //     return view('admin.indisipliner.siswa.rekapitulasi.index', compact('siswaList', 'siswa', 'pelanggaranSiswa', 'totalPoin', 'sanksiAktif'));
+    // }
+
+
+      // =================================================================================
     // REKAPITULASI
     // =================================================================================
 
@@ -237,15 +268,15 @@ class IndisiplinerSiswaController extends Controller
 
             if ($siswa) {
                 $pelanggaranSiswa = PelanggaranNilai::where('NIS', $siswa->nipd)
-                                        ->with('detailPoin')
-                                        ->orderBy('tanggal', 'desc')
-                                        ->get();
+                                    ->with('detailPoin')
+                                    ->orderBy('tanggal', 'desc')
+                                    ->get();
                 
                 $totalPoin = $pelanggaranSiswa->sum('poin');
 
                 $sanksiAktif = PelanggaranSanksi::where('poin_min', '<=', $totalPoin)
-                                        ->where('poin_max', '>=', $totalPoin)
-                                        ->first();
+                                ->where('poin_max', '>=', $totalPoin)
+                                ->first();
             } else {
                 return back()->withErrors(['nis' => 'Siswa dengan NIPD tersebut tidak ditemukan.'])->withInput();
             }

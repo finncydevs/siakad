@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Siswa;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -56,21 +57,42 @@ class GenericSyncController extends Controller
         $identifierColumn = $this->getIdentifierColumn($dapodikColumns, $entity);
 
         foreach ($dataFromDapodik as $row) {
-
-            // FIX: Cek setiap nilai di dalam baris data
             foreach ($row as $key => $value) {
-                // Jika nilainya adalah sebuah array, ubah menjadi string JSON
                 if (is_array($value)) {
                     $row[$key] = json_encode($value, JSON_UNESCAPED_UNICODE);
                 }
             }
+            
+            if ($tableName === 'siswas') {
+                
+                // --- INI PERUBAHAN UTAMANYA ---
+                // 1. Ambil data siswa yang ada, atau buat instance baru jika tidak ada.
+                $siswa = Siswa::firstOrNew([
+                    $identifierColumn => $row[$identifierColumn]
+                ]);
 
-            // Sekarang, $row dijamin aman untuk disimpan ke database
-            DB::table($tableName)->updateOrInsert(
-                [$identifierColumn => $row[$identifierColumn]], // Kunci untuk mencari
-                $row // Data yang sudah bersih dan lengkap
-            );
+                // 2. Isi data siswa dengan data DARI DAPODIK.
+                // Metode fill() hanya akan mengisi kolom yang ada di $row.
+                // Kolom 'foto' yang ada di database tidak akan tersentuh.
+                $siswa->fill($row);
+                $siswa->save();
+                // --- AKHIR PERUBAHAN ---
+
+                // Cek apakah siswa ini BARU DIBUAT dan belum punya token
+                if ($siswa->wasRecentlyCreated && is_null($siswa->qr_token)) {
+                    $siswa->qr_token = Str::uuid()->toString();
+                    $siswa->save();
+                }
+            } else {
+                // Untuk tabel lain, gunakan metode yang sudah ada
+                DB::table($tableName)->updateOrInsert(
+                    [$identifierColumn => $row[$identifierColumn]],
+                    $row
+                );
+            }
         }
+            // --- AKHIR BAGIAN YANG DIPERBARUI ---
+        
 
         return response()->json([
             'success' => true,

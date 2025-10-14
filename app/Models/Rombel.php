@@ -42,7 +42,11 @@ class Rombel extends Model
      */
     public function siswa()
     {
-        // Relasi yang sudah diperbaiki sesuai struktur tabel Anda
         return $this->hasMany(Siswa::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
-    }
+    } 
+
+    // public function waliKelas()
+    // {
+    //     return $this->belongsTo(Gtk::class, 'ptk_id_str', 'nama');
+    // }
 }

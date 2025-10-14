@@ -34,7 +34,6 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="nis_filter">Filter Berdasarkan Siswa</label>
-                    {{-- PERUBAHAN DI SINI: tambahkan data-initial-nis untuk dibaca oleh file JS --}}
                     <select name="nis" id="nis_filter" class="form-select" data-initial-nis="{{ request('nis') }}">
                         {{-- Opsi siswa akan diisi oleh JavaScript --}}
                     </select>
@@ -107,7 +106,103 @@
     </div>
 </div>
 
-{{-- Kode modal yang tadinya di sini, sekarang dipanggil dari file partial --}}
+{{-- Memanggil Modal dari file terpisah --}}
 @include('admin.indisipliner.siswa.daftar._modal-form')
 
 @endsection
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Inisialisasi Select2
+    $('#rombel_id_filter, #nis_filter').select2({
+        theme: "bootstrap-5",
+        placeholder: "- Pilih -",
+    });
+
+    $('#modalInputPelanggaran .form-select').select2({
+        theme: "bootstrap-5",
+        dropdownParent: $('#modalInputPelanggaran'),
+        placeholder: "- Pilih -",
+    });
+
+    function loadSiswa(rombelID, nisSelect, selectedNis, placeholder) {
+        nisSelect.prop('disabled', true).html(`<option value="">- ${placeholder} -</option>`).select2();
+        if (rombelID) {
+            nisSelect.html('<option value="">- Memuat Siswa... -</option>').select2();
+            $.ajax({
+                url: "{{ url('admin/indisipliner-siswa/get-siswa-by-rombel') }}/" + rombelID,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    nisSelect.prop('disabled', false).empty().append('<option value="">- Semua Siswa -</option>');
+                    $.each(data, function(key, value) {
+                        var selected = (value.nipd == selectedNis) ? 'selected' : '';
+                        nisSelect.append(`<option value="${value.nipd}" ${selected}>${value.nama}</option>`);
+                    });
+                    nisSelect.val(selectedNis).trigger('change');
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error:", textStatus, errorThrown);
+                    nisSelect.html('<option value="">- Gagal Memuat -</option>').select2();
+                }
+            });
+        }
+    }
+
+    // Filter di halaman utama
+    var initialRombelID = $('#rombel_id_filter').val();
+    var initialNis = $('#nis_filter').data('initial-nis') || null;
+
+    if (initialRombelID) {
+        loadSiswa(initialRombelID, $('#nis_filter'), initialNis, "Pilih Kelas Dulu");
+    }
+
+    $('#rombel_id_filter').on('change', function() {
+        loadSiswa($(this).val(), $('#nis_filter'), null, "Semua Siswa");
+    });
+
+    // Untuk form di dalam modal
+    $('#IDkelas').on('change', function() {
+        var rombelID = $(this).val();
+        var nisSelect = $('#NIS');
+        if (rombelID) {
+            nisSelect.prop('disabled', true).html('<option value="">- Memuat Siswa... -</option>').select2();
+            $.ajax({
+                url: "{{ url('admin/indisipliner-siswa/get-siswa-by-rombel') }}/" + rombelID,
+
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    nisSelect.prop('disabled', false).empty().append('<option value="">- Pilih Siswa -</option>');
+                    $.each(data, function(key, value) {
+                        nisSelect.append(`<option value="${value.nipd}">${value.nama} (${value.nipd})</option>`);
+                    });
+                    nisSelect.trigger('change');
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX Error:", textStatus, errorThrown);
+                    nisSelect.html('<option value="">- Gagal Memuat -</option>').select2();
+                }
+            });
+        } else {
+            nisSelect.html('<option value="">- Pilih Kelas Terlebih Dahulu -</option>').prop('disabled', true).select2();
+        }
+    });
+
+    // Inisialisasi Tooltip
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Konfirmasi Hapus
+    $('.form-delete').on('submit', function(event) {
+        event.preventDefault();
+        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            this.submit();
+        }
+    });
+});
+</script>
+@endpush

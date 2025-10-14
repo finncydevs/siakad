@@ -1,3 +1,4 @@
+// tailwind.config.js
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 
@@ -18,4 +19,10 @@ export default {
     },
 
     plugins: [forms],
+
+    // --- TAMBAHKAN BAGIAN INI ---
+    corePlugins: {
+      preflight: false,
+    },
+    // ---------------------------------
 };
