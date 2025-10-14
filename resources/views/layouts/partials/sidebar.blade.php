@@ -236,14 +236,14 @@
             </a>
             <ul class="menu-sub">
                 
-                <li class="menu-item {{ request()->is('admin/kesiswaan/ppdb*') ? 'open' : '' }}">
+                <li class="menu-item {{ request()->is('admin/ppdb*') ? 'open' : '' }}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <div data-i18n="Landing PPDB">Landing PPDB</div>
                     </a>
                     <ul class="menu-sub">
                         <li
-                            class="menu-item {{ request()->routeIs('admin.kesiswaan.ppdb.tahun-ppdb.index') ? 'active' : '' }}">
-                            <a href="{{ route('admin.kesiswaan.ppdb.tahun-ppdb.index') }}" class="menu-link">
+                            class="menu-item {{ request()->routeIs('admin.ppdb.landing') ? 'active' : '' }}">
+                            <a href="{{ route('admin.ppdb.landing.index') }}" class="menu-link">
                                 <div data-i18n="Tahun PPDB">Beranda</div>
                             </a>
                         </li>

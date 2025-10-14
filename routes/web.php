@@ -27,6 +27,8 @@ use App\Http\Controllers\Admin\Kesiswaan\ppdb\QuotaController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\SyaratController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\TahunPpdbController;
 
+use App\Http\Controllers\Admin\Landing\PpdbController;
+
 use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini di-import
 
 
@@ -165,6 +167,6 @@ Route::prefix('admin')->name('admin.')->group(function () {
         */
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
 
-        Route::resource('beranda', PpdbBerandaController::class);
+        Route::resource('landing', PpdbController::class);
     });
 });

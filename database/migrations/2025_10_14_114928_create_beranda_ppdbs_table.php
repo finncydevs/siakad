@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ppdb_berandas', function (Blueprint $table) {
+        Schema::create('beranda_ppdbs', function (Blueprint $table) {
             $table->id();
+            $table->string('slogan_utama');
+            $table->text('deskripsi_singkat');
+            $table->string('point_keunggulan_1')->nullable();
             $table->timestamps();
         });
     }
@@ -22,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ppdb_berandas');
+        Schema::dropIfExists('beranda_ppdbs');
     }
 };
