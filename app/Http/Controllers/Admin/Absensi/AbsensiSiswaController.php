@@ -321,5 +321,71 @@ public function getRecentScans()
     
         return response()->json($recentScans);
     }
+
+public function getUnscannedData(Request $request)
+{
+    try {
+        $today = Carbon::now()->toDateString();
+        $rombelId = $request->query('rombel_id');
+
+        // 1. Dapatkan ID siswa yang sudah tercatat absen masuk hari ini.
+        $scannedStudentIds = AbsensiSiswa::where('tanggal', '>', $today)
+            ->whereNotNull('jam_masuk')
+            ->pluck('siswa_id');
+
+        // 2. Siapkan query untuk mendapatkan siswa yang ID-nya TIDAK ADA di daftar yang sudah scan.
+        // [PERBAIKAN] Baris ->where('status', 'Aktif') telah DIHAPUS.
+        $unscannedQuery = Siswa::whereNotIn('id', $scannedStudentIds);
+
+        // 3. Jika ada filter kelas yang dipilih (bukan 'all'), modifikasi query.
+        if ($rombelId && $rombelId !== 'all') {
+            $rombel = Rombel::find($rombelId);
+            
+            if ($rombel && !empty($rombel->anggota_rombel)) {
+                $anggotaData = json_decode($rombel->anggota_rombel, true);
+
+                if (is_array($anggotaData) && !empty($anggotaData)) {
+                    $anggotaPdIds = array_column($anggotaData, 'peserta_didik_id');
+                    $siswaIdsInRombel = Siswa::whereIn('peserta_didik_id', $anggotaPdIds)->pluck('id');
+                    $unscannedQuery->whereIn('id', $siswaIdsInRombel);
+                } else {
+                    $unscannedQuery->whereRaw('1 = 0'); 
+                }
+            } else {
+                $unscannedQuery->whereRaw('1 = 0');
+            }
+        }
+
+        // 4. Eksekusi query untuk mendapatkan daftar siswa yang belum absen.
+        $unscannedStudents = $unscannedQuery->orderBy('nama')->select('id', 'nama', 'foto')->get();
+
+        // 5. Siapkan data Rombel untuk dropdown filter (hanya dijalankan saat load awal).
+        $rombelsForDropdown = [];
+        if (!$request->has('rombel_id') || $request->get('rombel_id') === 'all') {
+            $rombelsForDropdown = Rombel::orderBy('nama')
+                ->select('id', 'nama')
+                ->get()
+                ->unique('nama')
+                ->values()
+                ->all();
+        }
+
+        // 6. Kembalikan response JSON yang bersih.
+        return response()->json([
+            'unscanned_students' => $unscannedStudents,
+            'rombels' => $rombelsForDropdown
+        ]);
+
+    } catch (\Exception $e) {
+        // Log error yang detail untuk membantu jika ada masalah lain.
+        \Illuminate\Support\Facades\Log::error(
+            'Error in getUnscannedData: ' . $e->getMessage() . 
+            ' in file ' . $e->getFile() . 
+            ' on line ' . $e->getLine()
+        );
+        // Kembalikan response error 500.
+        return response()->json(['message' => 'Terjadi kesalahan pada server.'], 500);
+    }
+}
 }
 
