@@ -154,8 +154,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('indisipliner')->name('indisipliner.')->group(function () {
         
         // Rute untuk Indisipliner Guru
-    Route::prefix('guru')->name('guru.')->group(function () {
-        // Daftar pelanggaran
+  Route::prefix('guru')->name('guru.')->group(function () {
+    // Daftar pelanggaran
     Route::get('/daftar', [IndisiplinerGtkController::class, 'daftarIndex'])->name('daftar.index');
     Route::post('/daftar', [IndisiplinerGtkController::class, 'store'])->name('daftar.store');
     Route::delete('/daftar/{pelanggaran}', [IndisiplinerGtkController::class, 'destroy'])->name('daftar.destroy');
@@ -164,13 +164,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/pengaturan', [IndisiplinerGtkController::class, 'pengaturanIndex'])->name('pengaturan.index');
     Route::post('/pengaturan/kategori', [IndisiplinerGtkController::class, 'storeKategori'])->name('pengaturan.kategori.store');
     Route::post('/pengaturan/poin', [IndisiplinerGtkController::class, 'storePoin'])->name('pengaturan.poin.store');
-    Route::put('/pengaturan/poin/update', [IndisiplinerGtkController::class, 'updatePoin'])->name('pengaturan.poin.update');
-    Route::delete('/pengaturan/poin/destroy', [IndisiplinerGtkController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+
+    // ✅ Perbaikan: tambahkan {id} supaya controller menerima parameter
+    Route::put('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'updatePoin'])->name('pengaturan.poin.update');
+    Route::delete('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+
     Route::post('/pengaturan/sanksi', [IndisiplinerGtkController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
 
     // Rekapitulasi
     Route::get('/rekapitulasi', [IndisiplinerGtkController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
-        });
+});
+
 
 
         // Rute untuk Indisipliner Siswa (tetap menggunakan prefix 'indisipliner-siswa' yang sudah ada)

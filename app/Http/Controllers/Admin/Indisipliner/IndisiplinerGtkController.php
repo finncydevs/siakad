@@ -67,11 +67,60 @@ class IndisiplinerGtkController extends Controller
     }
 
     // ============================================================
+    // PENGATURAN POIN
+    // ============================================================
+    public function storePoin(Request $request)
+    {
+        $request->validate([
+            'IDpelanggaran_kategori' => 'required|exists:pelanggaran_kategori_gtk,ID',
+            'nama' => 'required|string|max:255',
+            'poin' => 'required|integer',
+            'tindakan' => 'nullable|string',
+        ]);
+
+        PelanggaranPoinGtk::create([
+            'IDpelanggaran_kategori' => $request->IDpelanggaran_kategori,
+            'nama' => strtoupper($request->nama),
+            'poin' => $request->poin,
+            'tindakan' => $request->tindakan,
+        ]);
+
+        return back()->with('success', 'Jenis pelanggaran berhasil ditambahkan.');
+    }
+
+    public function updatePoin(Request $request, $id)
+    {
+        $request->validate([
+            'IDpelanggaran_kategori' => 'required|exists:pelanggaran_kategori_gtk,ID',
+            'nama' => 'required|string|max:255',
+            'poin' => 'required|integer',
+            'tindakan' => 'nullable|string',
+        ]);
+
+        $poin = PelanggaranPoinGtk::findOrFail($id);
+        $poin->update([
+            'IDpelanggaran_kategori' => $request->IDpelanggaran_kategori,
+            'nama' => strtoupper($request->nama),
+            'poin' => $request->poin,
+            'tindakan' => $request->tindakan,
+        ]);
+
+        return back()->with('success', 'Jenis pelanggaran berhasil diperbarui.');
+    }
+
+    public function destroyPoin($id)
+    {
+        $poin = PelanggaranPoinGtk::findOrFail($id);
+        $poin->delete();
+
+        return back()->with('success', 'Jenis pelanggaran berhasil dihapus.');
+    }
+
+    // ============================================================
     // DAFTAR INDISIPLINER GURU
     // ============================================================
     public function daftarIndex(Request $request)
     {
-        // Ambil daftar semester unik dari rombel
         $semesterList = Rombel::select('semester_id')->distinct()->get()->map(function ($item) {
             $tahun = substr($item->semester_id, 0, 4);
             $semester = substr($item->semester_id, 4, 1);
@@ -82,10 +131,7 @@ class IndisiplinerGtkController extends Controller
             ];
         });
 
-        // Ambil semester aktif (terakhir dari rombel)
         $semesterAktif = Rombel::orderByDesc('semester_id')->value('semester_id');
-
-        // Pecah jadi tapel & semester aktif
         $tahun = substr($semesterAktif, 0, 4);
         $semesterAngka = substr($semesterAktif, 4, 1);
         $tapelAktif = $tahun . '/' . ($tahun + 1);
@@ -98,21 +144,21 @@ class IndisiplinerGtkController extends Controller
             ->latest('tanggal')
             ->latest('jam');
 
-        // Filter berdasarkan tapel & semester
-        if ($request->filled('semester_id')) {
-            $tahunReq = substr($request->semester_id, 0, 4);
-            $semesterReq = substr($request->semester_id, 4, 1);
-            $tapelReq = $tahunReq . '/' . ($tahunReq + 1);
-            $query->where('tapel', $tapelReq)->where('semester', $semesterReq);
-        } else {
-            // Jika tidak ada filter, gunakan semester aktif
-            $query->where('tapel', $tapelAktif)->where('semester', $semesterTeks);
-        }
+        // filter semester
+        $semesterFilter = $request->filled('semester_id') ? $request->semester_id : $semesterAktif;
+        $tahunReq = substr($semesterFilter, 0, 4);
+        $semesterReq = substr($semesterFilter, 4, 1);
+        $tapelReq = $tahunReq . '/' . ($tahunReq + 1);
+        $query->where('tapel', $tapelReq)->where('semester', $semesterReq);
 
+        // filter NIP opsional
         if ($request->filled('nip')) {
             $query->where('NIP', $request->nip);
+        } else {
+            $query->whereNotNull('NIP'); // pastikan hanya guru yang ada NIP
         }
 
+        // filter pencarian nama guru
         if ($request->filled('search')) {
             $search = $request->search;
             $query->whereHas('gtk', function ($q) use ($search) {
@@ -131,39 +177,41 @@ class IndisiplinerGtkController extends Controller
         ));
     }
 
-    // ============================================================
-    // SIMPAN DATA PELANGGARAN
-    // ============================================================
-    public function store(Request $request)
-    {
-        $request->validate([
-            'semester_id' => 'required|string',
-            'tanggal' => 'required|date',
-            'jam' => 'required',
-            'nip' => 'nullable|exists:gtks,nip',
-            'IDpelanggaran_poin' => 'required|exists:pelanggaran_poin_gtk,ID',
-        ]);
+   // ============================================================
+// SIMPAN DATA PELANGGARAN
+// ============================================================
+public function store(Request $request)
+{
+    $request->validate([
+        'semester_id' => 'required|string',
+        'tanggal' => 'required|date',
+        'jam' => 'required',
+        'nip' => 'nullable|exists:gtks,nip',
+        'IDpelanggaran_poin' => 'required|exists:pelanggaran_poin_gtk,ID',
+    ]);
 
-        $poin = PelanggaranPoinGtk::findOrFail($request->IDpelanggaran_poin);
+    $poin = PelanggaranPoinGtk::findOrFail($request->IDpelanggaran_poin);
+    $tahun = substr($request->semester_id, 0, 4);
+    $semester = substr($request->semester_id, 4, 1);
+    $tapel = $tahun . '/' . ($tahun + 1);
 
-        // Konversi semester_id ke tapel dan semester
-        $tahun = substr($request->semester_id, 0, 4);
-        $semester = substr($request->semester_id, 4, 1);
-        $tapel = $tahun . '/' . ($tahun + 1);
+    // pastikan NIP selalu ada, isi '-' jika kosong
+    $nip = $request->nip ?: '-';
 
-        PelanggaranNilaiGtk::create([
-            'NIP' => $request->nip ?? '-',
-            'IDpelanggaran_poin' => $request->IDpelanggaran_poin,
-            'tanggal' => $request->tanggal,
-            'jam' => $request->jam,
-            'poin' => $poin->poin,
-            'tapel' => $tapel,
-            'semester' => $semester,
-        ]);
+    PelanggaranNilaiGtk::create([
+        'NIP' => $nip,
+        'IDpelanggaran_poin' => $request->IDpelanggaran_poin,
+        'tanggal' => $request->tanggal,
+        'jam' => $request->jam,
+        'poin' => $poin->poin,
+        'tapel' => $tapel,
+        'semester' => $semester,
+    ]);
 
-        return redirect()->route('admin.indisipliner.guru.daftar.index')
-            ->with('success', 'Data pelanggaran guru berhasil disimpan.');
-    }
+    return redirect()->route('admin.indisipliner.guru.daftar.index')
+        ->with('success', 'Data pelanggaran guru berhasil disimpan.');
+}
+
 
     // ============================================================
     // HAPUS DATA
