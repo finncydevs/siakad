@@ -78,6 +78,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Kita definisikan rute satu per satu untuk kejelasan
         Route::prefix('siswa')->name('siswa.')->group(function() {
             Route::get('/todays-scans', [AbsensiSiswaController::class, 'getTodaysScans'])->name('get_todays_scans');
+            Route::get('/get-recent-scans', [AbsensiSiswaController::class, 'getRecentScans'])->name('get_recent_scans');
             
             // Rute untuk menampilkan halaman PILIH KELAS
             // URL: /admin/absensi/siswa

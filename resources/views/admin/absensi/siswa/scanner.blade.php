@@ -39,20 +39,11 @@
         #fullscreen-prompt p {
             margin-top: 1.5rem; font-size: 1.1rem; max-width: 400px;
         }
-        
-        /* === LOGIKA VISIBILITAS KONTEN === */
-        #main-content {
-            display: none; opacity: 0; transition: opacity 0.3s ease-in-out;
-        }
-        body.fullscreen-active #main-content {
-            display: block; opacity: 1;
-        }
-        body.fullscreen-active #fullscreen-prompt {
-            display: none;
-        }
-        /* === END LOGIKA VISIBILITAS === */
+        #main-content { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+        body.fullscreen-active #main-content { display: block; opacity: 1; }
+        body.fullscreen-active #fullscreen-prompt { display: none; }
 
-        /* Sisa CSS Anda */
+        /* DEFINISI WARNA DAN GAYA UMUM */
         :root {
             --kiosk-bg-light: #f5f5f9; --kiosk-border-color: #d9dee3;
             --kiosk-text-primary: #566a7f; --kiosk-text-secondary: #697a8d;
@@ -80,15 +71,75 @@
         .scan-time { font-size: 0.85rem; color: var(--kiosk-text-secondary); }
         .status-badge { font-size: 0.8rem; }
         @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
-        #scanResultModal .modal-content { border: none; box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15); }
-        #modal-status-icon { width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 1.5rem auto; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; }
-        .student-photo-modal { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: border-color 0.3s ease; }
+
+        /* [DIUBAH] CSS LENGKAP UNTUK MODAL BARU */
+        #scanResultModal .modal-content {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        /* CSS untuk state Memproses/Loading */
+        #modal-loading-state .modal-loader {
+            width: 80px;
+            height: 80px;
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid var(--kiosk-primary);
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* CSS untuk state Hasil (Ikon di Atas Foto) */
+        #modal-result-state .result-header-new {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        #modal-result-state .student-photo-modal {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--kiosk-border-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: border-color 0.3s ease;
+    /* [DIHAPUS] Hapus margin negatif yang menyebabkan tumpang tindih */
+    /* margin-top: -40px; */ 
+    /* z-index tidak lagi diperlukan */
+}
+
+#modal-result-state #modal-status-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    border: 3px solid white;
+    /* [DIUBAH] Ganti margin negatif menjadi margin positif untuk memberi jarak */
+    margin-bottom: 1rem; /* 1rem sekitar 16px */
+    /* z-index tidak lagi diperlukan */
+}
         #modal-student-name { color: var(--kiosk-text-primary); }
         #modal-status-info { color: var(--kiosk-text-secondary); font-size: 1.1rem; }
-        .status-success #modal-status-icon { background-color: var(--kiosk-success); } .status-success .student-photo-modal { border: 4px solid var(--kiosk-success); }
-        .status-warning #modal-status-icon { background-color: var(--kiosk-warning); } .status-warning .student-photo-modal { border: 4px solid var(--kiosk-warning); }
-        .status-info #modal-status-icon { background-color: var(--kiosk-info); } .status-info .student-photo-modal { border: 4px solid var(--kiosk-info); }
-        .status-danger #modal-status-icon { background-color: var(--kiosk-danger); } .status-danger .student-photo-modal { border: 4px solid var(--kiosk-danger); }
+
+        /* Dinamis berdasarkan status */
+        .status-success #modal-status-icon { background-color: var(--kiosk-success); }
+        .status-success .student-photo-modal { border-color: var(--kiosk-success); }
+        .status-warning #modal-status-icon { background-color: var(--kiosk-warning); }
+        .status-warning .student-photo-modal { border-color: var(--kiosk-warning); }
+        .status-info #modal-status-icon { background-color: var(--kiosk-info); }
+        .status-info .student-photo-modal { border-color: var(--kiosk-info); }
+        .status-danger #modal-status-icon { background-color: var(--kiosk-danger); }
+        .status-danger .student-photo-modal { border-color: var(--kiosk-danger); }
     </style>
 </head>
 
@@ -116,58 +167,33 @@
                             <div id="clock-date" class="clock-date">Memuat...</div>
                         </div>
 
-                        {{-- ====================================================== --}}
-                        {{-- |    KODE JADWAL HARI INI YANG SUDAH DIPERBAIKI      | --}}
-                        {{-- ====================================================== --}}
-
-                        {{-- Cek dulu apakah jadwal untuk hari ini ada DAN aktif --}}
                         @if ($jadwalHariIni && $jadwalHariIni->is_active)
                             <div class="text-center p-3 mb-4" style="background-color: #f7f7f9; border-radius: 0.5rem; border: 1px solid #e1e3e8;">
-                                <h5 class="mb-3">
-                                    Jadwal Hari Ini ({{ $jadwalHariIni->hari }})
-                                </h5>
+                                <h5 class="mb-3">Jadwal Hari Ini ({{ $jadwalHariIni->hari }})</h5>
                                 <div class="d-flex justify-content-around align-items-center">
-                                    
-                                    {{-- Info Jam Masuk --}}
                                     <div class="px-2">
                                         <i class='bx bx-log-in-circle bx-md text-primary'></i>
                                         <div class="small text-muted mt-1">Masuk</div>
-                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
-                                            {{ date('H:i', strtotime($jadwalHariIni->jam_masuk_sekolah)) }}
-                                        </div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">{{ date('H:i', strtotime($jadwalHariIni->jam_masuk_sekolah)) }}</div>
                                     </div>
-
-                                    {{-- Info Jam Pulang --}}
                                     <div class="px-2">
                                         <i class='bx bx-log-out-circle bx-md text-info'></i>
                                         <div class="small text-muted mt-1">Pulang</div>
-                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
-                                            {{ date('H:i', strtotime($jadwalHariIni->jam_pulang_sekolah)) }}
-                                        </div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">{{ date('H:i', strtotime($jadwalHariIni->jam_pulang_sekolah)) }}</div>
                                     </div>
-
-                                    {{-- Info Toleransi --}}
                                     <div class="px-2">
                                         <i class='bx bx-time bx-md text-warning'></i>
                                         <div class="small text-muted mt-1">Toleransi</div>
-                                        <div class="fs-4 fw-bold" style="color: #566a7f;">
-                                            {{ $jadwalHariIni->batas_toleransi_terlambat }} <span class="fs-6 fw-normal">menit</span>
-                                        </div>
+                                        <div class="fs-4 fw-bold" style="color: #566a7f;">{{ $jadwalHariIni->batas_toleransi_terlambat }} <span class="fs-6 fw-normal">menit</span></div>
                                     </div>
-
                                 </div>
                             </div>
                         @else
-                            {{-- Tampilan jika hari ini libur atau tidak ada jadwal --}}
                             <div class="alert alert-success text-center" role="alert">
                                 <i class='bx bx-calendar-star me-2'></i>
                                 <strong>Hari ini tidak ada jadwal absensi. Selamat beristirahat!</strong>
                             </div>
                         @endif
-
-                        {{-- ====================================================== --}}
-                        {{-- |                AKHIR DARI KODE BARU                  | --}}
-                        {{-- ====================================================== --}}
 
                         <div class="scanner-viewport">
                             <div id="qr-reader"></div>
@@ -181,256 +207,379 @@
                         <h5 class="mb-0">Aktivitas Hari Ini</h5>
                     </div>
                     <div class="card-body">
-                         <ul id="recent-scans-list" class="recent-scans-list">
-                            <li class="text-center border-0" style="animation: none;">Memuat data...</li>
-                        </ul>
+                        <div class="input-group input-group-merge mb-3">
+                <span class="input-group-text"><i class="bx bx-search"></i></span>
+                <input
+                    type="text"
+                    id="activity-search-input"
+                    class="form-control"
+                    placeholder="Cari nama siswa..."
+                />
+            </div>
+            
+            <ul id="recent-scans-list" class="recent-scans-list">
+                <li class="text-center border-0" style="animation: none;">Memuat data...</li>
+            </ul>
+            
+            {{-- ====================================================== --}}
+            {{-- === TAMBAHKAN KODE INI TEPAT DI SINI === --}}
+            {{-- ====================================================== --}}
+            <div id="no-results-message" class="text-center text-muted mt-3" style="display: none;">
+                Tidak ada aktivitas yang cocok dengan pencarian.
+            </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="scanResultModal" tabindex="-1" aria-labelledby="scanResultModalLabel" aria-hidden="true">
+    <div class="modal fade" id="scanResultModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content text-center">
                 <div class="modal-body p-4">
-                    <div id="modal-status-icon"></div>
-                    <img id="modal-student-photo" src="" alt="Foto Siswa" class="student-photo-modal mb-3">
-                    <h4 id="modal-student-name" class="card-title fs-3 mt-2">Memproses...</h4>
-                    <p id="modal-status-info" class="card-text fs-5 mb-0"></p>
+                    <div id="modal-loading-state">
+                        <div class="modal-loader"></div>
+                        <h4 class="card-title fs-3 mt-3">Memproses...</h4>
+                        <p class="card-text fs-5 mb-0">Mohon tunggu sebentar</p>
+                    </div>
+                    <div id="modal-result-state" style="display: none;">
+                        <div class="result-header-new">
+                            <div id="modal-status-icon"></div>
+                            <img id="modal-student-photo" src="" alt="Foto Siswa" class="student-photo-modal">
+                        </div>
+                        <h4 id="modal-student-name" class="card-title fs-3 mt-3">Nama Siswa</h4>
+                        <p id="modal-status-info" class="card-text fs-5 mb-0">Info Status</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                const toast = new bootstrap.Toast(document.getElementById('successToast'));
-                document.getElementById('successToastBody').innerHTML = "{{ session('success') }}";
-                toast.show();
-            @endif
-            @if(session('error'))
-                const toast = new bootstrap.Toast(document.getElementById('errorToast'));
-                document.getElementById('errorToastBody').innerHTML = "{{ session('error') }}";
-                toast.show();
-            @endif
-            @if(session('info'))
-                const toast = new bootstrap.Toast(document.getElementById('infoToast'));
-                document.getElementById('infoToastBody').innerHTML = "{{ session('info') }}";
-                toast.show();
-            @endif
-        });
-    </script>
-
+    @vite(['resources/js/app.js'])
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // --- LOGIKA BARU UNTUK MEMAKSA FULLSCREEN ---
-        const enterFullscreenBtn = document.getElementById('enter-fullscreen-btn');
-        function handleFullscreenChange() {
-            if (document.fullscreenElement) {
-                document.body.classList.add('fullscreen-active');
-            } else {
-                document.body.classList.remove('fullscreen-active');
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // --- Inisialisasi variabel dan elemen ---
+    const enterFullscreenBtn = document.getElementById('enter-fullscreen-btn');
+    const recentScansList = document.getElementById('recent-scans-list');
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+    const scanResultModal = new bootstrap.Modal(document.getElementById('scanResultModal'));
+    
+    // Variabel untuk fitur pencarian
+    const searchInput = document.getElementById('activity-search-input');
+    const noResultsMessage = document.getElementById('no-results-message');
+    
+    let isScanning = false;
+    let isAudioReady = false;
+    let modalHideTimeout;
+
+    // --- Logika Toast ---
+    @if(session('success'))
+        new bootstrap.Toast(document.getElementById('successToast')).show();
+    @endif
+    @if(session('error'))
+        new bootstrap.Toast(document.getElementById('errorToast')).show();
+    @endif
+    @if(session('info'))
+        new bootstrap.Toast(document.getElementById('infoToast')).show();
+    @endif
+    
+    // --- Fungsi Jam ---
+    function updateClock() {
+        const now = new Date();
+        timeEl.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
+        dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // --- [DIUBAH] Fungsi filter dengan pengecekan null ---
+    function filterActivityList() {
+        const searchText = searchInput.value.toLowerCase();
+        const allActivities = recentScansList.querySelectorAll('li');
+        let visibleCount = 0;
+
+        allActivities.forEach(activity => {
+            const scanNameElement = activity.querySelector('.scan-name');
+            if (!scanNameElement) {
+                return; 
             }
-        }
-        document.addEventListener('fullscreenchange', handleFullscreenChange);
-        enterFullscreenBtn.addEventListener('click', () => {
-            document.documentElement.requestFullscreen().catch(err => {
-                alert(`Gagal masuk mode layar penuh. Error: ${err.message}`);
-            });
-            initAudio(); 
+
+            const studentName = scanNameElement.textContent.toLowerCase();
+
+            if (studentName.includes(searchText)) {
+                activity.style.display = 'flex';
+                visibleCount++;
+            } else {
+                activity.style.display = 'none';
+            }
         });
 
-        // --- Sisa skrip Anda (tidak ada perubahan dari sini ke bawah) ---
-        const modalEl = document.getElementById('scanResultModal');
-        const scanResultModal = new bootstrap.Modal(modalEl);
-        const modalContent = modalEl.querySelector('.modal-content');
-        const modalIcon = document.getElementById('modal-status-icon');
-        const modalPhoto = document.getElementById('modal-student-photo');
-        const modalName = document.getElementById('modal-student-name');
-        const modalStatus = document.getElementById('modal-status-info');
-        const recentScansList = document.getElementById('recent-scans-list');
-        let isScanning = false;
-        let successSynth, errorSynth, infoSynth;
-        let isAudioReady = false;
-        async function initAudio() {
-            if (isAudioReady) return;
-            try {
-                await Tone.start();
-                successSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 0.1 } }).toDestination();
-                errorSynth = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 0.2 } }).toDestination();
-                infoSynth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.1, sustain: 0.2, release: 0.1 } }).toDestination();
-                isAudioReady = true;
-                console.log('AudioContext siap!');
-            } catch (e) {
-                console.error("Gagal memulai AudioContext:", e);
-            }
-        }
-        const timeEl = document.getElementById('clock-time');
-        const dateEl = document.getElementById('clock-date');
-        function updateClock() {
-            const now = new Date();
-            timeEl.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ':');
-            dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-        function addScanToList(scanData) {
-            if (recentScansList.querySelector('.text-center')) {
-                recentScansList.innerHTML = '';
-            }
-            const li = document.createElement('li');
-            let displayTime = '';
-            if (scanData.jam_pulang) {
-                displayTime = new Date(`1970-01-01T${scanData.jam_pulang}`).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            } else if (scanData.jam_masuk) {
-                displayTime = new Date(`1970-01-01T${scanData.jam_masuk}`).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+        // INI PERBAIKANNYA: Cek dulu apakah elemennya ada sebelum mengakses .style
+        if (noResultsMessage) {
+            if (visibleCount === 0 && allActivities.length > 0 && searchText !== '') {
+                noResultsMessage.style.display = 'block';
             } else {
-                displayTime = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                noResultsMessage.style.display = 'none';
             }
-            let statusBadge = '';
-            const statusKehadiran = scanData.status_kehadiran;
-            if (statusKehadiran === 'Tepat Waktu') {
-                statusBadge = `<span class="badge rounded-pill bg-label-success status-badge">Masuk</span>`;
-            } else if (statusKehadiran === 'Terlambat') {
-                statusBadge = `<span class="badge rounded-pill bg-label-warning status-badge">Terlambat</span>`;
-            } else if (scanData.jam_pulang && statusKehadiran !== 'Pulang Awal (Izin)') {
-                statusBadge = `<span class="badge rounded-pill bg-label-info status-badge">Pulang</span>`;
-            } else if (statusKehadiran === 'Hadir (Dispensasi)') {
-                statusBadge = `<span class="badge rounded-pill bg-label-primary status-badge">Dispensasi</span>`;
-            } else if (statusKehadiran === 'Pulang Awal (Izin)') {
+        }
+    }
+
+    // --- Fungsi untuk membuat item daftar aktivitas ---
+    function createScanListItem(scanData, eventType) {
+        const li = document.createElement('li');
+        li.id = `scan-${scanData.id}-${eventType}`; 
+
+        let displayTime, statusBadge, rawTime;
+
+        if (eventType === 'pulang') {
+            rawTime = scanData.jam_pulang;
+            displayTime = new Date(`1970-01-01T${rawTime}`).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            if (scanData.status_kehadiran === 'Pulang Awal (Izin)') {
                 statusBadge = `<span class="badge rounded-pill bg-label-info status-badge">Pulang Awal</span>`;
+            } else {
+                statusBadge = `<span class="badge rounded-pill bg-label-info status-badge">Pulang</span>`;
             }
-            const photoUrl = scanData.siswa.foto ? `{{ asset('storage') }}/${scanData.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(scanData.siswa.nama)}&background=696cff&color=fff&size=45`;
-            li.innerHTML = `
-                <img src="${photoUrl}" class="scan-photo" alt="Foto ${scanData.siswa.nama}">
-                <div class="scan-details">
-                    <div class="scan-name">${scanData.siswa.nama}</div>
-                    <div class="scan-time">Jam: ${displayTime}</div>
-                </div>
-                ${statusBadge}
-            `;
-            recentScansList.append(li);
-            if (recentScansList.children.length > 50) {
-                recentScansList.lastChild.remove();
+        } else { // eventType === 'masuk'
+            rawTime = scanData.jam_masuk;
+            displayTime = new Date(`1970-01-01T${rawTime}`).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            const statusKehadiran = scanData.status_kehadiran;
+
+            if (statusKehadiran === 'Tepat Waktu') statusBadge = `<span class="badge rounded-pill bg-label-success status-badge">Masuk</span>`;
+            else if (statusKehadiran === 'Terlambat') statusBadge = `<span class="badge rounded-pill bg-label-warning status-badge">Terlambat</span>`;
+            else if (statusKehadiran === 'Hadir (Dispensasi)') statusBadge = `<span class="badge rounded-pill bg-label-primary status-badge">Dispensasi</span>`;
+            else {
+                statusBadge = `<span class="badge rounded-pill bg-label-secondary status-badge">${statusKehadiran}</span>`;
             }
         }
-        function fetchInitialScans() {
-            fetch("{{ route('admin.absensi.siswa.get_todays_scans') }}")
-                .then(response => response.json())
-                .then(data => {
-                    recentScansList.innerHTML = '';
-                    if (data.length === 0) {
-                        recentScansList.innerHTML = '<li class="text-center text-muted border-0" style="animation: none;">Belum ada aktivitas.</li>';
-                        return;
-                    }
-                    data.forEach(scan => addScanToList(scan));
-                })
-                .catch(error => {
-                    console.error("Gagal mengambil data absensi awal:", error);
-                    recentScansList.innerHTML = '<li class="text-center text-danger border-0" style="animation: none;">Gagal memuat data.</li>';
+        li.setAttribute('data-time', rawTime);
+
+        const photoUrl = scanData.siswa.foto ? `{{ asset('storage') }}/${scanData.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(scanData.siswa.nama)}&background=696cff&color=fff&size=45`;
+        li.innerHTML = `<img src="${photoUrl}" class="scan-photo" alt="Foto ${scanData.siswa.nama}"><div class="scan-details"><div class="scan-name">${scanData.siswa.nama}</div><div class="scan-time">Jam: ${displayTime}</div></div>${statusBadge}`;
+        return li;
+    }
+
+    // --- Fungsi untuk menyisipkan item ke daftar sesuai urutan waktu ---
+    function insertIntoSortedList(newItem) {
+        const listContainer = recentScansList;
+        const existingItems = listContainer.querySelectorAll('li[data-time]');
+        const newItemTime = newItem.getAttribute('data-time');
+
+        let inserted = false;
+        for (const existingItem of existingItems) {
+            const existingItemTime = existingItem.getAttribute('data-time');
+            if (newItemTime.localeCompare(existingItemTime) > 0) {
+                listContainer.insertBefore(newItem, existingItem);
+                inserted = true;
+                break;
+            }
+        }
+
+        if (!inserted) {
+            listContainer.appendChild(newItem);
+        }
+
+        newItem.style.backgroundColor = '#e7f5ff';
+        newItem.style.transition = 'background-color 1.5s ease-out';
+        setTimeout(() => { newItem.style.backgroundColor = ''; }, 2000);
+
+        filterActivityList();
+    }
+
+    // --- Pusat logika untuk menambah/memperbarui daftar ---
+    function addOrUpdateActivityList(scanData) {
+        const placeholder = recentScansList.querySelector('.text-muted, .border-0');
+        if (placeholder) {
+            placeholder.remove();
+        }
+        if (scanData.jam_masuk && !document.getElementById(`scan-${scanData.id}-masuk`)) {
+            const newLi = createScanListItem(scanData, 'masuk');
+            insertIntoSortedList(newLi);
+        }
+        if (scanData.jam_pulang && !document.getElementById(`scan-${scanData.id}-pulang`)) {
+            const newLi = createScanListItem(scanData, 'pulang');
+            insertIntoSortedList(newLi);
+        }
+    }
+
+    // --- Fungsi untuk memuat data awal ---
+    function fetchInitialScans() {
+        fetch("{{ route('admin.absensi.siswa.get_todays_scans') }}")
+            .then(response => response.json())
+            .then(data => {
+                recentScansList.innerHTML = '';
+                if (data.length === 0) {
+                    recentScansList.innerHTML = '<li class="text-center text-muted border-0" style="animation: none;">Belum ada aktivitas.</li>';
+                    return;
+                }
+                data.forEach(scan => {
+                    addOrUpdateActivityList(scan);
                 });
+            })
+            .catch(error => console.error("Gagal mengambil data absensi awal:", error));
+    }
+
+    // --- Polling untuk data baru ---
+    function startPolling() {
+        setInterval(function() {
+            fetch("{{ route('admin.absensi.siswa.get_recent_scans') }}")
+                .then(response => response.json())
+                .then(newScans => {
+                    if (newScans.length > 0) {
+                        newScans.forEach(scan => addOrUpdateActivityList(scan));
+                    }
+                })
+                .catch(error => console.error("Polling error:", error));
+        }, 5000);
+    }
+
+    // --- Fungsi terpusat untuk memutar suara ---
+    function speak(text) {
+        try {
+            if (!isAudioReady) return;
+            window.speechSynthesis.cancel();
+            const ucapan = new SpeechSynthesisUtterance(text);
+            ucapan.lang = 'id-ID';
+            ucapan.rate = 0.9;
+            window.speechSynthesis.speak(ucapan);
+        } catch (e) {
+            console.error("Gagal memutar suara:", e);
         }
-        function showFeedback(type, message, studentName, statusInfo, photoUrl) {
-            modalContent.className = `modal-content text-center status-${type}`;
-            let iconClass = '';
-            if (type === 'loading') { iconClass = 'bx bx-loader-alt bx-spin'; }
-            else if (type === 'success') { iconClass = 'bx bx-check'; }
-            else if (type === 'warning') { iconClass = 'bx bx-error-circle'; }
-            else if (type === 'info') { iconClass = 'bx bx-info-circle'; }
-            else { iconClass = 'bx bx-x'; }
+    }
+
+    // --- Logika Pemindai QR ---
+    function onScanSuccess(decodedText, decodedResult) {
+        if (isScanning) return;
+        isScanning = true;
+        showFeedback('loading');
+
+        fetch("{{ route('admin.absensi.siswa.handle_scan') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+            body: JSON.stringify({ token: decodedText })
+        })
+        .then(response => {
+            if (!response.ok) return response.json().then(err => Promise.reject(err));
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                let statusType = 'success';
+                let subMessage = 'Kehadiran Tercatat.';
+                const status = data.status;
+
+                if (status === 'Terlambat') {
+                    statusType = 'warning';
+                    subMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
+                } else if (status.includes('Pulang')) {
+                    statusType = 'info';
+                    subMessage = 'Status: Absen Pulang Tercatat.';
+                }
+                
+                const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.siswa.nama)}&background=696cff&color=fff&size=120`;
+                showFeedback(statusType, data.siswa.nama, subMessage, fotoUrl);
+                
+                const namaSiswa = data.siswa?.nama || 'Siswa';
+                let statusAbsen = "berhasil absen";
+                if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') statusAbsen = "berhasil absen masuk";
+                else if (status === 'Terlambat') statusAbsen = `terlambat ${data.keterlambatan} menit`;
+                else if (status.includes('Pulang')) statusAbsen = "berhasil absen pulang";
+                
+                speak(`${namaSiswa}, ${statusAbsen}`);
+            }
+        })
+        .catch(error => {
+            const studentName = error.siswa ? error.siswa.nama : 'Gagal';
+            const photoUrl = error.siswa?.foto ? `{{ asset('storage') }}/${error.siswa.foto}` : `https://ui-avatars.com/api/?name=X&background=ffab00&color=fff&size=120`;
+            const errorMessage = error.message || 'Tidak dapat memproses permintaan.';
+            showFeedback('warning', studentName, errorMessage, photoUrl);
+
+            const nameForSpeech = error.siswa ? error.siswa.nama : '';
+            speak(nameForSpeech ? `${nameForSpeech}, ${errorMessage}` : errorMessage);
+        })
+        .finally(() => { setTimeout(() => { isScanning = false; }, 4500); }); 
+    }
+
+    // --- Fungsi umpan balik (Modal) ---
+    function showFeedback(type, studentName, statusInfo, photoUrl) {
+        clearTimeout(modalHideTimeout);
+        const modalContent = document.querySelector('#scanResultModal .modal-content');
+        const loadingState = document.getElementById('modal-loading-state');
+        const resultState = document.getElementById('modal-result-state');
+        modalContent.className = `modal-content text-center status-${type}`;
+
+        if (type === 'loading') {
+            loadingState.style.display = 'block';
+            resultState.style.display = 'none';
+        } else {
+            loadingState.style.display = 'none';
+            resultState.style.display = 'block';
+            const modalIcon = document.getElementById('modal-status-icon');
+            const modalPhoto = document.getElementById('modal-student-photo');
+            const modalName = document.getElementById('modal-student-name');
+            const modalStatus = document.getElementById('modal-status-info');
+
+            let iconClass = 'bx bx-x';
+            if (type === 'success') iconClass = 'bx bx-check';
+            else if (type === 'warning') iconClass = 'bx bx-error-circle';
+            else if (type === 'info') iconClass = 'bx bx-info-circle';
+            
             modalIcon.innerHTML = `<i class='${iconClass}'></i>`;
-            modalPhoto.src = photoUrl || `https://ui-avatars.com/api/?name=?&background=dee3e0&color=fff&size=120`;
+            modalPhoto.src = photoUrl;
             modalName.textContent = studentName;
             modalStatus.textContent = statusInfo;
-            if (isAudioReady && type !== 'loading') {
-                if (type === 'danger' || type === 'warning') { errorSynth.triggerAttackRelease("C3", "0.2"); }
-                else if (type === 'info') { infoSynth.triggerAttackRelease("A4", "0.1"); }
-                else { successSynth.triggerAttackRelease("C5", "0.1"); }
-            }
-            scanResultModal.show();
-            if (type !== 'loading') { setTimeout(() => scanResultModal.hide(), 4000); }
         }
-        function onScanSuccess(decodedText, decodedResult) {
-            if (isScanning) return;
-            isScanning = true;
-            const loadingSpinnerUrl = `https://ui-avatars.com/api/?name=.&background=dee3e0&color=fff&size=120&font-size=0.1`;
-            showFeedback('loading', '', 'Memproses...', 'Mohon tunggu sebentar...', loadingSpinnerUrl);
-            fetch("{{ route('admin.absensi.siswa.handle_scan') }}", {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify({ token: decodedText })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(errorData => {
-                        let err = new Error(errorData.message || 'Error tidak diketahui');
-                        err.data = errorData;
-                        throw err;
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    let statusType = 'success', mainMessage, subMessage;
-                    const status = data.status, studentName = data.siswa?.nama;
-                    const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=696cff&color=fff&size=120`;
-                    if (status === 'Terlambat') {
-                        statusType = 'warning'; mainMessage = studentName; subMessage = `Status: Terlambat ${data.keterlambatan} menit.`;
-                    } else if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') {
-                        statusType = 'success'; mainMessage = studentName; subMessage = 'Status: Kehadiran Tercatat.';
-                    } else if (status === 'Pulang' || status === 'Pulang Awal' || status === 'Pulang Awal (Izin)') {
-                        statusType = 'info'; mainMessage = studentName; subMessage = 'Status: Absen Pulang Tercatat.';
-                    } else {
-                        statusType = 'info'; mainMessage = data.message; subMessage = studentName || 'Status: Aksi Berhasil Dicatat.';
-                    }
-                    showFeedback(statusType, data.message, mainMessage, subMessage, fotoUrl);
-                    fetchInitialScans();
-                } else {
-                    const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
-                    showFeedback('danger', 'Gagal', data.message, 'Silakan coba lagi.', photoPlaceholder);
-                }
-            })
-            .catch(error => {
-                console.error('Scan Error:', error);
-                if (error.data && error.data.siswa) {
-                    const studentName = error.data.siswa.nama;
-                    const photoUrl = error.data.siswa.foto ? `{{ asset('storage') }}/${error.data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=ffab00&color=fff&size=120`;
-                    showFeedback('warning', 'Peringatan', studentName, error.message, photoUrl);
-                } else {
-                    const photoPlaceholder = `https://ui-avatars.com/api/?name=X&background=ff3e1d&color=fff&size=120`;
-                    showFeedback('danger', 'Error Kritis', error.message || 'Tidak dapat memproses permintaan.', 'Periksa koneksi atau hubungi admin.', photoPlaceholder);
-                }
-            })
-            .finally(() => { setTimeout(() => { isScanning = false; }, 3000); });
+        
+        scanResultModal.show();
+        
+        if (type !== 'loading') {
+            modalHideTimeout = setTimeout(() => scanResultModal.hide(), 4000);
         }
-        const readerEl = document.getElementById('qr-reader');
-        function startScanner(config) {
-            const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config, false);
+    }
+    
+    // --- Fungsi untuk memulai pemindai ---
+    function startScanner() {
+        try {
+            const html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", { fps: 10, qrbox: { width: 250, height: 250 } }, false);
             html5QrcodeScanner.render(onScanSuccess, (error) => {});
+        } catch (e) {
+            console.error("Gagal memulai scanner:", e);
+            document.getElementById('qr-reader').innerHTML = '<div class="alert alert-danger">Gagal memulai kamera. Pastikan izin telah diberikan.</div>';
         }
-        const baseConfig = { fps: 10, qrbox: { width: 250, height: 250 }, supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA], rememberLastUsedCamera: true };
-        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            Html5Qrcode.getCameras().then(cameras => {
-                if (cameras && cameras.length) { startScanner(baseConfig); }
-                else { throw new Error("Tidak ada kamera yang ditemukan di perangkat ini."); }
-            }).catch(err => {
-                console.error("Gagal mendapatkan daftar kamera:", err);
-                readerEl.innerHTML = `<div class="alert alert-danger d-flex align-items-center" role="alert"><i class='bx bx-error-circle me-2' style="font-size: 1.5rem;"></i><div><strong>Akses Kamera Gagal.</strong><br>Pastikan Anda telah memberikan izin dan tidak ada aplikasi lain yang sedang menggunakan kamera.</div></div>`;
-            });
-        } else {
-            console.error("getUserMedia tidak didukung oleh browser ini.");
-            readerEl.innerHTML = `<div class="alert alert-danger">Browser Anda tidak mendukung akses kamera.</div>`;
-        }
-        fetchInitialScans();
-    });
-    </script>
+    }
 
-    @vite(['resources/js/app.js'])
+    // --- Logika Fullscreen dan Inisialisasi Aplikasi ---
+    function handleFullscreenChange() {
+        if (document.fullscreenElement) {
+            document.body.classList.add('fullscreen-active');
+        } else {
+            document.body.classList.remove('fullscreen-active');
+        }
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    enterFullscreenBtn.addEventListener('click', () => {
+        document.documentElement.requestFullscreen().catch(err => {
+            alert(`Gagal masuk mode layar penuh. Error: ${err.message}`);
+        });
+        
+        if (!isAudioReady) {
+            window.speechSynthesis.speak(new SpeechSynthesisUtterance(''));
+            console.log('API Suara siap!');
+            isAudioReady = true;
+        }
+        
+        startScanner();
+        fetchInitialScans();
+        startPolling();
+    });
+
+    // --- Event Listener untuk input pencarian ---
+    searchInput.addEventListener('keyup', filterActivityList);
+});
+</script>
 </body>
 </html>
