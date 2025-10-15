@@ -22,15 +22,14 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
-            // 'role' => ['required', 'string'], // <-- HAPUS ATAU BERI KOMENTAR BARIS INI
-            'tahun_pelajaran' => ['required', 'string'], // Pastikan validasi tahun pelajaran tetap ada jika diperlukan
+            'email'           => ['required', 'string', 'email'],
+            'password'        => ['required', 'string'],
+            'tahun_pelajaran' => ['required', 'string'], // Validasi ini tetap ada sesuai kode Anda
         ];
     }
 
@@ -43,13 +42,20 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // Mengambil semua input kecuali 'tahun_pelajaran' untuk proses autentikasi
+        $credentials = $this->only('email', 'password');
+
+        if (! Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
+        
+        // Simpan tahun pelajaran ke session setelah login berhasil
+        session(['tahun_pelajaran' => $this->input('tahun_pelajaran')]);
+
 
         RateLimiter::clear($this->throttleKey());
     }
@@ -82,6 +88,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
     }
 }

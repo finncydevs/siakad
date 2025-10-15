@@ -20,29 +20,25 @@
             background-repeat: no-repeat;
             background-position: center;
         }
-
         .login-header {
             position: absolute;
             top: 2rem;
             left: 2rem;
             right: 2rem;
             display: flex;
-            justify-content: space-between; /* Membuat jarak maksimal antar elemen */
+            justify-content: space-between;
             align-items: center;
         }
-
         .login-header .header-icon i {
-            font-size: 2.5rem; /* 40px */
+            font-size: 2.5rem;
             color: #566a7f;
         }
-        
         .login-header .app-name {
             font-size: 1.25rem;
             font-weight: 600;
             color: #566a7f;
             text-align: center;
         }
-        
         .btn-masuk {
             background-color: #008493 !important;
             border-color: #008493 !important;
@@ -57,15 +53,12 @@
 <body>
     <header class="login-header">
         <div class="header-icon">
-            {{-- Ikon Kiri (Sekolah) --}}
             <i class='bx bxs-school'></i>
         </div>
         <div class="app-name">
-            {{-- Teks di Tengah --}}
             {{-- Sistem Informasi Akademik --}}
         </div>
         <div class="header-icon">
-            {{-- Ikon Kanan (Aplikasi/Widget) --}}
             <i class='bx bxs-widget'></i>
         </div>
     </header>
@@ -81,7 +74,11 @@
                         
                         @if ($errors->any())
                             <div class="alert alert-danger py-2">
-                                <ul class="mb-0">@foreach ($errors->all() as $error)<li class="small">{{ $error }}</li>@endforeach</ul>
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li class="small">{{ $error }}</li>
+                                    @endforeach
+                                </ul>
                             </div>
                         @endif
 
@@ -123,7 +120,7 @@
                         </form>
                     </div>
                 </div>
-                </div>
+            </div>
         </div>
     </div>
 
@@ -132,18 +129,13 @@
             const passwordInput = document.getElementById('password');
             const togglePassword = document.getElementById('togglePassword');
             const icon = togglePassword.querySelector('i');
+            
             togglePassword.addEventListener('click', function () {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 
-                // Toggle ikon antara hide dan show
-                if (type === 'text') {
-                    icon.classList.remove('bx-hide');
-                    icon.classList.add('bx-show');
-                } else {
-                    icon.classList.remove('bx-show');
-                    icon.classList.add('bx-hide');
-                }
+                icon.classList.toggle('bx-show', type === 'text');
+                icon.classList.toggle('bx-hide', type !== 'text');
             });
         });
     </script>

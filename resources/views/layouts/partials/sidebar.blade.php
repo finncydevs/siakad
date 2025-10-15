@@ -221,6 +221,14 @@
             </ul>
         </li>
 
+        {{-- MENU JADWAL PELAJARAN --}}
+<li class="menu-item {{ request()->is('admin/jadwal-pelajaran*') ? 'active' : '' }}">
+    <a href="{{ route('admin.jadwal-pelajaran.index') }}" class="menu-link">
+        <i class="menu-icon tf-icons bx bxs-calendar"></i>
+        <div data-i18n="Jadwal Pelajaran">Jadwal Pelajaran</div>
+    </a>
+</li>
+
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
         <li class="menu-item {{ request()->is('admin/pengaturan/webservice*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">

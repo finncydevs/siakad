@@ -30,6 +30,9 @@ use App\Http\Controllers\Admin\Rombel\RombelEkstrakurikulerController;
 use App\Http\Controllers\Admin\Rombel\RombelMapelPilihanController;
 use App\Http\Controllers\Admin\Rombel\RombelWaliController;
 
+// Controller Jadwal Pelajaran
+use App\Http\Controllers\Admin\JadwalPelajaran\JadwalPelajaranController;
+
 // Controller Pengaturan
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 
@@ -99,22 +102,30 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/reguler/create', [RombelRegulerController::class, 'create'])->name('reguler.create');
         Route::get('/reguler', [RombelRegulerController::class, 'index'])->name('reguler.index');
 
-        // Praktik (ROUTE BARU DITAMBAHKAN)
+        // Praktik
         Route::get('/praktik/create', [RombelPraktikController::class, 'create'])->name('praktik.create');
         Route::get('/praktik', [RombelPraktikController::class, 'index'])->name('praktik.index');
 
-        // Ekstrakurikuler (ROUTE BARU DITAMBAHKAN)
+        // Ekstrakurikuler
         Route::get('/ekstrakurikuler/create', [RombelEkstrakurikulerController::class, 'create'])->name('ekstrakurikuler.create');
         Route::get('/ekstrakurikuler', [RombelEkstrakurikulerController::class, 'index'])->name('ekstrakurikuler.index');
 
-        // Mapel Pilihan (ROUTE BARU DITAMBAHKAN)
+        // Mapel Pilihan
         Route::get('/mapel-pilihan/create', [RombelMapelPilihanController::class, 'create'])->name('mapel-pilihan.create');
         Route::get('/mapel-pilihan', [RombelMapelPilihanController::class, 'index'])->name('mapel-pilihan.index');
 
-        // Wali (ROUTE BARU DITAMBAHKAN)
+        // Wali
         Route::get('/wali/create', [RombelWaliController::class, 'create'])->name('wali.create');
         Route::get('/wali', [RombelWaliController::class, 'index'])->name('wali.index');
     });
-});
+
+    // --- GRUP JADWAL PELAJARAN --- (PINDAHKAN KE SINI)
+    Route::prefix('jadwal-pelajaran')->name('jadwal-pelajaran.')->group(function () {
+        Route::get('/', [JadwalPelajaranController::class, 'index'])->name('index');
+        Route::get('/{rombel}', [JadwalPelajaranController::class, 'create'])->name('create');
+        Route::post('/{rombel}', [JadwalPelajaranController::class, 'store'])->name('store');
+    });
+
+}); // <-- Batas akhir dari grup prefix 'admin'
 
 require __DIR__.'/auth.php';

@@ -219,7 +219,7 @@ class RombelSeeder extends Seeder
                 'kurikulum_id' => 2,
                 'ruang' => 'XI DKV',
                 'wali_id' => 65,
-                'jurusan_id' => 5, // 'Desain Komunikasi Visual'
+                'jurusan_id' => 5,
                 'tahun_ajaran' => 2025,
             ],
             [
