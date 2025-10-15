@@ -131,7 +131,7 @@ class SiswaController extends Controller
         if ($siswa->foto) {
             Storage::disk('public')->delete($siswa->foto);
         }
-        
+
         $siswa->delete();
 
         return redirect()->route('admin.kesiswaan.siswa.index')->with('success', 'Data siswa berhasil dihapus.');
@@ -175,4 +175,3 @@ class SiswaController extends Controller
         return view('admin.kesiswaan.siswa.kartu_massal', compact('siswas', 'rombel'));
     }
 }
-

@@ -3,8 +3,6 @@ import Alpine from 'alpinejs';
 
 window.Alpine = Alpine;
 Alpine.start();
-
-// =================================================================
 // ==> BAGIAN PALING PENTING ADA DI SINI <==
 // 1. Import JQuery dari path tema Sneat Anda dan tampung dalam variabel `$`.
 // import $ from '~sneat/vendor/libs/jquery/jquery.js';

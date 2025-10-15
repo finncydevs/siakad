@@ -20,7 +20,6 @@ export default {
 
     plugins: [forms],
 
-    // --- TAMBAHKAN BAGIAN INI ---
     corePlugins: {
       preflight: false,
     },

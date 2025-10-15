@@ -1,6 +1,8 @@
+// Corrected PostCSS config
 export default {
     plugins: {
-        '@tailwindcss/postcss': {},
+        // Change '@tailwindcss/postcss' to 'tailwindcss'
+        tailwindcss: {},
         autoprefixer: {},
-      },
-    }
+    },
+};

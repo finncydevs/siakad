@@ -4,30 +4,28 @@ use Illuminate\Support\Facades\Route;
 
 // --- CONTROLLER UTAMA ---
 use App\Http\Controllers\ProfilSekolahController;
-use App\Http\Controllers\PegawaiController;
-use App\Http\Controllers\TugasPegawaiController;
-use App\Http\Controllers\SiswaController;
 
 // --- AKADEMIK ---
 use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
-use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
-use App\Http\Controllers\Admin\Akademik\PaketKeahlianController;
+use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController; // Unused, but kept for clarity
+use App\Http\Controllers\Admin\Akademik\PaketKeahlianController; // Unused, but kept for clarity
 use App\Http\Controllers\Admin\Akademik\JurusanController;
 use App\Http\Controllers\Admin\Akademik\MapelController;
 use App\Http\Controllers\Admin\Akademik\EkstrakurikulerController;
 use App\Http\Controllers\Admin\Akademik\JadwalPelajaranController;
 
 // --- KESISWAAN/PPDB ---
-use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
-use App\Http\Controllers\Admin\Kesiswaan\FormulirPendaftaranController;
-use App\Http\Controllers\Admin\Kesiswaan\JalurController;
-use App\Http\Controllers\Admin\Kesiswaan\LaporanPendaftaranController;
-use App\Http\Controllers\Admin\Kesiswaan\LaporanQuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\PenempatanKelasController;
-use App\Http\Controllers\Admin\Kesiswaan\QuotaController;
-use App\Http\Controllers\Admin\Kesiswaan\SyaratController;
-use App\Http\Controllers\Admin\Kesiswaan\TahunPpdbController;
+use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarCalonPesertaDidikController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\FormulirPendaftaranController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\JalurController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanPendaftaranController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\LaporanQuotaController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\PenempatanKelasController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\QuotaController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\SyaratController;
+use App\Http\Controllers\Admin\Kesiswaan\ppdb\TahunPpdbController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\DaftarPesertaDidikBaruController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\PemberianNisController;
 use App\Http\Controllers\Admin\Kesiswaan\ppdb\TingkatPendaftaranController;
@@ -45,10 +43,10 @@ use App\Http\Controllers\Admin\Laporan\LaporanAbsensiController;
 
 // --- PENGATURAN LAINNYA ---
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
-use App\Http\Controllers\Admin\Settings\SekolahController; // Added based on route definition
+use App\Http\Controllers\Admin\Settings\SekolahController;
 
-// --- KEPEGAWAIAN ---
-use App\Http\Controllers\Admin\Kepegawaian\GtkController;
+// --- KEPEGAWAIAN (Consolidated) ---
+use App\Http\Controllers\Admin\Kepegawaian\GtkController; // Assuming GtkController handles both Guru and Tendik
 
 // --- LANDING/PPDB ---
 use App\Http\Controllers\LandingPpdbController;
@@ -100,9 +98,9 @@ Route::prefix('guru')->middleware(['auth'])->name('guru.')->group(function () {
 | Rute Panel Admin (Prefix 'admin')
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () { // Added middleware('auth') assuming admin routes are protected
     // Dashboard
-    Route::get('/dashboard', function () {
+      Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
@@ -139,40 +137,50 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Profil Sekolah
         Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
         Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
-        // Data Sekolah (Assumed to be here)
+        // Data Sekolah
         Route::get('/sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
+        Route::put('/sekolah', [SekolahController::class, 'update'])->name('sekolah.update');
         // Web Service / API Settings
         Route::get('/webservice', [ApiSettingsController::class, 'index'])->name('webservice.index');
     });
 
-    // --- GRUP KEPEGAWAIAN ---
+    // --- GRUP KEPEGAWAIAN (Consolidated) ---
     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
-        Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
-        Route::resource('gtk', GtkController::class);
-        Route::resource('pegawai', PegawaiController::class);
-        Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
+        // Consolidated GtkController for Guru/Tendik based on menu structure
+        Route::get('/guru', [GtkController::class, 'indexGuru'])->name('guru.index'); // <-- Rute GET Kustom
+    Route::get('/guru/export/excel', [GtkController::class, 'exportGuruExcel'])->name('guru.export.excel');
+       Route::get('/tendik', [GtkController::class, 'indexTendik'])->name('tendik.index'); // <-- Rute GET Kustom
+    Route::get('/tendik/export/excel', [GtkController::class, 'exportTendikExcel'])->name('tendik.export.excel');
+
+Route::get('/gtk/multiple-show', [GtkController::class, 'showMultiple'])
+    ->name('gtk.show-multiple')
+    ;
     });
 
-    // --- GRUP AKADEMIK ---
+    // --- GRUP AKADEMIK (Consolidated) ---
     Route::prefix('akademik')->name('akademik.')->group(function () {
-        // Tapel (Tahun Pelajaran)
-        Route::get('tapel', [TapelController::class, 'index'])->name('tapel.index');
+        // Tapel (Tahun Pelajaran) - Consolidated all Tapel routes
+        Route::resource('tapel', TapelController::class)->except(['show', 'edit', 'update']);
         Route::get('tapel/sinkron', [TapelController::class, 'sinkron'])->name('tapel.sinkron');
         Route::post('tapel/aktif/{id}', [TapelController::class, 'setAktif'])->name('tapel.aktif');
-        Route::resource('tapel', TapelController::class)->only(['store', 'destroy']); // Combined resource routes
-        Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle'); // Added status toggle
+        Route::patch('tapel/{tapel}/toggle', [TapelController::class, 'toggleStatus'])->name('tapel.toggle');
 
-        // Semester
+        // Semester (Incomplete resource, kept as is)
         Route::resource('semester', SemesterController::class)->only(['index']);
         Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
 
-        // Kurikulum/Struktur
+        // Kurikulum/Struktur (Incomplete resources, kept as is)
         Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
         Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
         Route::resource('jurusan', JurusanController::class)->only(['index']);
-        Route::get('mapel', [MapelController::class, 'index'])->name('mapel.index');
-        Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index'])->name('ekskul.index');
 
+        // Mapel (Using resource->only for cleaner code)
+        Route::resource('mapel', MapelController::class)->only(['index']); // Replaced manual get route
+
+        // Ekstrakurikuler (Using resource->only for cleaner code)
+Route::resource('ekstrakurikuler', EkstrakurikulerController::class)
+    ->only(['index'])
+    ->names(['index' => 'ekskul.index']); // Use names() to map specific actions
         // Jadwal Pelajaran
         Route::get('jadwal', [JadwalPelajaranController::class, 'index'])->name('jadwal.index');
         Route::get('jadwal/{rombel}/edit', [JadwalPelajaranController::class, 'edit'])->name('jadwal.edit');
@@ -224,19 +232,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // --- GRUP ROMBONGAN BELAJAR ---
     Route::prefix('rombel')->name('rombel.')->group(function () {
-        // Reguler
+        // All routes kept as they are custom index/create views
         Route::get('/reguler', [RombelRegulerController::class, 'index'])->name('reguler.index');
         Route::get('/reguler/create', [RombelRegulerController::class, 'create'])->name('reguler.create');
-        // Praktik
         Route::get('/praktik', [RombelPraktikController::class, 'index'])->name('praktik.index');
         Route::get('/praktik/create', [RombelPraktikController::class, 'create'])->name('praktik.create');
-        // Ekstrakurikuler
         Route::get('/ekstrakurikuler', [RombelEkstrakurikulerController::class, 'index'])->name('ekstrakurikuler.index');
         Route::get('/ekstrakurikuler/create', [RombelEkstrakurikulerController::class, 'create'])->name('ekstrakurikuler.create');
-        // Mapel Pilihan
         Route::get('/mapel-pilihan', [RombelMapelPilihanController::class, 'index'])->name('mapel-pilihan.index');
         Route::get('/mapel-pilihan/create', [RombelMapelPilihanController::class, 'create'])->name('mapel-pilihan.create');
-        // Wali
         Route::get('/wali', [RombelWaliController::class, 'index'])->name('wali.index');
         Route::get('/wali/create', [RombelWaliController::class, 'create'])->name('wali.create');
     });

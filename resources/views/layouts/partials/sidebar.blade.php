@@ -100,11 +100,11 @@
                         <div data-i18n="Tenaga Kependidikan">Tenaga Kependidikan</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/kepegawaian/tugas-pegawai*') ? 'active' : '' }}">
+                {{-- <li class="menu-item {{ request()->is('admin/kepegawaian/tugas-pegawai*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.tugas-pegawai.index') }}" class="menu-link">
                         <div data-i18n="Tugas Pegawai">Tugas Pegawai</div>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </li>
 
@@ -408,13 +408,12 @@
                         <div data-i18n="Landing PPDB">Landing PPDB</div>
                     </a>
                     <ul class="menu-sub">
-                        <li
+                        {{-- <li
                             class="menu-item {{ request()->routeIs('admin.ppdb.landing.index') ? 'active' : '' }}">
-                            {{-- Note: 'admin.ppdb.landing.index' route is assumed to exist for "Beranda" --}}
                             <a href="{{ route('admin.ppdb.landing.index') }}" class="menu-link">
                                 <div data-i18n="Beranda">Beranda</div>
                             </a>
-                        </li>
+                        </li> --}}
                     </ul>
                 </li>
             </ul>

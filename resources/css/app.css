@@ -7,8 +7,5 @@
 @import "~sneat/vendor/libs/apex-charts/apex-charts.css";
 
 /* 2. TAILWIND CSS - DITEMPATKAN SETELAH SEMUA @import */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Tambahkan style kustom lainnya di bawah sini jika perlu */

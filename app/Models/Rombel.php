@@ -42,9 +42,7 @@ class Rombel extends Model
      */
     public function siswa()
     {
-<<<<<<< HEAD
-        // BENAR: Menggunakan foreign key 'ptk_id' untuk terhubung ke primary key Gtk.
-        return $this->belongsTo(Gtk::class, 'ptk_id');
+        return $this->hasMany(Siswa::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
     }
 
     public function wali() {
@@ -56,14 +54,9 @@ class Rombel extends Model
     public function kurikulum() {
         return $this->belongsTo(Kurikulum::class);
     }
-}
-=======
-        return $this->hasMany(Siswa::class, 'rombongan_belajar_id', 'rombongan_belajar_id');
-    } 
 
-    // public function waliKelas()
-    // {
-    //     return $this->belongsTo(Gtk::class, 'ptk_id_str', 'nama');
-    // }
+    public function waliKelas()
+    {
+        return $this->belongsTo(Gtk::class, 'ptk_id_str', 'nama');
+    }
 }
->>>>>>> origin/modul/indisipliner

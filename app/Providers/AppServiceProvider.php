@@ -20,11 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-<<<<<<< HEAD
         Paginator::useBootstrapFive(); // 2. Tambahkan baris ini
-=======
-        Paginator::useBootstrapFive();
->>>>>>> origin/modul/indisipliner
     }
 }
 
