@@ -12,7 +12,7 @@ use App\Http\Controllers\Admin\Kesiswaan\SiswaController;
 use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
 use App\Http\Controllers\Admin\Akademik\JadwalPelajaranController;
-use App\Http\Controllers\Admin\Akademik\JurusanController; // Ditambahkan
+use App\Http\Controllers\Admin\Akademik\JurusanController; 
 
 // --- GROUP CONTROLLER KESISWAAN ---
 use App\Http\Controllers\Admin\Kesiswaan\DaftarCalonPesertaDidikController;
@@ -31,10 +31,11 @@ use App\Http\Controllers\Admin\Absensi\IzinSiswaController;
 use App\Http\Controllers\Guru\GuruAbsensiController;
 use App\Http\Controllers\Admin\Pengaturan\HariLiburController;
 use App\Http\Controllers\Admin\Pengaturan\PengaturanAbsensiController;
-use App\Http\Controllers\Admin\Laporan\LaporanAbsensiController; // Ditambahkan
+use App\Http\Controllers\Admin\Laporan\LaporanAbsensiController; 
 
 // --- GROUP CONTROLLER INDISIPLINER ---
 use App\Http\Controllers\Admin\Indisipliner\IndisiplinerSiswaController;
+use App\Http\Controllers\Admin\indisipliner\IndisiplinerGtkController; // Import Controller Indisipliner Guru
 
 // --- GROUP CONTROLLER PENGATURAN LAINNYA ---
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
@@ -45,7 +46,7 @@ use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.dashboard');
 });
 
 
@@ -149,24 +150,49 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 
-    // --- GRUP INDISIPLINER SISWA ---
-    Route::prefix('indisipliner-siswa')->name('indisipliner.siswa.')->group(function () {
-        Route::get('pengaturan', [IndisiplinerSiswaController::class, 'pengaturanIndex'])->name('pengaturan.index');
-        Route::post('pengaturan/kategori', [IndisiplinerSiswaController::class, 'storeKategori'])->name('pengaturan.kategori.store');
-        Route::put('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'updateKategori'])->name('pengaturan.kategori.update');
-        Route::delete('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'destroyKategori'])->name('pengaturan.kategori.destroy');
-        Route::post('pengaturan/poin', [IndisiplinerSiswaController::class, 'storePoin'])->name('pengaturan.poin.store');
-        Route::put('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'updatePoin'])->name('pengaturan.poin.update');
-        Route::delete('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
-        Route::post('pengaturan/sanksi', [IndisiplinerSiswaController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
-        Route::put('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'updateSanksi'])->name('pengaturan.sanksi.update');
-        Route::delete('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'destroySanksi'])->name('pengaturan.sanksi.destroy');
-        Route::get('daftar', [IndisiplinerSiswaController::class, 'daftarIndex'])->name('daftar.index');
-        Route::post('daftar', [IndisiplinerSiswaController::class, 'storePelanggaran'])->name('daftar.store');
-        Route::delete('daftar/{pelanggaranNilai}', [IndisiplinerSiswaController::class, 'destroyPelanggaran'])->name('daftar.destroy');
-        Route::get('get-siswa-by-rombel/{rombel}', [IndisiplinerSiswaController::class, 'getSiswaByRombel'])->name('getSiswaByRombel');
-        Route::get('rekapitulasi', [IndisiplinerSiswaController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
+    // --- GRUP INDISIPLINER ---
+    Route::prefix('indisipliner')->name('indisipliner.')->group(function () {
+        
+        // Rute untuk Indisipliner Guru
+    Route::prefix('guru')->name('guru.')->group(function () {
+        // Daftar pelanggaran
+    Route::get('/daftar', [IndisiplinerGtkController::class, 'daftarIndex'])->name('daftar.index');
+    Route::post('/daftar', [IndisiplinerGtkController::class, 'store'])->name('daftar.store');
+    Route::delete('/daftar/{pelanggaran}', [IndisiplinerGtkController::class, 'destroy'])->name('daftar.destroy');
+
+    // Pengaturan kategori/poin/sanksi
+    Route::get('/pengaturan', [IndisiplinerGtkController::class, 'pengaturanIndex'])->name('pengaturan.index');
+    Route::post('/pengaturan/kategori', [IndisiplinerGtkController::class, 'storeKategori'])->name('pengaturan.kategori.store');
+    Route::post('/pengaturan/poin', [IndisiplinerGtkController::class, 'storePoin'])->name('pengaturan.poin.store');
+    Route::put('/pengaturan/poin/update', [IndisiplinerGtkController::class, 'updatePoin'])->name('pengaturan.poin.update');
+    Route::delete('/pengaturan/poin/destroy', [IndisiplinerGtkController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+    Route::post('/pengaturan/sanksi', [IndisiplinerGtkController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
+
+    // Rekapitulasi
+    Route::get('/rekapitulasi', [IndisiplinerGtkController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
+        });
+
+
+        // Rute untuk Indisipliner Siswa (tetap menggunakan prefix 'indisipliner-siswa' yang sudah ada)
+        Route::prefix('siswa')->name('siswa.')->group(function () {
+            Route::get('pengaturan', [IndisiplinerSiswaController::class, 'pengaturanIndex'])->name('pengaturan.index');
+            Route::post('pengaturan/kategori', [IndisiplinerSiswaController::class, 'storeKategori'])->name('pengaturan.kategori.store');
+            Route::put('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'updateKategori'])->name('pengaturan.kategori.update');
+            Route::delete('pengaturan/kategori/{pelanggaranKategori}', [IndisiplinerSiswaController::class, 'destroyKategori'])->name('pengaturan.kategori.destroy');
+            Route::post('pengaturan/poin', [IndisiplinerSiswaController::class, 'storePoin'])->name('pengaturan.poin.store');
+            Route::put('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'updatePoin'])->name('pengaturan.poin.update');
+            Route::delete('pengaturan/poin/{pelanggaranPoin}', [IndisiplinerSiswaController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+            Route::post('pengaturan/sanksi', [IndisiplinerSiswaController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
+            Route::put('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'updateSanksi'])->name('pengaturan.sanksi.update');
+            Route::delete('pengaturan/sanksi/{pelanggaranSanksi}', [IndisiplinerSiswaController::class, 'destroySanksi'])->name('pengaturan.sanksi.destroy');
+            Route::get('daftar', [IndisiplinerSiswaController::class, 'daftarIndex'])->name('daftar.index');
+            Route::post('daftar', [IndisiplinerSiswaController::class, 'storePelanggaran'])->name('daftar.store');
+            Route::delete('daftar/{pelanggaranNilai}', [IndisiplinerSiswaController::class, 'destroyPelanggaran'])->name('daftar.destroy');
+            Route::get('get-siswa-by-rombel/{rombel}', [IndisiplinerSiswaController::class, 'getSiswaByRombel'])->name('getSiswaByRombel');
+            Route::get('rekapitulasi', [IndisiplinerSiswaController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
+        });
     });
+
 
     // --- GRUP LAPORAN ---
     Route::prefix('laporan')->name('laporan.')->group(function() {
