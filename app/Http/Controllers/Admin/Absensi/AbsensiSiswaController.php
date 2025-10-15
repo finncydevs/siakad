@@ -322,19 +322,20 @@ public function getRecentScans()
         return response()->json($recentScans);
     }
 
+// GANTI SELURUH METODE getUnscannedData DENGAN VERSI FINAL YANG SUDAH DIPERBAIKI INI
+
 public function getUnscannedData(Request $request)
 {
     try {
         $today = Carbon::now()->toDateString();
         $rombelId = $request->query('rombel_id');
 
-        // 1. Dapatkan ID siswa yang sudah tercatat absen masuk hari ini.
-        $scannedStudentIds = AbsensiSiswa::where('tanggal', '>', $today)
+        // 1. [INI PERBAIKANNYA] Dapatkan ID siswa yang sudah absen masuk HARI INI (bukan setelah hari ini).
+        $scannedStudentIds = AbsensiSiswa::where('tanggal', $today) // Diubah dari '>' menjadi '=' (atau biarkan saja)
             ->whereNotNull('jam_masuk')
             ->pluck('siswa_id');
 
         // 2. Siapkan query untuk mendapatkan siswa yang ID-nya TIDAK ADA di daftar yang sudah scan.
-        // [PERBAIKAN] Baris ->where('status', 'Aktif') telah DIHAPUS.
         $unscannedQuery = Siswa::whereNotIn('id', $scannedStudentIds);
 
         // 3. Jika ada filter kelas yang dipilih (bukan 'all'), modifikasi query.
