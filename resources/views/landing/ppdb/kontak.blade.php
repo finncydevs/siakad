@@ -10,7 +10,7 @@
                 </h2>
                 <p class="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto" data-aos="fade-up"
                     data-aos-delay="100">
-                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan SMAKNIS.
+                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan {{ $profilSekolah->singkatan}}.
                 </p>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -39,12 +39,12 @@
                             <li class="flex items-start">
                                 <i data-lucide="phone"
                                     class="w-6 h-6 mr-4 mt-0.5 text-secondary-green flex-shrink-0"></i>
-                                <span class="text-gray-700 font-medium">081381123837 (Layanan PPDB)</span>
+                                <span class="text-gray-700 font-medium">{{ $profilSekolah->telepon ?? '-'}} (Layanan PPDB)</span>
                             </li>
                             <li class="flex items-start">
                                 <i data-lucide="mail"
                                     class="w-6 h-6 mr-4 mt-0.5 text-secondary-green flex-shrink-0"></i>
-                                <span class="text-gray-700 font-medium">info@smaknis.sch.id</span>
+                                <span class="text-gray-700 font-medium">{{ $profilSekolah->email ?? 'Smaknis.sch.id' }}</span>
                             </li>
                             <li class="flex items-start">
                                 <i data-lucide="clock"
