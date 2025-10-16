@@ -31,7 +31,7 @@ return new class extends Migration
             $table->string('agama_id', 191)->nullable()->index();
             $table->text('agama_id_str')->nullable();
             $table->text('nomor_telepon_rumah')->nullable();
-            $table->text('nomor_telepon_seluler')->nullable();
+            $table->text(column: 'nomor_telepon_seluler')->nullable();
             $table->text('nama_ayah')->nullable();
             $table->string('pekerjaan_ayah_id', 191)->nullable()->index();
             $table->text('pekerjaan_ayah_id_str')->nullable();

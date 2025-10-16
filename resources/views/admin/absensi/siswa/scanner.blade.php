@@ -479,12 +479,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 let subMessage = 'Kehadiran Tercatat.'; 
                 const status = data.status; 
                 if (status === 'Terlambat') { 
-                    statusType = 'warning'; 
-                    subMessage = `Status: Terlambat ${data.keterlambatan} menit.`; 
-                } else if (status.includes('Pulang')) { 
-                    statusType = 'info'; 
-                    subMessage = 'Status: Absen Pulang Tercatat.'; 
-                } 
+                statusType = 'warning'; 
+                
+                let keterlambatanParts = [];
+                if (data.menit_terlambat > 0) {
+                    keterlambatanParts.push(`${data.menit_terlambat} menit`);
+                }
+                if (data.detik_terlambat > 0) {
+                    keterlambatanParts.push(`${data.detik_terlambat} detik`);
+                }
+                
+                // Gabungkan bagian-bagian pesan
+                subMessage = `Status: Terlambat ${keterlambatanParts.join(' ')}.`;
+
+            } else if (status.includes('Pulang')) { 
+                statusType = 'info'; 
+                subMessage = 'Status: Absen Pulang Tercatat.'; 
+            } 
                 const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.siswa.nama)}&background=696cff&color=fff&size=120`; 
                 showFeedback(statusType, data.siswa.nama, subMessage, fotoUrl); 
                 const namaSiswa = data.siswa?.nama || 'Siswa'; 
