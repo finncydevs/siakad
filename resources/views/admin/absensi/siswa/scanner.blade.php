@@ -176,13 +176,8 @@
             <div class="col-lg-5">
                 <div class="card kiosk-card">
                     <div class="card-header">
-                        {{-- Judul card tidak lagi statis, karena isinya adalah tab --}}
                         <h5 class="mb-0">Monitoring Kehadiran</h5>
                     </div>
-                    
-                    {{-- ====================================================== --}}
-                    {{-- === [DIUBAH TOTAL] STRUKTUR TAB BARU === --}}
-                    {{-- ====================================================== --}}
                     <div class="card-body">
                         <ul class="nav nav-tabs nav-fill" id="activityTab" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -466,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- FUNGSI INTI & PEMINDAI ---
     
     function speak(text) {
-        try { if (!isAudioReady) return; window.speechSynthesis.cancel(); const ucapan = new SpeechSynthesisUtterance(text); ucapan.lang = 'id-ID'; ucapan.rate = 0.9; window.speechSynthesis.speak(ucapan); } catch (e) { console.error("Gagal memutar suara:", e); }
+        try { if (!isAudioReady) return; window.speechSynthesis.cancel(); const ucapan = new SpeechSynthesisUtterance(text); ucapan.lang = 'id-ID'; ucapan.rate = 1.1; window.speechSynthesis.speak(ucapan); } catch (e) { console.error("Gagal memutar suara:", e); }
     }
 
     function onScanSuccess(decodedText, decodedResult) {

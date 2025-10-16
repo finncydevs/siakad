@@ -275,7 +275,14 @@ public function showScanner()
                     return response()->json(['success' => false, 'message' => $pesan, 'siswa' => $siswa->only(['nama', 'foto'])], 400);
                 }
                 $statusKehadiran = $waktuScan->gt($batasMasuk) ? 'Terlambat' : 'Tepat Waktu';
-                $keterlambatan = ($statusKehadiran === 'Terlambat') ? $waktuScan->diffInMinutes($batasMasuk) : null;
+                $keterlambatan = null; // Inisialisasi variabel
+                
+                if ($statusKehadiran === 'Terlambat') {
+                    // Hitung selisih waktu dalam detik
+                    $selisihDetik = $waktuScan->diffInSeconds($batasMasuk);
+                    // Konversi ke menit dan bulatkan ke atas untuk mendapatkan bilangan bulat
+                    $keterlambatan = (int) ceil($selisihDetik / 60);
+                }
                 AbsensiSiswa::updateOrCreate(
                     ['siswa_id' => $siswa->id, 'tanggal' => $tanggalScan],
                     ['status' => 'Hadir', 'jam_masuk' => $waktuScan->toTimeString(), 'status_kehadiran' => $statusKehadiran, 'dicatat_oleh' => auth()->id() ?? 1]
