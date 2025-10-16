@@ -465,59 +465,68 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function onScanSuccess(decodedText, decodedResult) {
-        if (isScanning) return; 
-        isScanning = true; 
-        showFeedback('loading');
-        fetch("{{ route('admin.absensi.siswa.handle_scan') }}", { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' }, body: JSON.stringify({ token: decodedText }) })
-        .then(response => { 
-            if (!response.ok) return response.json().then(err => Promise.reject(err)); 
-            return response.json(); 
-        })
-        .then(data => { 
-            if (data.success) { 
-                let statusType = 'success'; 
-                let subMessage = 'Kehadiran Tercatat.'; 
-                const status = data.status; 
-                if (status === 'Terlambat') { 
-                statusType = 'warning'; 
-                
-                let keterlambatanParts = [];
-                if (data.menit_terlambat > 0) {
-                    keterlambatanParts.push(`${data.menit_terlambat} menit`);
-                }
-                if (data.detik_terlambat > 0) {
-                    keterlambatanParts.push(`${data.detik_terlambat} detik`);
-                }
-                
-                // Gabungkan bagian-bagian pesan
-                subMessage = `Status: Terlambat ${keterlambatanParts.join(' ')}.`;
+    if (isScanning) return;
+    isScanning = true;
+    showFeedback('loading');
+    fetch("{{ route('admin.absensi.siswa.handle_scan') }}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        body: JSON.stringify({ token: decodedText })
+    })
+    .then(response => {
+        if (!response.ok) return response.json().then(err => Promise.reject(err));
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            let statusType = 'success';
+            let subMessage = 'Kehadiran Tercatat.';
+            let speechMessage = "berhasil absen";
+            const status = data.status;
 
-            } else if (status.includes('Pulang')) { 
-                statusType = 'info'; 
-                subMessage = 'Status: Absen Pulang Tercatat.'; 
-            } 
-                const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.siswa.nama)}&background=696cff&color=fff&size=120`; 
-                showFeedback(statusType, data.siswa.nama, subMessage, fotoUrl); 
-                const namaSiswa = data.siswa?.nama || 'Siswa'; 
-                let statusAbsen = "berhasil absen"; 
-                if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)') statusAbsen = "berhasil absen masuk"; 
-                else if (status === 'Terlambat') statusAbsen = `terlambat ${data.keterlambatan} menit`; 
-                else if (status.includes('Pulang')) statusAbsen = "berhasil absen pulang"; 
-                speak(`${namaSiswa}, ${statusAbsen}`); 
-            } 
-        })
-        .catch(error => { 
-            const studentName = error.siswa ? error.siswa.nama : 'Gagal'; 
-            const photoUrl = error.siswa?.foto ? `{{ asset('storage') }}/${error.siswa.foto}` : `https://ui-avatars.com/api/?name=X&background=ffab00&color=fff&size=120`; 
-            const errorMessage = error.message || 'Tidak dapat memproses permintaan.'; 
-            showFeedback('warning', studentName, errorMessage, photoUrl); 
-            const nameForSpeech = error.siswa ? error.siswa.nama : ''; 
-            speak(nameForSpeech ? `${nameForSpeech}, ${errorMessage}` : errorMessage); 
-        })
-        .finally(() => { 
-            setTimeout(() => { isScanning = false; }, 4500); 
-        }); 
-    }
+            if (status === 'Terlambat') {
+                statusType = 'warning';
+                
+                // --- Logika untuk Tampilan Visual ---
+                let keterlambatanParts = [];
+                if (data.menit_terlambat > 0) keterlambatanParts.push(`${data.menit_terlambat} menit`);
+                if (data.detik_terlambat > 0) keterlambatanParts.push(`${data.detik_terlambat} detik`);
+                
+                if (keterlambatanParts.length > 0) {
+                    subMessage = `Status: Terlambat ${keterlambatanParts.join(' ')}.`;
+                    speechMessage = `terlambat ${keterlambatanParts.join(' ')}`;
+                } else {
+                    subMessage = 'Status: Terlambat.';
+                    speechMessage = 'terlambat';
+                }
+
+            } else if (status.includes('Pulang')) {
+                statusType = 'info';
+                subMessage = 'Status: Absen Pulang Tercatat.';
+                speechMessage = "berhasil absen pulang";
+            } else if (status === 'Tepat Waktu' || status === 'Hadir (Dispensasi)'){
+                speechMessage = "berhasil absen masuk";
+            }
+            
+            const fotoUrl = data.siswa?.foto ? `{{ asset('storage') }}/${data.siswa.foto}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(data.siswa.nama)}&background=696cff&color=fff&size=120`;
+            showFeedback(statusType, data.siswa.nama, subMessage, fotoUrl);
+            
+            const namaSiswa = data.siswa?.nama || 'Siswa';
+            speak(`${namaSiswa}, ${speechMessage}`);
+        }
+    })
+    .catch(error => {
+        const studentName = error.siswa ? error.siswa.nama : 'Gagal';
+        const photoUrl = error.siswa?.foto ? `{{ asset('storage') }}/${error.siswa.foto}` : `https://ui-avatars.com/api/?name=X&background=ffab00&color=fff&size=120`;
+        const errorMessage = error.message || 'Tidak dapat memproses permintaan.';
+        showFeedback('warning', studentName, errorMessage, photoUrl);
+        const nameForSpeech = error.siswa ? error.siswa.nama : '';
+        speak(nameForSpeech ? `${nameForSpeech}, ${errorMessage}` : errorMessage);
+    })
+    .finally(() => {
+        setTimeout(() => { isScanning = false; }, 4500);
+    });
+}
 
     function showFeedback(type, studentName, statusInfo, photoUrl) {
         clearTimeout(modalHideTimeout); 

@@ -247,7 +247,8 @@ private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan
         'message' => "Selamat Datang, {$siswa->nama}!",
         'status' => $statusKehadiran,
         'siswa' => $siswa,
-        'keterlambatan' => $menitTerlambat // <-- Kunci ini sekarang selalu ada
+        'menit_terlambat' => (int) $menitTerlambat,
+        'detik_terlambat' => (int) $detikTerlambat
     ];
 
     // [DEBUGGING] Tambahkan log untuk memastikan data yang dikirim sudah benar
