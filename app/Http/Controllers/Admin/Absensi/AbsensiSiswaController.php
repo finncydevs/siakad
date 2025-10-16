@@ -203,9 +203,11 @@ class AbsensiSiswaController extends Controller
 private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan)
 {
     $batasMasuk = Carbon::parse($pengaturan->jam_masuk_sekolah);
-    $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60);
-    $batasAkhirAbsen = $batasMasuk->copy()->addMinutes((int) $pengaturan->batas_toleransi_terlambat);
+    $batasAwalMasuk = $batasMasuk->copy()->subMinutes(60); // Bisa disesuaikan
+    $batasAkhirAbsen = $batasMasuk->copy()->addMinutes((int) $pengaturan->batas_toleransi_terlambat); // Batas akhir absen
 
+    // Validasi 1: Apakah waktu scan berada di luar jendela absensi?
+    // Catatan: sengaja tidak pakai ->between() agar bisa memberi pesan error yang berbeda
     if ($waktuScan->lt($batasAwalMasuk)) {
         return response()->json(['success' => false, 'message' => 'Belum waktunya untuk absen masuk!'], 400);
     }
@@ -213,32 +215,33 @@ private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan
          return response()->json(['success' => false, 'message' => 'Waktu untuk absen masuk sudah berakhir.'], 400);
     }
     
-    // --- PERUBAHAN LOGIKA INTI DIMULAI DI SINI ---
+    // Inisialisasi variabel
+    $menitTerlambat = 0;
+    $detikTerlambat = 0;
+    $statusKehadiran = 'Tepat Waktu'; // Default status
 
-    // 1. Hitung selisih detik terlebih dahulu. Inilah satu-satunya sumber kebenaran.
-    $totalDetikTerlambat = 0;
+    // Validasi 2: Cek apakah siswa terlambat (waktu scan setelah jam masuk)
     if ($waktuScan->isAfter($batasMasuk)) {
-        $totalDetikTerlambat = $waktuScan->diffInSeconds($batasMasuk);
-    }
-
-    // 2. Tentukan status HANYA berdasarkan hasil perhitungan detik.
-    if ($totalDetikTerlambat > 0) {
         $statusKehadiran = 'Terlambat';
+        
+        // Hitung total detik, lalu pecah menjadi menit dan sisa detik
+        $totalDetikTerlambat = $waktuScan->diffInSeconds($batasMasuk);
+
+        // Jika karena pembulatan milidetik hasilnya 0, tapi statusnya terlambat, anggap terlambat 1 detik
+        if ($totalDetikTerlambat === 0) {
+            $totalDetikTerlambat = 1;
+        }
+
         $menitTerlambat = floor($totalDetikTerlambat / 60);
         $detikTerlambat = $totalDetikTerlambat % 60;
-    } else {
-        $statusKehadiran = 'Tepat Waktu';
-        $menitTerlambat = 0;
-        $detikTerlambat = 0;
     }
     
-    // 3. Simpan ke database
     AbsensiSiswa::updateOrCreate(
         ['siswa_id' => $siswa->id, 'tanggal' => $waktuScan->toDateString()],
         ['status' => 'Hadir', 'jam_masuk' => $waktuScan->toTimeString(), 'status_kehadiran' => $statusKehadiran, 'dicatat_oleh' => auth()->id() ?? 1]
     );
 
-    // 4. Kirim notifikasi (tidak diubah)
+    // Logika Notifikasi WhatsApp (tidak diubah)
     if ($siswa->nomor_telepon_seluler) {
         $pesan = "🏫 *Notifikasi Absensi Masuk*\n\n" .
                  "Yth. Orang Tua/Wali,\n\n" .
@@ -250,7 +253,7 @@ private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan
         SendWhatsappNotification::dispatch($siswa->nomor_telepon_seluler, $pesan);
     }
 
-    // 5. Siapkan respons JSON yang dijamin konsisten
+    // Siapkan respons JSON yang sekarang sudah konsisten
     $responseData = [
         'success' => true,
         'message' => "Selamat Datang, {$siswa->nama}!",
