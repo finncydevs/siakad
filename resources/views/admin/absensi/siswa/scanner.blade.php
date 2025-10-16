@@ -485,22 +485,32 @@ document.addEventListener('DOMContentLoaded', function () {
             const status = data.status;
 
             if (status === 'Terlambat') {
-                statusType = 'warning';
-                
-                // --- Logika untuk Tampilan Visual ---
-                let keterlambatanParts = [];
-                if (data.menit_terlambat > 0) keterlambatanParts.push(`${data.menit_terlambat} menit`);
-                if (data.detik_terlambat > 0) keterlambatanParts.push(`${data.detik_terlambat} detik`);
-                
-                if (keterlambatanParts.length > 0) {
-                    subMessage = `Status: Terlambat ${keterlambatanParts.join(' ')}.`;
-                    speechMessage = `terlambat ${keterlambatanParts.join(' ')}`;
-                } else {
-                    subMessage = 'Status: Terlambat.';
-                    speechMessage = 'terlambat';
-                }
+    statusType = 'warning';
 
-            } else if (status.includes('Pulang')) {
+    // --- [PERBAIKAN] Logika untuk Tampilan Visual ---
+    let keterlambatanParts = [];
+    // Gunakan 'parseInt' untuk memastikan kita membandingkan angka
+    // dan berikan nilai default 0 jika properti tidak ada (untuk keamanan)
+    const menit = parseInt(data.menit_terlambat) || 0;
+    const detik = parseInt(data.detik_terlambat) || 0;
+
+    if (menit > 0) {
+        keterlambatanParts.push(`${menit} menit`);
+    }
+    if (detik > 0) {
+        keterlambatanParts.push(`${detik} detik`);
+    }
+
+    // Jika setelah dicek ternyata memang ada keterlambatan (minimal 1 detik)
+    if (keterlambatanParts.length > 0) {
+        subMessage = `Status: Terlambat ${keterlambatanParts.join(' ')}.`;
+        speechMessage = `terlambat ${keterlambatanParts.join(' ')}`;
+    } else {
+        // Fallback jika karena alasan aneh menit & detik = 0, tapi statusnya terlambat
+        subMessage = 'Status: Terlambat.';
+        speechMessage = 'terlambat';
+    }
+} else if (status.includes('Pulang')) {
                 statusType = 'info';
                 subMessage = 'Status: Absen Pulang Tercatat.';
                 speechMessage = "berhasil absen pulang";
