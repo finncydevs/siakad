@@ -243,15 +243,26 @@ private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan
 
     // Logika Notifikasi WhatsApp (tidak diubah)
     if ($siswa->nomor_telepon_seluler) {
-        $pesan = "🏫 *Notifikasi Absensi Masuk*\n\n" .
-                 "Yth. Orang Tua/Wali,\n\n" .
-                 "Kami informasikan ananda *{$siswa->nama}* telah tercatat absensi masuk pada:\n\n" .
-                 "🗓️ Tanggal: " . $waktuScan->isoFormat('dddd, D MMMM Y') . "\n" .
-                 "⏰ Pukul: *" . $waktuScan->format('H:i') . "*\n" .
-                 "✅ Status: *{$statusKehadiran}" . ($menitTerlambat > 0 ? " ({$menitTerlambat} menit)" : "") . "*\n\n" .
-                 "Terima kasih.";
-        SendWhatsappNotification::dispatch($siswa->nomor_telepon_seluler, $pesan);
+    // Siapkan template pesan dasar
+    $pesan = "🏫 *Notifikasi Absensi Masuk*\n\n" .
+             "Yth. Orang Tua/Wali,\n\n" .
+             "Kami informasikan ananda *{$siswa->nama}* telah tercatat absensi masuk pada:\n\n" .
+             "🗓️ Tanggal: " . $waktuScan->isoFormat('dddd, D MMMM Y') . "\n";
+
+    // Tambahkan detail berdasarkan status kehadiran
+    if ($statusKehadiran === 'Terlambat') {
+        $pesan .= "🕒 Batas Masuk: *" . $batasMasuk->format('H:i') . "*\n" . // INFORMASI PENTING!
+                  "⏰ Waktu Scan: *" . $waktuScan->format('H:i') . "*\n" .
+                  "✅ Status: *{$statusKehadiran} ({$menitTerlambat} menit " . ($detikTerlambat > 0 ? "{$detikTerlambat} detik" : "") . ")*\n\n";
+    } else {
+        $pesan .= "⏰ Pukul: *" . $waktuScan->format('H:i') . "*\n" .
+                  "✅ Status: *{$statusKehadiran}*\n\n";
     }
+
+    $pesan .= "Terima kasih.";
+    
+    SendWhatsappNotification::dispatch($siswa->nomor_telepon_seluler, $pesan);
+}
 
     // Siapkan respons JSON yang sekarang sudah konsisten
     $responseData = [
@@ -322,33 +333,33 @@ private function prosesAbsensiMasuk(Siswa $siswa, $pengaturan, Carbon $waktuScan
     public function getUnscannedData(Request $request)
     {
         try {
-            // $today = Carbon::now()->toDateString();
-            // $rombelId = $request->query('rombel_id');
-            // $scannedStudentIds = AbsensiSiswa::where('tanggal', $today)->whereNotNull('jam_masuk')->pluck('siswa_id');
-            // $unscannedQuery = Siswa::whereNotIn('id', $scannedStudentIds);
+            $today = Carbon::now()->toDateString();
+            $rombelId = $request->query('rombel_id');
+            $scannedStudentIds = AbsensiSiswa::where('tanggal', $today)->whereNotNull('jam_masuk')->pluck('siswa_id');
+            $unscannedQuery = Siswa::whereNotIn('id', $scannedStudentIds);
 
-            // if ($rombelId && $rombelId !== 'all') {
-            //     $rombel = Rombel::find($rombelId);
-            //     if ($rombel && !empty($rombel->anggota_rombel)) {
-            //         $anggotaData = json_decode($rombel->anggota_rombel, true);
-            //         if (is_array($anggotaData) && !empty($anggotaData)) {
-            //             $anggotaPdIds = array_column($anggotaData, 'peserta_didik_id');
-            //             $siswaIdsInRombel = Siswa::whereIn('peserta_didik_id', $anggotaPdIds)->pluck('id');
-            //             $unscannedQuery->whereIn('id', $siswaIdsInRombel);
-            //         } else { $unscannedQuery->whereRaw('1 = 0'); }
-            //     } else { $unscannedQuery->whereRaw('1 = 0'); }
-            // }
+            if ($rombelId && $rombelId !== 'all') {
+                $rombel = Rombel::find($rombelId);
+                if ($rombel && !empty($rombel->anggota_rombel)) {
+                    $anggotaData = json_decode($rombel->anggota_rombel, true);
+                    if (is_array($anggotaData) && !empty($anggotaData)) {
+                        $anggotaPdIds = array_column($anggotaData, 'peserta_didik_id');
+                        $siswaIdsInRombel = Siswa::whereIn('peserta_didik_id', $anggotaPdIds)->pluck('id');
+                        $unscannedQuery->whereIn('id', $siswaIdsInRombel);
+                    } else { $unscannedQuery->whereRaw('1 = 0'); }
+                } else { $unscannedQuery->whereRaw('1 = 0'); }
+            }
 
-            // $unscannedStudents = $unscannedQuery->orderBy('nama')->select('id', 'nama', 'foto')->get();
-            // $rombelsForDropdown = [];
-            // if (!$request->has('rombel_id') || $request->get('rombel_id') === 'all') {
-            //     $rombelsForDropdown = Rombel::orderBy('nama')->select('id', 'nama')->get()->unique('nama')->values()->all();
-            // }
+            $unscannedStudents = $unscannedQuery->orderBy('nama')->select('id', 'nama', 'foto')->get();
+            $rombelsForDropdown = [];
+            if (!$request->has('rombel_id') || $request->get('rombel_id') === 'all') {
+                $rombelsForDropdown = Rombel::orderBy('nama')->select('id', 'nama')->get()->unique('nama')->values()->all();
+            }
 
-            // return response()->json([
-            //     'unscanned_students' => $unscannedStudents,
-            //     'rombels' => $rombelsForDropdown
-            // ]);
+            return response()->json([
+                'unscanned_students' => $unscannedStudents,
+                'rombels' => $rombelsForDropdown
+            ]);
         } catch (\Exception $e) {
             Log::error('Error in getUnscannedData: ' . $e->getMessage() . ' in file ' . $e->getFile() . ' on line ' . $e->getLine());
             return response()->json(['message' => 'Terjadi kesalahan pada server.'], 500);

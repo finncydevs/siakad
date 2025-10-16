@@ -14,6 +14,20 @@ class SendWhatsappNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Berapa kali job dapat dicoba sebelum dianggap gagal.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
+     * Waktu (dalam detik) untuk menunggu sebelum mencoba kembali job yang gagal.
+     *
+     * @var int
+     */
+    public $backoff = 60; // Job akan dicoba lagi setelah 1 menit
+
     protected $nomorTujuan;
     protected $pesan;
 
@@ -58,10 +72,12 @@ class SendWhatsappNotification implements ShouldQueue
 
 
         // Catat ke log jika pengiriman gagal untuk memudahkan debugging
-        if (!$response->successful() || $response->json()['status'] === 'error') {
+        if (!$response->successful() || (isset($response->json()['status']) && $response->json()['status'] === 'error')) {
             Log::error('Gagal mengirim notifikasi WA ke ' . $payload['phone'], [
                 'response' => $response->body()
             ]);
+             // Lemparkan exception agar job dianggap gagal dan bisa di-retry
+            $response->throw();
         } else {
              Log::info('Sukses mengirim notifikasi WA ke ' . $payload['phone']);
         }
