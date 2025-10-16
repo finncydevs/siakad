@@ -36,6 +36,8 @@ use App\Http\Controllers\Admin\JadwalPelajaran\JadwalPelajaranController;
 // Controller Pengaturan
 use App\Http\Controllers\Admin\Settings\ApiSettingsController;
 
+use App\Http\Controllers\Admin\Settings\PenggunaController;
+
 /*
 |--------------------------------------------------------------------------
 | Rute Publik
@@ -125,6 +127,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/{rombel}', [JadwalPelajaranController::class, 'create'])->name('create');
         Route::post('/{rombel}', [JadwalPelajaranController::class, 'store'])->name('store');
     });
+
+    
+        // --- GRUP PENGATURAN ---
+        Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
+            // ... (rute pengaturan yang sudah ada)
+        });
+    
+        // --- MANAJEMEN PENGGUNA (LENGKAP) ---
+        Route::resource('pengguna', PenggunaController::class)->except(['show']);
 
 }); // <-- Batas akhir dari grup prefix 'admin'
 

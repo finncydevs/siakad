@@ -230,6 +230,14 @@
 </li>
 
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
+
+        <li class="menu-item {{ request()->is('admin/pengguna*') ? 'active' : '' }}">
+            <a href="{{ route('admin.pengguna.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-user-detail"></i>
+                <div data-i18n="Manajemen Pengguna">Manajemen Pengguna</div>
+            </a>
+        </li>
+
         <li class="menu-item {{ request()->is('admin/pengaturan/webservice*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-git-branch"></i>

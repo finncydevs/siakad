@@ -52,21 +52,14 @@
 
 <body>
     <header class="login-header">
-        <div class="header-icon">
-            <i class='bx bxs-school'></i>
-        </div>
-        <div class="app-name">
-            {{-- Sistem Informasi Akademik --}}
-        </div>
-        <div class="header-icon">
-            <i class='bx bxs-widget'></i>
-        </div>
+        <div class="header-icon"><i class='bx bxs-school'></i></div>
+        <div class="app-name"></div>
+        <div class="header-icon"><i class='bx bxs-widget'></i></div>
     </header>
 
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner py-4">
-
                 <div class="card">
                     <div class="card-body">
                         <h4 class="mb-2 text-center">Masuk</h4>
@@ -74,21 +67,17 @@
                         
                         @if ($errors->any())
                             <div class="alert alert-danger py-2">
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li class="small">{{ $error }}</li>
-                                    @endforeach
-                                </ul>
+                                <ul class="mb-0">@foreach ($errors->all() as $error)<li class="small">{{ $error }}</li>@endforeach</ul>
                             </div>
                         @endif
 
                         <form id="formAuthentication" class="mb-3" action="{{ route('login') }}" method="POST">
                             @csrf
+                            
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="text" class="form-control" id="email" name="email" placeholder="Masukkan email" value="{{ old('email') }}" required autofocus />
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username Anda" value="{{ old('username') }}" required autofocus />
                             </div>
-
                             <div class="mb-3 form-password-toggle">
                                 <label class="form-label" for="password">Password</label>
                                 <div class="input-group input-group-merge">
@@ -129,13 +118,17 @@
             const passwordInput = document.getElementById('password');
             const togglePassword = document.getElementById('togglePassword');
             const icon = togglePassword.querySelector('i');
-            
             togglePassword.addEventListener('click', function () {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
                 
-                icon.classList.toggle('bx-show', type === 'text');
-                icon.classList.toggle('bx-hide', type !== 'text');
+                if (type === 'text') {
+                    icon.classList.remove('bx-hide');
+                    icon.classList.add('bx-show');
+                } else {
+                    icon.classList.remove('bx-show');
+                    icon.classList.add('bx-hide');
+                }
             });
         });
     </script>
