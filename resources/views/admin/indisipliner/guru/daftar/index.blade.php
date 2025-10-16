@@ -56,12 +56,12 @@
 
                 <div class="col-md-3">
                     <label class="form-label">Guru</label>
-                    <select name="nip" id="nip_filter" class="form-select select2">
+                    <select name="nama_guru" id="nama_guru_filter" class="form-select select2">
                         <option value="">- Semua Guru -</option>
                         @foreach ($gurus as $guru)
-                            <option value="{{ $guru->nip }}" 
-                                {{ request('nip') == $guru->nip ? 'selected' : '' }}>
-                                {{ $guru->nama }} ({{ $guru->nip }})
+                            <option value="{{ $guru->nama }}" 
+                                {{ request('nama_guru') == $guru->nama ? 'selected' : '' }}>
+                                {{ $guru->nama }}
                             </option>
                         @endforeach
                     </select>
@@ -92,9 +92,10 @@
             <thead class="table-light">
                 <tr>
                     <th>No</th>
-                    <th>NIP</th>
-                    <th>Nama</th>
+                    <th>Nama Guru</th>
                     <th>Pelanggaran</th>
+                    <th>Tahun Pelajaran</th>
+                    <th>Semester</th>
                     <th>Tanggal</th>
                     <th>Jam</th>
                     <th>Poin</th>
@@ -105,9 +106,10 @@
                 @forelse ($pelanggaranList as $key => $pelanggaran)
                     <tr>
                         <td>{{ $pelanggaranList->firstItem() + $key }}</td>
-                        <td>{{ $pelanggaran->NIP }}</td>
-                        <td><strong>{{ $pelanggaran->gtk->nama ?? 'Guru Dihapus' }}</strong></td>
+                        <td><strong>{{ $pelanggaran->nama_guru }}</strong></td>
                         <td>{{ $pelanggaran->detailPoinGtk->nama ?? 'Tidak diketahui' }}</td>
+                        <td>{{ $pelanggaran->tapel ?? '-' }}</td>
+                        <td>{{ ucfirst($pelanggaran->semester) ?? '-' }}</td>
                         <td>{{ \Carbon\Carbon::parse($pelanggaran->tanggal)->format('d M Y') }}</td>
                         <td>{{ $pelanggaran->jam }}</td>
                         <td><span class="badge bg-danger rounded-pill">{{ $pelanggaran->poin }}</span></td>
@@ -125,7 +127,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-5 text-muted">
+                        <td colspan="9" class="text-center py-5 text-muted">
                             <i class="bx bx-info-circle bx-lg d-block mb-2"></i>
                             Tidak ada data pelanggaran guru.
                         </td>
@@ -149,7 +151,6 @@
 
 {{-- Modal Input Pelanggaran --}}
 @include('admin.indisipliner.guru.daftar._modal-form')
-{{-- @include('admin.indisipliner.guru.daftar._modal-delete') --}}
 
 @endsection
 
@@ -168,7 +169,7 @@ $(document).ready(function () {
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
 
-    // 🔹 SweetAlert konfirmasi hapus dengan animasi loading
+    // 🔹 SweetAlert konfirmasi hapus
     $('.form-delete').on('submit', function (e) {
         e.preventDefault();
         const form = this;
@@ -195,10 +196,10 @@ $(document).ready(function () {
     });
 
     // 🔹 Auto-select guru di modal berdasarkan filter aktif
-    const selectedGuru = "{{ request('nip') }}";
+    const selectedGuru = "{{ request('nama_guru') }}";
     if (selectedGuru) {
         $('#modalInputPelanggaran').on('shown.bs.modal', function() {
-            $('#nip').val(selectedGuru).trigger('change');
+            $('#nama_guru').val(selectedGuru).trigger('change');
         });
     }
 });

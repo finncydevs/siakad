@@ -67,7 +67,7 @@ class IndisiplinerGtkController extends Controller
     }
 
     // ============================================================
-    // PENGATURAN POIN
+    // POIN PELANGGARAN
     // ============================================================
     public function storePoin(Request $request)
     {
@@ -132,38 +132,27 @@ class IndisiplinerGtkController extends Controller
         });
 
         $semesterAktif = Rombel::orderByDesc('semester_id')->value('semester_id');
-        $tahun = substr($semesterAktif, 0, 4);
-        $semesterAngka = substr($semesterAktif, 4, 1);
-        $tapelAktif = $tahun . '/' . ($tahun + 1);
-        $semesterTeks = $semesterAngka == '1' ? '1' : '2';
 
         $kategoriList = PelanggaranKategoriGtk::with('pelanggaranPoinGtk')->orderBy('nama')->get();
         $gurus = Gtk::orderBy('nama')->get();
 
-        $query = PelanggaranNilaiGtk::with(['detailPoinGtk.kategoriGtk', 'gtk'])
-            ->latest('tanggal')
-            ->latest('jam');
+        $query = PelanggaranNilaiGtk::with('detailPoinGtk')->latest('tanggal')->latest('jam');
 
-        // filter semester
         $semesterFilter = $request->filled('semester_id') ? $request->semester_id : $semesterAktif;
         $tahunReq = substr($semesterFilter, 0, 4);
         $semesterReq = substr($semesterFilter, 4, 1);
         $tapelReq = $tahunReq . '/' . ($tahunReq + 1);
-        $query->where('tapel', $tapelReq)->where('semester', $semesterReq);
+        $semesterTeks = $semesterReq == '1' ? 'Ganjil' : 'Genap';
 
-        // filter NIP opsional
-        if ($request->filled('nip')) {
-            $query->where('NIP', $request->nip);
-        } else {
-            $query->whereNotNull('NIP'); // pastikan hanya guru yang ada NIP
+        $query->where('tapel', $tapelReq)->where('semester', $semesterTeks);
+
+        if ($request->filled('nama_guru')) {
+            $query->where('nama_guru', 'like', "%{$request->nama_guru}%");
         }
 
-        // filter pencarian nama guru
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('gtk', function ($q) use ($search) {
-                $q->where('nama', 'like', "%$search%");
-            });
+            $query->where('nama_guru', 'like', "%$search%");
         }
 
         $pelanggaranList = $query->paginate(10)->appends($request->query());
@@ -177,41 +166,40 @@ class IndisiplinerGtkController extends Controller
         ));
     }
 
-   // ============================================================
-// SIMPAN DATA PELANGGARAN
-// ============================================================
-public function store(Request $request)
-{
-    $request->validate([
-        'semester_id' => 'required|string',
-        'tanggal' => 'required|date',
-        'jam' => 'required',
-        'nip' => 'nullable|exists:gtks,nip',
-        'IDpelanggaran_poin' => 'required|exists:pelanggaran_poin_gtk,ID',
-    ]);
+    // ============================================================
+    // SIMPAN DATA
+    // ============================================================
+    public function store(Request $request)
+    {
+        $request->validate([
+            'semester_id' => 'required|string',
+            'tanggal' => 'required|date',
+            'jam' => 'required',
+            'nama_guru' => 'required|string|max:255',
+            'IDpelanggaran_poin' => 'required|exists:pelanggaran_poin_gtk,ID',
+        ]);
 
-    $poin = PelanggaranPoinGtk::findOrFail($request->IDpelanggaran_poin);
-    $tahun = substr($request->semester_id, 0, 4);
-    $semester = substr($request->semester_id, 4, 1);
-    $tapel = $tahun . '/' . ($tahun + 1);
+        $poin = PelanggaranPoinGtk::findOrFail($request->IDpelanggaran_poin);
 
-    // pastikan NIP selalu ada, isi '-' jika kosong
-    $nip = $request->nip ?: '-';
+        $tahun = substr($request->semester_id, 0, 4);
+        $semesterAngka = substr($request->semester_id, 4, 1);
+        $tapel = $tahun . '/' . ($tahun + 1);
+        $semesterTeks = $semesterAngka == '1' ? 'Ganjil' : 'Genap';
 
-    PelanggaranNilaiGtk::create([
-        'NIP' => $nip,
-        'IDpelanggaran_poin' => $request->IDpelanggaran_poin,
-        'tanggal' => $request->tanggal,
-        'jam' => $request->jam,
-        'poin' => $poin->poin,
-        'tapel' => $tapel,
-        'semester' => $semester,
-    ]);
+        PelanggaranNilaiGtk::create([
+            'nama_guru' => strtoupper($request->nama_guru),
+            'IDpelanggaran_poin' => $request->IDpelanggaran_poin,
+            'tanggal' => $request->tanggal,
+            'jam' => $request->jam,
+            'poin' => $poin->poin,
+            'tapel' => $tapel,
+            'semester' => $semesterTeks,
+            'semester_id' => $request->semester_id,
+        ]);
 
-    return redirect()->route('admin.indisipliner.guru.daftar.index')
-        ->with('success', 'Data pelanggaran guru berhasil disimpan.');
-}
-
+        return redirect()->route('admin.indisipliner.guru.daftar.index')
+            ->with('success', 'Data pelanggaran guru berhasil disimpan.');
+    }
 
     // ============================================================
     // HAPUS DATA
@@ -228,33 +216,65 @@ public function store(Request $request)
     public function rekapitulasiIndex(Request $request)
     {
         $guruList = Gtk::orderBy('nama')->get();
-        $guru = null;
         $pelanggaranGuru = null;
         $totalPoin = 0;
         $sanksiAktif = null;
+        $namaGuru = $request->nama_guru ?? null;
 
-        if ($request->filled('nip')) {
-            $guru = Gtk::where('nip', $request->nip)->first();
+        if ($namaGuru) {
+            $pelanggaranGuru = PelanggaranNilaiGtk::where('nama_guru', 'like', "%$namaGuru%")
+                ->with('detailPoinGtk')
+                ->orderBy('tanggal', 'desc')
+                ->get();
 
-            if ($guru) {
-                $pelanggaranGuru = PelanggaranNilaiGtk::where('NIP', $guru->nip)
-                    ->with('detailPoinGtk')
-                    ->orderBy('tanggal', 'desc')
-                    ->get();
+            $totalPoin = $pelanggaranGuru->sum('poin');
 
-                $totalPoin = $pelanggaranGuru->sum('poin');
-
-                $sanksiAktif = PelanggaranSanksiGtk::where('poin_min', '<=', $totalPoin)
-                    ->where('poin_max', '>=', $totalPoin)
-                    ->first();
-            } else {
-                return back()->withErrors(['nip' => 'Guru dengan NIP tersebut tidak ditemukan.'])
-                    ->withInput();
-            }
+            $sanksiAktif = PelanggaranSanksiGtk::where('poin_min', '<=', $totalPoin)
+                ->where('poin_max', '>=', $totalPoin)
+                ->first();
         }
 
         return view('admin.indisipliner.guru.rekapitulasi.index', compact(
             'guruList',
+            'namaGuru',
+            'pelanggaranGuru',
+            'totalPoin',
+            'sanksiAktif'
+        ));
+    }
+
+    // ============================================================
+    // CETAK SEMUA GURU
+    // ============================================================
+    public function cetakSemua()
+    {
+        $pelanggaranList = PelanggaranNilaiGtk::with('detailPoinGtk')
+            ->orderBy('nama_guru')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        return view('admin.indisipliner.guru.cetak.rekap-semua', compact('pelanggaranList'));
+    }
+
+    // ============================================================
+    // CETAK SATU GURU
+    // ============================================================
+    public function cetakIndividu($nama)
+    {
+        $guru = Gtk::where('nama', $nama)->firstOrFail();
+
+        $pelanggaranGuru = PelanggaranNilaiGtk::where('nama_guru', $guru->nama)
+            ->with('detailPoinGtk')
+            ->orderBy('tanggal', 'desc')
+            ->get();
+
+        $totalPoin = $pelanggaranGuru->sum('poin');
+
+        $sanksiAktif = PelanggaranSanksiGtk::where('poin_min', '<=', $totalPoin)
+            ->where('poin_max', '>=', $totalPoin)
+            ->first();
+
+        return view('admin.indisipliner.guru.cetak.rekap-individu', compact(
             'guru',
             'pelanggaranGuru',
             'totalPoin',
