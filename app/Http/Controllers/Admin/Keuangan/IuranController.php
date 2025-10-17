@@ -4,15 +4,15 @@ namespace App\Http\Controllers\Admin\Keuangan;
 
 use App\Http\Controllers\Controller;
 use App\Models\Iuran;
-use App\Models\TahunPelajaran;
+use App\Models\Tapel;
 use Illuminate\Http\Request;
 
 class IuranController extends Controller
 {
     public function index()
     {
-        $iurans = Iuran::with('tahunPelajaran')->latest()->get();
-        $tahunAjarans = TahunPelajaran::where('is_active', true)->get();;
+        $iurans = Iuran::with('tapel')->latest()->get();
+        $tahunAjarans = Tapel::where('is_active', true)->get();;
 
         return view('admin.keuangan.iuran.index', compact('iurans', 'tahunAjarans'));
     }
@@ -26,7 +26,7 @@ class IuranController extends Controller
             'nama_iuran' => 'required|string|max:100',
             'tipe_iuran' => 'required|in:Bulanan,Bebas',
             'besaran_default' => 'required|numeric|min:0',
-            'tahun_pelajaran_id' => 'required|exists:tahun_pelajarans,id',
+            'tahun_pelajaran_id' => 'required|exists:tapel,id',
         ]);
 
         Iuran::create($request->all());
@@ -44,7 +44,7 @@ class IuranController extends Controller
             'nama_iuran' => 'required|string|max:100',
             'tipe_iuran' => 'required|in:Bulanan,Bebas',
             'besaran_default' => 'required|numeric|min:0',
-            'tahun_pelajaran_id' => 'required|exists:tahun_pelajarans,id',
+            'tahun_pelajaran_id' => 'required|exists:tapel,id',
         ]);
 
         $iuran->update($request->all());

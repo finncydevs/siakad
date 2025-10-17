@@ -32,7 +32,7 @@ $daftarKas = MasterKas::where('is_active', true)->get(); // Data untuk dropdown 
                 'tunggakans.iuran',
                 'pembayarans' => fn($q) => $q->with('iuran', 'petugas')->latest()->limit(10),
             ])->findOrFail($request->siswa_id);
-        }
+        }   
 
         return view('admin.keuangan.penerimaan.index', compact('siswas', 'siswaDipilih', 'daftarKas'));
     }

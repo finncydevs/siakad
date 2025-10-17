@@ -29,7 +29,6 @@
     @endif
 
     <div class="row">
-        <!-- Form Tambah Iuran -->
         <div class="col-12 mb-4">
             <div class="card">
                 <h5 class="card-header">Formulir Tambah Iuran Baru</h5>
@@ -70,7 +69,6 @@
             </div>
         </div>
 
-        <!-- Daftar Iuran -->
         <div class="col-12">
             <div class="card">
                 <h5 class="card-header">Daftar Iuran Sekolah</h5>
@@ -99,13 +97,17 @@
                                     @endif
                                 </td>
                                 <td>Rp {{ number_format($iuran->besaran_default, 0, ',', '.') }}</td>
-                                <td>{{ $iuran->tahunPelajaran->tahun_ajaran }}</td>
+                                {{-- PERUBAHAN DI SINI --}}
+                                <td>{{ $iuran->tapel->tahun_ajaran }}</td>
+                                {{-- END PERUBAHAN --}}
                                 <td>
                                     <div class="dropdown">
                                         <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item" href="javascript:void(0);"><i class="ti ti-pencil me-1"></i> Edit</a>
-                                            <form action="{{ route('keuangan.iuran.destroy', $iuran->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus iuran ini?');">
+                                            {{-- PERUBAHAN DI SINI --}}
+                                            <form action="{{ route('admin.keuangan.iuran.destroy', $iuran->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus iuran ini?');">
+                                            {{-- END PERUBAHAN --}}
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="dropdown-item"><i class="ti ti-trash me-1"></i> Hapus</button>
@@ -127,4 +129,3 @@
     </div>
 </div>
 @endsection
-

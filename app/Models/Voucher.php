@@ -21,7 +21,7 @@ class Voucher extends Model
     /**
      * Relasi ke tahun pelajaran saat voucher diberikan.
      */
-    public function tahunPelajaran(): BelongsTo
+    public function tapel(): BelongsTo
     {
         return $this->belongsTo(tahunPelajaran::class, 'tahun_pelajaran_id');
     }

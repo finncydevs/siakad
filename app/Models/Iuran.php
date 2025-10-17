@@ -17,9 +17,9 @@ class Iuran extends Model
     /**
      * Relasi ke tahun ajaran.
      */
-    public function tahunPelajaran(): BelongsTo
+    public function tapel(): BelongsTo
     {
-        return $this->belongsTo(TahunPelajaran::class, 'tahun_pelajaran_id');
+        return $this->belongsTo(Tapel::class, 'tahun_pelajaran_id');
     }
 
     /**
