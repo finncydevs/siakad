@@ -98,7 +98,7 @@ Route::prefix('guru')->middleware(['auth'])->name('guru.')->group(function () {
 | Rute Panel Admin (Prefix 'admin')
 |--------------------------------------------------------------------------
 */
-Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () { // Added middleware('auth') assuming admin routes are protected
+Route::prefix('admin')->name('admin.')->group(function () { // Added middleware('auth') assuming admin routes are protected
     // Dashboard
       Route::get('/dashboard', function () {
         return view('admin.dashboard');
