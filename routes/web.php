@@ -74,10 +74,6 @@ Route::prefix('akademik')->name('akademik.')->group(function () {
     Route::get('tapel', [TapelController::class, 'index'])->name('tapel.index');
     Route::get('tapel/sinkron', [TapelController::class, 'sinkron'])->name('tapel.sinkron');
     Route::post('tapel/aktif/{id}', [TapelController::class, 'setAktif'])->name('tapel.aktif');
-    Route::resource('semester', SemesterController::class)->only(['index']);
-    Route::patch('semester/{semester}/toggle', [SemesterController::class, 'toggle'])->name('semester.toggle');
-    Route::resource('program-keahlian', ProgramKeahlianController::class)->only(['index']);
-    Route::resource('paket-keahlian', PaketKeahlianController::class)->only(['index']);
     Route::resource('jurusan', JurusanController::class)->only(['index']);
     Route::get('mapel', [MapelController::class, 'index'])->name('mapel.index'); 
     Route::get('/ekstrakurikuler', [EkstrakurikulerController::class, 'index'])->name('ekskul.index');
