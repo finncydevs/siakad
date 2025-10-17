@@ -118,7 +118,7 @@
                         <div data-i18n="Semester">Mapel</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/ekstarakulikuler*') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/akademik/ekstrakurikuler*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.ekskul.index') }}" class="menu-link">
                         <div data-i18n="Semester">Ekstrakulikuler</div>
                     </a>
