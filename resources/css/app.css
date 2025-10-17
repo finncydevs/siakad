@@ -1,3 +1,5 @@
+@import "../sneat/assets/vendor/fonts/boxicons.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
