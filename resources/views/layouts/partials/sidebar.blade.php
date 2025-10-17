@@ -241,6 +241,12 @@
         <div data-i18n="Laporan">Laporan</div>
     </a>
     <ul class="menu-sub">
+        <li class="menu-item {{ request()->is('admin/laporan/absensi/dashboard') ? 'active' : '' }}">
+            <a href="{{ route('admin.laporan.absensi.dashboard') }}" class="menu-link">
+                <div data-i18n="Dashboard Absensi">Dashboard Absensi</div>
+            </a>
+        </li>
+
         <li class="menu-item {{ request()->is('admin/laporan/absensi') ? 'active' : '' }}">
             <a href="{{ route('admin.laporan.absensi.index') }}" class="menu-link">
                 <div data-i18n="Laporan Absensi">Laporan Absensi</div>
