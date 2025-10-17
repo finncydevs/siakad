@@ -21,13 +21,13 @@ class LoginRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
+        // === BAGIAN YANG DIPERBAIKI 1 ===
+        // Mengganti 'email' menjadi 'username' dan menghapus validasi format email.
         return [
-            'email' => ['required', 'string', 'email'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -41,11 +41,13 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // === BAGIAN YANG DIPERBAIKI 2 ===
+        // Menggunakan 'username' untuk percobaan login dan menampilkan pesan error.
+        if (! Auth::attempt($this->only('username', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'username' => trans('auth.failed'), // Tampilkan error di field 'username'
             ]);
         }
 
@@ -67,8 +69,9 @@ class LoginRequest extends FormRequest
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
+        // Tampilkan error di field yang benar jika terlalu banyak percobaan
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'username' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -80,6 +83,8 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        // === BAGIAN YANG DIPERBAIKI 3 ===
+        // Menggunakan 'username' untuk kunci rate limiter.
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

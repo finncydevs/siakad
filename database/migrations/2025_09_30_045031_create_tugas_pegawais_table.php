@@ -10,7 +10,7 @@
             {
                 Schema::create('tugas_pegawais', function (Blueprint $table) {
                     $table->id();
-                    $table->foreignId('pegawai_id')->constrained('pegawais')->onDelete('cascade');
+                    $table->foreignId('pegawai_id')->constrained('gtks')->onDelete('cascade');
                     $table->string('tahun_pelajaran');
                     $table->string('semester');
                     $table->string('tugas_pokok');

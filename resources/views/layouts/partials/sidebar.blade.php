@@ -2,9 +2,10 @@
     <div class="app-brand demo">
         <a href="{{ route('admin.dashboard') }}" class="app-brand-link">
             <span class="app-brand-logo demo">
-                {{-- SVG Logo Anda --}}
+                {{-- SVG Logo Anda (Sama seperti V1/V2) --}}
                 <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
                     xmlns:xlink="http://www.w3.org/1999/xlink">
+                    {{-- Path SVG sengaja disingkat agar ringkas --}}
                     <defs>
                         <path
                             d="M13.7918663,0.358365126 L3.39788168,7.44174259 C0.566865006,9.69408886 -0.379795268,12.4788597 0.557900856,15.7960551 C0.68998853,16.2305145 1.09562888,17.7872135 3.12357076,19.2293357 C3.8146334,19.7207684 5.32369333,20.3834223 7.65075054,21.2172976 L7.59773219,21.2525164 L2.63468769,24.5493413 C0.445452254,26.3002124 0.0884951797,28.5083815 1.56381646,31.1738486 C2.83770406,32.8170431 5.20850219,33.2640127 7.09180128,32.5391577 C8.347334,32.0559211 11.4559176,30.0011079 16.4175519,26.3747182 C18.0338572,24.4997857 18.6973423,22.4544883 18.4080071,20.2388261 C17.963753,17.5346866 16.1776345,15.5799961 13.0496516,14.3747546 L10.9194936,13.4715819 L18.6192054,7.984237 L13.7918663,0.358365126 Z"
@@ -48,14 +49,16 @@
             </span>
             <span class="app-brand-text demo menu-text fw-bolder ms-2">Sekull</span>
         </a>
+
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
             <i class="bx bx-chevron-left bx-sm align-middle"></i>
         </a>
     </div>
+
     <div class="menu-inner-shadow"></div>
+
     <ul class="menu-inner py-1">
 
-        <!-- Dashboard -->
         <li class="menu-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
             <a href="{{ route('admin.dashboard') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bx-home-circle"></i>
@@ -63,34 +66,31 @@
             </a>
         </li>
 
-        <!-- Pengaturan Dasar (Profil Sekolah) -->
+        {{-- PENYESUAIAN: Menggunakan nama 'Profil Sekolah' dari V2 --}}
         <li class="menu-item {{ request()->is('admin/pengaturan/sekolah*') ? 'active' : '' }}">
             <a href="{{ route('admin.pengaturan.sekolah.index') }}" class="menu-link">
                 <i class="menu-icon tf-icons bx bxs-school"></i>
-                <div data-i18n="Data Sekolah">Data Sekolah</div>
+                <div data-i18n="Profil Sekolah">Profil Sekolah</div>
             </a>
         </li>
 
-        <!-- Kepegawaian -->
+        {{-- Menggunakan struktur V1 (Guru & Tendik terpisah) --}}
         <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-user-badge"></i>
                 <div data-i18n="Kepegawaian">Kepegawaian</div>
             </a>
             <ul class="menu-sub">
-                {{-- MENU BARU UNTUK GURU --}}
                 <li class="menu-item {{ request()->routeIs('admin.kepegawaian.guru.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.guru.index') }}" class="menu-link">
                         <div data-i18n="Data Guru">Data Guru</div>
                     </a>
                 </li>
-                {{-- MENU BARU UNTUK TENAGA KEPENDIDIKAN --}}
                 <li class="menu-item {{ request()->routeIs('admin.kepegawaian.tendik.*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.tendik.index') }}" class="menu-link">
                         <div data-i18n="Tenaga Kependidikan">Tenaga Kependidikan</div>
                     </a>
                 </li>
-                {{-- Menu Tugas Pegawai Anda --}}
                 <li class="menu-item {{ request()->is('admin/kepegawaian/tugas-pegawai*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.tugas-pegawai.index') }}" class="menu-link">
                         <div data-i18n="Tugas Pegawai">Tugas Pegawai</div>
@@ -99,7 +99,8 @@
             </ul>
         </li>
 
-        <!-- Akademik -->
+        {{-- PENYESUAIAN: Mengambil dari V1, tapi menghapus 'Mapel' & 'Ekstrakurikuler' (bug) 
+             karena sudah ditangani menu Rombel baru --}}
         <li class="menu-item {{ request()->is('admin/akademik*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
@@ -116,20 +117,16 @@
                         <div data-i18n="Jurusan">Konsentrasi Keahlian</div>
                     </a>
                 </li>
-                <li class="menu-item {{ request()->is('admin/akademik/mapel*') ? 'active' : '' }}">
+                {{-- Mengambil 'Semester' dari V2 untuk menggantikan 'Mapel' V1 yang bug --}}
+                <li class="menu-item {{ request()->is('admin/akademik/semester*') ? 'active' : '' }}">
                     <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
-                        <div data-i18n="Semester">Mapel</div>
-                    </a>
-                </li>
-                <li class="menu-item {{ request()->is('admin/akademik/ekstarakulikuler*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.akademik.semester.index') }}" class="menu-link">
-                        <div data-i18n="Semester">Ekstrakulikuler</div>
+                        <div data-i18n="Semester">Semester</div>
                     </a>
                 </li>
             </ul>
         </li>
 
-        <!-- Kesiswaan -->
+        {{-- Menggunakan struktur V1 (Identik dengan V2) --}}
         <li class="menu-item {{ request()->is('admin/kesiswaan*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-user-check"></i>
@@ -207,8 +204,61 @@
             </ul>
         </li>
 
-        <!-- PENGATURAN SISTEM (DI BAWAH SENDIRI) -->
+        {{-- BARU: Ditambahkan dari V2 --}}
+        <li class="menu-item {{ request()->is('admin/rombel*') ? 'open' : '' }}">
+            <a href="javascript:void(0);" class="menu-link menu-toggle">
+                <i class="menu-icon tf-icons bx bx-group"></i>
+                <div data-i18n="Rombel">Rombongan Belajar</div>
+            </a>
+            <ul class="menu-sub">
+                <li class="menu-item {{ request()->is('admin/rombel/reguler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.reguler.index') }}" class="menu-link">
+                        <div data-i18n="Reguler">Reguler</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/praktik*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.praktik.index') }}" class="menu-link">
+                        <div data-i18n="Praktik">Praktik</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/ekstrakurikuler*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.ekstrakurikuler.index') }}" class="menu-link">
+                        <div data-i18n="Ekstrakurikuler">Ekstrakurikuler</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/mapel-pilihan*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.mapel-pilihan.index') }}" class="menu-link">
+                        <div data-i18n="Mapel Pilihan">Mapel Pilihan</div>
+                    </a>
+                </li>
+                <li class="menu-item {{ request()->is('admin/rombel/wali*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.rombel.wali.index') }}" class="menu-link">
+                        <div data-i18n="Wali">Wali</div>
+                    </a>
+                </li>
+            </ul>
+        </li>
+
+        {{-- BARU: Ditambahkan dari V2 --}}
+        <li class="menu-item {{ request()->is('admin/jadwal-pelajaran*') ? 'active' : '' }}">
+            <a href="{{ route('admin.jadwal-pelajaran.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-calendar"></i>
+                <div data-i18n="Jadwal Pelajaran">Jadwal Pelajaran</div>
+            </a>
+        </li>
+
+
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan Sistem</span></li>
+        
+        {{-- BARU: Ditambahkan 'Manajemen Pengguna' dari V2 --}}
+        <li class="menu-item {{ request()->is('admin/pengguna*') ? 'active' : '' }}">
+            <a href="{{ route('admin.pengguna.index') }}" class="menu-link">
+                <i class="menu-icon tf-icons bx bxs-user-detail"></i>
+                <div data-i18n="Manajemen Pengguna">Manajemen Pengguna</div>
+            </a>
+        </li>
+
+        {{-- Menggunakan struktur V1 (Identik dengan V2) --}}
         <li class="menu-item {{ request()->is('admin/pengaturan/webservice*') ? 'open' : '' }}">
             <a href="javascript:void(0);" class="menu-link menu-toggle">
                 <i class="menu-icon tf-icons bx bx-git-branch"></i>
