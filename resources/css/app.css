@@ -1,4 +1,5 @@
-/* 1. SNEAT VENDOR CSS - HARUS DI ATAS SEMUA @tailwind */
+@import "tailwindcss";
+
 @import "~sneat/vendor/fonts/boxicons.css";
 @import "~sneat/vendor/css/core.css";
 @import "~sneat/vendor/css/theme-default.css";
