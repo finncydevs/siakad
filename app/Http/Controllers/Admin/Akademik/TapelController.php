@@ -3,56 +3,70 @@
 namespace App\Http\Controllers\Admin\Akademik;
 
 use App\Http\Controllers\Controller;
-use App\Models\TahunPelajaran;
+use App\Models\Tapel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TapelController extends Controller
 {
+    /**
+     * Tampilkan daftar tahun pelajaran
+     */
     public function index()
     {
-        // PERBAIKAN DI SINI:
-        // Urutkan berdasarkan 'is_active' secara DESC (TRUE/1 akan di atas)
-        // Kemudian urutkan berdasarkan 'tahun_pelajaran' secara DESC (untuk sisanya)
-        $tahun_pelajarans = TahunPelajaran::orderBy('is_active', 'desc')
-                                          ->orderBy('tahun_pelajaran', 'desc')
-                                          ->get();
+        $tapel = Tapel::orderByDesc('kode_tapel')->get();
 
-        // Menggunakan view path sesuai struktur folder yang baru: admin.akademik.tapel.index
-        return view('admin.akademik.tapel.index', compact('tahun_pelajarans'));
+        return view('admin.akademik.tapel.index', compact('tapel'));
     }
 
-    public function store(Request $request)
+    /**
+     * Sinkronkan tahun pelajaran dengan semester_id terbaru dari tabel rombels
+     */
+    public function sinkron()
     {
-        $request->validate([
-            'tahun_pelajaran' => 'required|string|unique:tahun_pelajarans,tahun_pelajaran',
-            'keterangan' => 'nullable|string',
-        ]);
+        $latest = DB::table('rombels')
+            ->select('semester_id')
+            ->whereNotNull('semester_id')
+            ->distinct()
+            ->orderByDesc('semester_id')
+            ->first();
 
-        TahunPelajaran::create($request->all());
-
-        return redirect()->route('admin.akademik.tapel.index')->with('success', 'Tahun Pelajaran berhasil ditambahkan.');
-    }
-
-    public function destroy(TahunPelajaran $tapel)
-    {
-        if ($tapel->is_active) {
-            return back()->with('error', 'Tidak dapat menghapus Tahun Pelajaran yang aktif.');
+        if (!$latest) {
+            return back()->with('warning', 'Tidak ada data semester_id di tabel rombels ❌');
         }
 
-        $tapel->delete();
+        $kode = $latest->semester_id;
+        $tahun = substr($kode, 0, 4);
+        $semester = substr($kode, -1) == '1' ? 'Ganjil' : 'Genap';
+        $tahunAjaran = $tahun . '/' . ($tahun + 1);
 
-        return redirect()->route('admin.akademik.tapel.index')->with('success', 'Tahun Pelajaran berhasil dihapus.');
-    }
+        // Nonaktifkan semua tapel dulu
+        Tapel::query()->update(['is_active' => false]);
 
-    public function toggleStatus(TahunPelajaran $tapel)
-    {
-        if ($tapel->is_active) {
-            return back()->with('error', 'Tahun Pelajaran sudah aktif.');
+        $existing = Tapel::where('kode_tapel', $kode)->first();
+
+        if ($existing) {
+            $existing->update(['is_active' => true]);
+        } else {
+            Tapel::create([
+                'kode_tapel' => $kode,
+                'tahun_ajaran' => $tahunAjaran,
+                'semester' => $semester,
+                'is_active' => true,
+            ]);
         }
 
-        // Panggil static method di Model untuk mengaktifkan hanya satu
-        TahunPelajaran::setActive($tapel->id);
+        return back()->with('success', 'Tapel berhasil disinkron dan dijadikan aktif 🟢');
+    }
 
-        return back()->with('success', 'Tahun Pelajaran berhasil diaktifkan.');
+    /**
+     * Jadikan salah satu tapel sebagai aktif
+     */
+    public function setAktif($id)
+    {
+        Tapel::query()->update(['is_active' => false]);
+        Tapel::where('id', $id)->update(['is_active' => true]);
+
+        return back()->with('success', 'Tapel berhasil dijadikan aktif 🟢');
     }
 }

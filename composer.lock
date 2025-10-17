@@ -1124,6 +1124,7 @@
             "time": "2025-09-28T21:21:36+00:00"
         },
         {
+<<<<<<< HEAD
             "name": "laravel/breeze",
             "version": "v2.3.8",
             "source": {
@@ -1185,6 +1186,8 @@
             "time": "2025-07-18T18:49:59+00:00"
         },
         {
+=======
+>>>>>>> origin/modul/akademik
             "name": "laravel/framework",
             "version": "v12.31.1",
             "source": {
