@@ -9,10 +9,7 @@ use App\Http\Controllers\TugasPegawaiController;
 use App\Http\Controllers\SiswaController;
 
 // Controller Akademik
-use App\Http\Controllers\Admin\Akademik\SemesterController;
 use App\Http\Controllers\Admin\Akademik\TapelController;
-use App\Http\Controllers\Admin\Akademik\ProgramKeahlianController;
-use App\Http\Controllers\Admin\Akademik\PaketKeahlianController; 
 use App\Http\Controllers\Admin\Akademik\JurusanController;
 use App\Http\Controllers\Admin\Akademik\MapelController; 
 use App\Http\Controllers\Admin\Akademik\EkstrakurikulerController;
