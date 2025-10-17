@@ -34,8 +34,8 @@
                 </div>
                 <div class="col-md-4">
                     <label class="form-label" for="nis_filter">Filter Berdasarkan Siswa</label>
-                    <select name="nis" id="nis_filter" class="form-select" data-initial-nis="{{ request('nis') }}">
-                        {{-- Opsi siswa akan diisi oleh JavaScript --}}
+                    <select name="nis" id="nis_filter" class="form-select">
+                        <option value="">- Pilih Kelas Terlebih Dahulu -</option>
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -44,7 +44,7 @@
                 </div>
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-secondary w-100"><i class="bx bx-search"></i> Cari</button>
-                    <a href="{{ route('admin.indisipliner.siswa.daftar.index') }}" class="btn btn-outline-secondary" data-bs-toggle="tooltip" data-bs-placement="top" title="Reset Filter"><i class="bx bx-refresh"></i></a>
+                    <a href="{{ route('admin.indisipliner.siswa.daftar.index') }}" class="btn btn-outline-secondary" title="Reset Filter"><i class="bx bx-refresh"></i></a>
                 </div>
             </div>
         </form>
@@ -79,7 +79,7 @@
                         <form action="{{ route('admin.indisipliner.siswa.daftar.destroy', $pelanggaran->ID) }}" method="POST" class="d-inline form-delete">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-icon btn-sm btn-outline-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus Data">
+                            <button type="submit" class="btn btn-icon btn-sm btn-outline-danger" title="Hapus Data" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                 <i class="bx bx-trash"></i>
                             </button>
                         </form>
@@ -113,96 +113,97 @@
 
 @push('scripts')
 <script>
-$(document).ready(function() {
-    // Inisialisasi Select2
-    $('#rombel_id_filter, #nis_filter').select2({
-        theme: "bootstrap-5",
-        placeholder: "- Pilih -",
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - Initializing siswa filter');
+    
+    const rombelFilter = document.getElementById('rombel_id_filter');
+    const nisFilter = document.getElementById('nis_filter');
+    const modalRombel = document.getElementById('IDkelas');
+    const modalNis = document.getElementById('NIS');
 
-    $('#modalInputPelanggaran .form-select').select2({
-        theme: "bootstrap-5",
-        dropdownParent: $('#modalInputPelanggaran'),
-        placeholder: "- Pilih -",
-    });
+    // Fungsi untuk memuat siswa
+    function loadSiswa(rombelId, targetSelect, isFilter = true) {
+        console.log('Loading siswa for rombel:', rombelId);
+        
+        if (!rombelId) {
+            targetSelect.innerHTML = '<option value="">- Pilih Kelas Terlebih Dahulu -</option>';
+            targetSelect.disabled = true;
+            return;
+        }
 
-    function loadSiswa(rombelID, nisSelect, selectedNis, placeholder) {
-        nisSelect.prop('disabled', true).html(`<option value="">- ${placeholder} -</option>`).select2();
-        if (rombelID) {
-            nisSelect.html('<option value="">- Memuat Siswa... -</option>').select2();
-            $.ajax({
-                url: "{{ url('admin/indisipliner-siswa/get-siswa-by-rombel') }}/" + rombelID,
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    nisSelect.prop('disabled', false).empty().append('<option value="">- Semua Siswa -</option>');
-                    $.each(data, function(key, value) {
-                        var selected = (value.nipd == selectedNis) ? 'selected' : '';
-                        nisSelect.append(`<option value="${value.nipd}" ${selected}>${value.nama}</option>`);
-                    });
-                    nisSelect.val(selectedNis).trigger('change');
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("AJAX Error:", textStatus, errorThrown);
-                    nisSelect.html('<option value="">- Gagal Memuat -</option>').select2();
+        // Show loading
+        targetSelect.innerHTML = '<option value="">- Memuat Siswa... -</option>';
+        targetSelect.disabled = true;
+
+        // ✅ PERBAIKAN: Gunakan URL langsung untuk menghindari error route
+        const url = `/admin/indisipliner/siswa/get-siswa-by-rombel/${rombelId}`;
+        console.log('Fetching from:', url);
+
+        fetch(url)
+            .then(response => {
+                console.log('Response status:', response.status, response.statusText);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                
+                let options = '';
+                
+                if (isFilter) {
+                    options = '<option value="">- Semua Siswa -</option>';
+                } else {
+                    options = '<option value="">- Pilih Siswa -</option>';
+                }
+
+                if (data && data.length > 0) {
+                    data.forEach(siswa => {
+                        options += `<option value="${siswa.nipd}">${siswa.nama} (${siswa.nipd})</option>`;
+                    });
+                    targetSelect.disabled = false;
+                    console.log(`Loaded ${data.length} students`);
+                } else {
+                    options = '<option value="">- Tidak ada siswa -</option>';
+                    targetSelect.disabled = true;
+                    console.log('No students found');
+                }
+                
+                targetSelect.innerHTML = options;
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                targetSelect.innerHTML = '<option value="">- Error memuat data -</option>';
+                targetSelect.disabled = true;
             });
+    }
+
+    // Event listeners
+    if (rombelFilter) {
+        rombelFilter.addEventListener('change', function() {
+            const rombelId = this.value;
+            console.log('Filter rombel changed to:', rombelId);
+            loadSiswa(rombelId, nisFilter, true);
+        });
+
+        // Load initial data
+        const initialRombelId = rombelFilter.value;
+        if (initialRombelId) {
+            console.log('Initial rombel found:', initialRombelId);
+            loadSiswa(initialRombelId, nisFilter, true);
         }
     }
 
-    // Filter di halaman utama
-    var initialRombelID = $('#rombel_id_filter').val();
-    var initialNis = $('#nis_filter').data('initial-nis') || null;
-
-    if (initialRombelID) {
-        loadSiswa(initialRombelID, $('#nis_filter'), initialNis, "Pilih Kelas Dulu");
+    if (modalRombel) {
+        modalRombel.addEventListener('change', function() {
+            const rombelId = this.value;
+            console.log('Modal rombel changed to:', rombelId);
+            loadSiswa(rombelId, modalNis, false);
+        });
     }
 
-    $('#rombel_id_filter').on('change', function() {
-        loadSiswa($(this).val(), $('#nis_filter'), null, "Semua Siswa");
-    });
-
-    // Untuk form di dalam modal
-    $('#IDkelas').on('change', function() {
-        var rombelID = $(this).val();
-        var nisSelect = $('#NIS');
-        if (rombelID) {
-            nisSelect.prop('disabled', true).html('<option value="">- Memuat Siswa... -</option>').select2();
-            $.ajax({
-                url: "{{ url('admin/indisipliner-siswa/get-siswa-by-rombel') }}/" + rombelID,
-
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    nisSelect.prop('disabled', false).empty().append('<option value="">- Pilih Siswa -</option>');
-                    $.each(data, function(key, value) {
-                        nisSelect.append(`<option value="${value.nipd}">${value.nama} (${value.nipd})</option>`);
-                    });
-                    nisSelect.trigger('change');
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error("AJAX Error:", textStatus, errorThrown);
-                    nisSelect.html('<option value="">- Gagal Memuat -</option>').select2();
-                }
-            });
-        } else {
-            nisSelect.html('<option value="">- Pilih Kelas Terlebih Dahulu -</option>').prop('disabled', true).select2();
-        }
-    });
-
-    // Inisialisasi Tooltip
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function(tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-
-    // Konfirmasi Hapus
-    $('.form-delete').on('submit', function(event) {
-        event.preventDefault();
-        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
-            this.submit();
-        }
-    });
+    console.log('Siswa filter initialized successfully');
 });
 </script>
 @endpush
