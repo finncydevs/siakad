@@ -19,7 +19,7 @@
                         data-aos="zoom-in" data-aos-duration="1000">
                         <!-- IFRAME PETA LOKASI SMK Nurul Islam Affandiyah Cianjur -->
                         <iframe
-                            src="https://maps.google.com/maps?q=SMK%20Nurul%20Islam%20Affandiyah%20Cianjur,%20Jl.%20Raya%20Cianjur%20Bandung%20Km.%2009%20Desa%20Selajambe%20Kec.%20Sukaluyu%20Kab.%20Cianjur&z=15&output=embed"
+                            src="https://maps.google.com/maps?q={{ urlencode($profilSekolah->alamat) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                             frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"
                             loading="lazy" title="Google Map Lokasi SMK Nurul Islam Affandiyah Cianjur"
                             class="absolute inset-0 w-full h-full"></iframe>

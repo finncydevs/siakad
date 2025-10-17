@@ -168,5 +168,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('ppdb')->name('ppdb.')->group(function () {
 
         Route::resource('landing', PpdbController::class);
+
+        Route::post('submit', [PpdbController::class, 'submitForm'])->name('submit');
     });
 });
