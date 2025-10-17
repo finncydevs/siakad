@@ -3,14 +3,43 @@
 namespace App\Http\Controllers\Admin\Kepegawaian;
 
 use App\Models\Gtk;
-use App\Models\Sekolah; // INI BARU
+use App\Models\Sekolah;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Response;
-use Barryvdh\DomPDF\Facade\Pdf; // INI BARU
+use Barryvdh\DomPDF\Facade\Pdf;
+
+// --- IMPORT BARU UNTUK EXCEL ---
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\GtkExport;
+// ---------------------------------
 
 class GtkController extends Controller
 {
+    public function cetakPdfMultiple(Request $request)
+    {
+        // 1. Validasi
+        $request->validate(['ids' => 'required|string']);
+        
+        // 2. Explode IDs
+        $ids = explode(',', $request->input('ids'));
+
+        // 3. Fetch data GTK
+        // Kita pakai 'find' dengan array 'ids' untuk menjaga urutan
+        // Jika urutan tidak penting, bisa ganti Gtk::whereIn('id', $ids)->get();
+        $gtks = Gtk::find($ids); 
+
+        // 4. Fetch data Sekolah (untuk kop surat)
+        $sekolah = Sekolah::first();
+
+        // 5. Load view PDF baru
+        $pdf = Pdf::loadView('admin.kepegawaian.gtk.gtk_pdf_multiple', compact('gtks', 'sekolah'));
+        
+        // 6. Atur nama file
+        $fileName = 'Kumpulan_Profil_GTK.pdf';
+
+        // 7. Stream PDF
+        return $pdf->stream($fileName);
+    }
     /**
      * Menampilkan daftar Guru.
      */
@@ -39,13 +68,12 @@ class GtkController extends Controller
         $query = Gtk::query()->where('jenis_ptk_id_str', 'Tenaga Kependidikan');
         
         $query->when($request->search, function ($q, $search) {
-            return $q->where(function ($sub) use ($search) {
-                $sub->where('nama', 'like', "%{$search}%")
-                    ->orWhere('nip', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%");
-            });
+        return $q->where(function ($sub) use ($search) {
+            $sub->where('nama', 'like', "%{$search}%")
+                ->orWhere('nip', 'like', "%{$search}%")
+                ->orWhere('nik', 'like', "%{$search}%"); // <-- SUDAH DIPERBAIKI
         });
-
+    });
         $tendiks = $query->latest()->paginate(15);
         
         return view('admin.kepegawaian.gtk.index_tendik', compact('tendiks'));
@@ -93,33 +121,49 @@ class GtkController extends Controller
 
     /**
      * Menangani export data Guru ke Excel.
+     * --- SUDAH DIPERBARUI ---
      */
     public function exportGuruExcel(Request $request)
     {
         $query = Gtk::query()->where('jenis_ptk_id_str', 'Guru');
-        return $this->generateExport($request, $query, 'Data_Guru_Sekull.csv');
-    }
 
-    /**
-     * Menangani export data Tenaga Kependidikan ke Excel.
-     */
-    public function exportTendikExcel(Request $request)
-    {
-        $query = Gtk::query()->where('jenis_ptk_id_str', 'Tenaga Kependidikan');
-        return $this->generateExport($request, $query, 'Data_Tendik_Sekull.csv');
-    }
-
-    /**
-     * Logika utama untuk generate file CSV.
-     */
-    private function generateExport(Request $request, $query, $fileName)
-    {
-        // Filter berdasarkan ID yang dipilih
+        // Terapkan filter berdasarkan ID atau pencarian
         if ($request->has('ids')) {
             $ids = explode(',', $request->input('ids'));
             $query->whereIn('id', $ids);
         }
-        // Filter berdasarkan pencarian yang sedang aktif
+        elseif ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function ($sub) use ($search) {
+                $sub->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nip', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%");
+            });
+        }
+
+        // Tambahkan sorting
+        $query->latest(); 
+        
+        // Tentukan nama file .xlsx
+        $fileName = 'Data_Guru_Sekull.xlsx';
+
+        // Panggil class export baru
+        return Excel::download(new GtkExport($query), $fileName);
+    }
+
+    /**
+     * Menangani export data Tenaga Kependidikan ke Excel.
+     * --- SUDAH DIPERBARUI ---
+     */
+    public function exportTendikExcel(Request $request)
+    {
+        $query = Gtk::query()->where('jenis_ptk_id_str', 'Tenaga Kependidikan');
+
+        // Terapkan filter berdasarkan ID atau pencarian
+        if ($request->has('ids')) {
+            $ids = explode(',', $request->input('ids'));
+            $query->whereIn('id', $ids);
+        }
         elseif ($request->has('search')) {
             $search = $request->search;
             $query->where(function ($sub) use ($search) {
@@ -129,41 +173,18 @@ class GtkController extends Controller
             });
         }
         
-        $gtks = $query->latest()->get();
+        // Tambahkan sorting
+        $query->latest();
 
-        $headers = [
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        ];
+        // Tentukan nama file .xlsx
+        $fileName = 'Data_Tendik_Sekull.xlsx';
 
-        $callback = function() use($gtks) {
-            $file = fopen('php://output', 'w');
-            
-            fputcsv($file, [
-                'Nama Lengkap', 'Jenis Kelamin', 'Tempat Lahir', 'Tanggal Lahir', 'Agama', 'NIK',
-                'Status Kepegawaian', 'NIP', 'NUPTK', 'Jenis PTK', 'Jabatan', 'Tanggal Surat Tugas', 'Status Induk',
-                'Pendidikan Terakhir', 'Bidang Studi Terakhir', 'Pangkat/Golongan Terakhir',
-                'Riwayat Pendidikan Formal', 'Riwayat Kepangkatan'
-            ]);
-
-            foreach ($gtks as $gtk) {
-                fputcsv($file, [
-                    $gtk->nama, $gtk->jenis_kelamin, $gtk->tempat_lahir, $gtk->tanggal_lahir,
-                    $gtk->agama_id_str, $gtk->nik, $gtk->status_kepegawaian_id_str, $gtk->nip,
-                    $gtk->nuptk, $gtk->jenis_ptk_id_str, $gtk->jabatan_ptk_id_str, $gtk->tanggal_surat_tugas,
-                    $gtk->ptk_induk == 1 ? 'Induk' : 'Non-Induk', $gtk->pendidikan_terakhir,
-                    $gtk->bidang_studi_terakhir, $gtk->pangkat_golongan_terakhir,
-                    $gtk->rwy_pend_formal, $gtk->rwy_kepangkatan
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return Response::stream($callback, 200, $headers);
+        // Panggil class export baru
+        return Excel::download(new GtkExport($query), $fileName);
     }
-}
 
+    /**
+     * --- FUNGSI generateExport LAMA SUDAH DIHAPUS ---
+     * --- KARENA LOGIKANYA PINDAH KE GtkExport.php ---
+     */
+}

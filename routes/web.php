@@ -78,6 +78,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         // Route untuk detail multi-GTK
         Route::get('/gtk/show-multiple', [GtkController::class, 'showMultiple'])->name('gtk.show-multiple');
         Route::get('gtk/cetak-pdf/{id}', [GtkController::class, 'cetakPdf'])->name('gtk.cetak_pdf');
+        Route::get('gtk/cetak-pdf-multiple', [GtkController::class, 'cetakPdfMultiple'])
+     ->name('gtk.cetak_pdf_multiple');
         // Route untuk Tugas Pegawai
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
     });
@@ -118,7 +120,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         });
     });
 
-}); // Akhir dari grup 'admin'
+}); // Akhir dari grup 'admin'  
 
 // Anda bisa menambahkan route untuk auth di sini jika perlu
 // require __DIR__.'/auth.php';
