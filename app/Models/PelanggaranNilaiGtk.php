@@ -14,28 +14,18 @@ class PelanggaranNilaiGtk extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'NIP',
+        'nama_guru',
         'IDpelanggaran_poin',
         'tanggal',
         'jam',
         'poin',
         'tapel',
         'semester',
+        'semester_id',
     ];
 
-    /**
-     * Relasi ke detail poin pelanggaran
-     */
     public function detailPoinGtk()
     {
         return $this->belongsTo(PelanggaranPoinGtk::class, 'IDpelanggaran_poin', 'ID');
-    }
-
-    /**
-     * Relasi ke data GTK (guru)
-     */
-    public function gtk()
-    {
-        return $this->belongsTo(Gtk::class, 'NIP', 'nip');
     }
 }

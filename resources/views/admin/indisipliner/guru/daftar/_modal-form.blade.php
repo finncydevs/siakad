@@ -1,7 +1,7 @@
 <div class="modal fade" id="modalInputPelanggaran" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content border-0 shadow-lg">
-      <div class="modal-header text-white">
+      <div class="modal-header text-white bg-primary">
         <h5 class="modal-title">
           <i class="bx bx-error-circle me-2"></i> Formulir Pelanggaran Guru
         </h5>
@@ -12,21 +12,26 @@
         @csrf
         <div class="modal-body">
           <div class="row">
-            {{-- Kolom Kiri --}}
+            
+            {{-- =========================
+                KOLOM KIRI
+            ========================== --}}
             <div class="col-md-6">
               
-              {{-- Tahun Pelajaran & Semester (otomatis aktif) --}}
+              {{-- Tahun Pelajaran & Semester (otomatis dari semester aktif rombel) --}}
               <div class="mb-3">
                 <label class="form-label fw-semibold">Tahun Pelajaran - Semester</label>
+                @php 
+                  $tahun = substr($semesterAktif, 0, 4);
+                  $sem = substr($semesterAktif, 4, 1);
+                  $tapel = $tahun . '/' . ($tahun + 1);
+                  $semesterTeks = $sem == '1' ? 'Ganjil' : 'Genap';
+                @endphp
                 <input type="text" 
                        class="form-control bg-light fw-semibold" 
-                       value="@php 
-                         $tahun = substr($semesterAktif, 0, 4);
-                         $sem = substr($semesterAktif, 4, 1);
-                         echo $tahun . '/' . ($tahun + 1) . ' - ' . ($sem == '1' ? 'Ganjil' : 'Genap');
-                       @endphp"
+                       value="{{ $tapel }} - {{ $semesterTeks }}"
                        readonly>
-                {{-- hidden agar tetap terkirim --}}
+                {{-- Hidden value agar tersimpan di database --}}
                 <input type="hidden" name="semester_id" value="{{ $semesterAktif }}">
               </div>
 
@@ -45,17 +50,18 @@
               </div>
             </div>
 
-            {{-- Kolom Kanan --}}
+            {{-- =========================
+                KOLOM KANAN
+            ========================== --}}
             <div class="col-md-6">
-              {{-- Guru --}}
+
+              {{-- Nama Guru --}}
               <div class="mb-3">
-                <label for="nip" class="form-label fw-semibold">Guru</label>
-                <select name="nip" id="nip" class="form-select select2">
+                <label for="nama_guru" class="form-label fw-semibold">Nama Guru</label>
+                <select name="nama_guru" id="nama_guru" class="form-select select2" required>
                   <option value="">- Pilih Guru -</option>
                   @foreach ($gurus as $guru)
-                    <option value="{{ $guru->nip }}">
-                      {{ $guru->nama }} {{ $guru->nip ? "($guru->nip)" : '' }}
-                    </option>
+                    <option value="{{ $guru->nama }}">{{ $guru->nama }}</option>
                   @endforeach
                 </select>
               </div>
@@ -76,11 +82,14 @@
                   @endforeach
                 </select>
               </div>
+
             </div>
           </div>
         </div>
 
-        {{-- Footer --}}
+        {{-- =========================
+            FOOTER
+        ========================== --}}
         <div class="modal-footer bg-light d-flex justify-content-end">
           <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
             <i class="bx bx-x me-1"></i> Batal
@@ -97,12 +106,21 @@
 @push('scripts')
 <script>
 $(document).ready(function() {
+  // Aktifkan Select2 dalam modal
   $('#modalInputPelanggaran .select2').select2({
     theme: 'bootstrap-5',
     dropdownParent: $('#modalInputPelanggaran'),
     placeholder: '- Pilih -',
     width: '100%'
   });
+
+  // Prefill guru jika sedang difilter di halaman
+  const selectedGuru = "{{ request('nama_guru') }}";
+  if (selectedGuru) {
+    $('#modalInputPelanggaran').on('shown.bs.modal', function() {
+      $('#nama_guru').val(selectedGuru).trigger('change');
+    });
+  }
 });
 </script>
 @endpush

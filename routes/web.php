@@ -155,6 +155,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::prefix('indisipliner')->name('indisipliner.')->group(function () {
 
         // Rute untuk Indisipliner Guru
+<<<<<<< HEAD
         Route::prefix('guru')->name('guru.')->group(function () {
             // Daftar pelanggaran
             Route::get('/daftar', [IndisiplinerGtkController::class, 'daftarIndex'])->name('daftar.index');
@@ -169,6 +170,32 @@ Route::prefix('admin')->name('admin.')->group(function () {
             // ✅ Perbaikan: tambahkan {id} supaya controller menerima parameter
             Route::put('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'updatePoin'])->name('pengaturan.poin.update');
             Route::delete('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+=======
+  Route::prefix('guru')->name('guru.')->group(function () {
+        // Daftar pelanggaran
+        Route::get('/daftar', [IndisiplinerGtkController::class, 'daftarIndex'])->name('daftar.index');
+        Route::post('/daftar', [IndisiplinerGtkController::class, 'store'])->name('daftar.store');
+        Route::delete('/daftar/{pelanggaran}', [IndisiplinerGtkController::class, 'destroy'])->name('daftar.destroy');
+
+        // Pengaturan kategori/poin/sanksi
+        Route::get('/pengaturan', [IndisiplinerGtkController::class, 'pengaturanIndex'])->name('pengaturan.index');
+        Route::post('/pengaturan/kategori', [IndisiplinerGtkController::class, 'storeKategori'])->name('pengaturan.kategori.store');
+        Route::post('/pengaturan/poin', [IndisiplinerGtkController::class, 'storePoin'])->name('pengaturan.poin.store');
+        Route::put('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'updatePoin'])->name('pengaturan.poin.update');
+        Route::delete('/pengaturan/poin/{id}', [IndisiplinerGtkController::class, 'destroyPoin'])->name('pengaturan.poin.destroy');
+        Route::post('/pengaturan/sanksi', [IndisiplinerGtkController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
+
+        // Rekapitulasi
+        Route::get('/rekapitulasi', [IndisiplinerGtkController::class, 'rekapitulasiIndex'])->name('rekapitulasi.index');
+
+        // ✅ Tambahan Rute Cetak
+        Route::get('/rekapitulasi/cetak/semua', [IndisiplinerGtkController::class, 'cetakSemua'])
+            ->name('rekapitulasi.cetak.semua');
+
+       Route::get('/rekapitulasi/cetak/{namaGuru}', [IndisiplinerGtkController::class, 'cetakIndividu'])
+        ->name('rekapitulasi.cetak.individu');
+    });
+>>>>>>> 771d444039d9ad4141d34d6c76aa8f4deb32b96c
 
             Route::post('/pengaturan/sanksi', [IndisiplinerGtkController::class, 'storeSanksi'])->name('pengaturan.sanksi.store');
 
