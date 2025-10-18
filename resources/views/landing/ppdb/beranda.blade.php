@@ -23,7 +23,7 @@
 
                         <p class="text-xl text-white text-opacity-90 mb-10 max-w-lg" data-aos="fade-right"
                             data-aos-delay="200" data-aos-duration="800">
-                            {{ $beranda->deskripsi_singkat }}
+                            {{ $beranda->deskripsi_singkat ?? ''}}
                         </p>
                         <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4" data-aos="fade-up"
                             data-aos-delay="300" data-aos-duration="800">

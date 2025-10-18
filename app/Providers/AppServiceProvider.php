@@ -3,8 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator; // 1. Tambahkan baris ini
 use Illuminate\Support\Facades\View;
-use App\Models\ProfilSekolah;
+use App\Models\Sekolah;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,8 +22,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive(); // 2. Tambahkan baris ini
         // Mengirim semua data siswa ke view tertentu
         
-        View::share('profilSekolah', ProfilSekolah::first());
+        View::share('profilSekolah', Sekolah::first());
     }
 }
+

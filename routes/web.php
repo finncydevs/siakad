@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 // Controller Utama
-use App\Http\Controllers\ProfilSekolahController;
-use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\TugasPegawaiController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\SekolahController;
+use App\Http\Controllers\GtkController;
 use App\Http\Controllers\LandingPpdbController;
 
 // Controller Akademik
@@ -38,8 +38,14 @@ use App\Http\Controllers\Admin\Settings\ApiSettingsController; // Pastikan ini d
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
-    return view('welcome');
+    return view('admin.dashboard');
 });
+
+Route::get('/index', function () {
+    return view('index');
+});
+
+Route::post('/submitForm', [LandingPpdbController::class, 'submitForm'])->name('submitForm');
 
 
 /*
@@ -73,8 +79,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('dashboard');
 
     Route::prefix('pengaturan')->name('pengaturan.')->group(function() {
-        Route::get('/profil_sekolah', [ProfilSekolahController::class, 'edit'])->name('profil_sekolah.edit');
-        Route::put('/profil_sekolah', [ProfilSekolahController::class, 'update'])->name('profil_sekolah.update');
+        Route::get('/sekolah', [SekolahController::class, 'index'])->name('sekolah.index');
 
         Route::prefix('webservice')->name('webservice.')->group(function () {
             Route::get('/', [ApiSettingsController::class, 'index'])->name('index');
@@ -82,9 +87,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     });
 
     Route::prefix('kepegawaian')->name('kepegawaian.')->group(function() {
-        Route::resource('pegawai', PegawaiController::class);
+        Route::get('/gtk/export/excel', [GtkController::class, 'exportExcel'])->name('gtk.export.excel');
+        Route::resource('gtk', GtkController::class);
         Route::resource('tugas-pegawai', TugasPegawaiController::class)->except(['create', 'edit', 'show']);
-    });
+});
 
     // --- GRUP AKADEMIK ---
     Route::prefix('akademik')->name('akademik.')->group(function () {

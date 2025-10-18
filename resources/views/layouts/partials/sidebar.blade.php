@@ -64,12 +64,14 @@
         </li>
 
         <!-- Pengaturan Dasar (Profil Sekolah) -->
-        <li class="menu-item {{ request()->is('admin/pengaturan/profil_sekolah*') ? 'active' : '' }}">
-            <a href="{{ route('admin.pengaturan.profil_sekolah.edit') }}" class="menu-link">
-                <i class="menu-icon tf-icons bx bxs-school"></i>
-                <div data-i18n="Profil Sekolah">Profil Sekolah</div>
-            </a>
-        </li>
+        {{-- <li class="menu-header small text-uppercase"><span class="menu-header-text">Pengaturan</span></li> --}}
+    <li class="menu-item {{ request()->is('admin/pengaturan*') ? 'active' : '' }}">
+        {{-- UBAH BAGIAN INI --}}
+        <a href="{{ route('admin.pengaturan.sekolah.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons bx bxs-school"></i>
+            <div data-i18n="Data Sekolah">Data Sekolah</div>
+        </a>
+    </li>
 
         <!-- Kepegawaian -->
         <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'open' : '' }}">
@@ -78,11 +80,13 @@
                 <div data-i18n="Kepegawaian">Kepegawaian</div>
             </a>
             <ul class="menu-sub">
-                <li class="menu-item {{ request()->is('admin/kepegawaian/pegawai*') ? 'active' : '' }}">
-                    <a href="{{ route('admin.kepegawaian.pegawai.index') }}" class="menu-link">
-                        <div data-i18n="Data Pegawai">Data Pegawai</div>
-                    </a>
-                </li>
+                <li class="menu-item {{ request()->is('admin/kepegawaian*') ? 'active' : '' }}">
+        {{-- UBAH BAGIAN INI --}}
+        <a href="{{ route('admin.kepegawaian.gtk.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons bx bxs-user-badge"></i>
+            <div data-i18n="Data GTK">Data GTK</div>
+        </a>
+    </li>
                 <li class="menu-item {{ request()->is('admin/kepegawaian/tugas-pegawai*') ? 'active' : '' }}">
                     <a href="{{ route('admin.kepegawaian.tugas-pegawai.index') }}" class="menu-link">
                         <div data-i18n="Tugas Pegawai">Tugas Pegawai</div>
@@ -234,20 +238,12 @@
                 <i class="menu-icon tf-icons bx bxs-book-content"></i>
                 <div data-i18n="Akademik">Pengaturan Landing</div>
             </a>
-            <ul class="menu-sub">
-                
-                <li class="menu-item {{ request()->is('admin/ppdb*') ? 'open' : '' }}">
-                    <a href="javascript:void(0);" class="menu-link menu-toggle">
-                        <div data-i18n="Landing PPDB">Landing PPDB</div>
+            <ul class="menu-sub">   
+                <li
+                    class="menu-item {{ request()->routeIs('admin.ppdb.landing') ? 'active' : '' }}">
+                    <a href="{{ route('admin.ppdb.landing.index') }}" class="menu-link">
+                        <div data-i18n="Tahun PPDB">Landing PPDB</div>
                     </a>
-                    <ul class="menu-sub">
-                        <li
-                            class="menu-item {{ request()->routeIs('admin.ppdb.landing') ? 'active' : '' }}">
-                            <a href="{{ route('admin.ppdb.landing.index') }}" class="menu-link">
-                                <div data-i18n="Tahun PPDB">Beranda</div>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
                 {{-- <li class="">
                     <a href="" class="menu-link">

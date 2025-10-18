@@ -7,11 +7,11 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 text-center mb-4" data-aos="fade-up"
                     data-aos-duration="600">
-                    {{ $kompetensiList->first()->judul_kompetensi }}
+                    {{ $kompetensiList->first()->judul_kompetensi ?? '' }}
                 </h2>
                 <p class="text-xl text-gray-600 text-center mb-16 max-w-3xl mx-auto" data-aos="fade-up"
                     data-aos-delay="100" data-aos-duration="600">
-                    {{ $kompetensiList->first()->deskripsi_kompetensi }}
+                    {{ $kompetensiList->first()->deskripsi_kompetensi ?? '' }}
                 </p>
 
                 {{--nah ini untuk bagian daftar kompetensi --}}
@@ -35,15 +35,10 @@
                             <p class="text-sm font-semibold text-gray-700 mb-2">
                                 ({{ $kompetensi->nama_kompetensi }})
                             </p>
-                        
-                            @php
-                                $poinList = explode(',', $kompetensi->deskripsi_jurusan);
-                            @endphp
-                            <ul class="text-gray-600 text-base list-disc list-inside">
-                                @foreach ($poinList as $poin)
-                                    <li>{{ trim($poin) }}</li>
-                                @endforeach
-                            </ul>
+                            
+                            <p class="text-gray-600 text-base">
+                                {{ $kompetensi->deskripsi_jurusan }}
+                            </p>
                         </div>
                     @endforeach
                 </div>

@@ -10,7 +10,7 @@
                 </h2>
                 <p class="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto" data-aos="fade-up"
                     data-aos-delay="100">
-                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan {{ $profilSekolah->singkatan}}.
+                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan {{ $profilSekolah->nama}}.
                 </p>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
