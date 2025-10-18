@@ -2,6 +2,11 @@
 
 @section('content-ppdb')
     
+ 
+<div id="notification" 
+     class="fixed top-5 right-5 hidden z-50 px-4 py-3 rounded-lg shadow-lg text-white transition-all duration-300">
+</div>
+
     <!-- Formulir Pendaftaran Section (Daftar) - DENGAN PROGRESS BAR DINAMIS -->
         <section id="daftar" class="py-20 bg-gray-100">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" data-aos="fade-up" data-aos-delay="100"
@@ -24,7 +29,7 @@
                             </div>
                     </div>
 
-                    <form id="ppdb-form" class="space-y-6" method="POST" action="{{route('submitForm')}}" enctype="multipart/form-data">
+                    <form id="ppdb-form" class="space-y-6" method="POST" action="{{ route('ppdb.formulir.store') }}" enctype="multipart/form-data">
                         @csrf
 
                         <div id="formContent" class="min-h-[350px] bg-neutral-light p-6 rounded-lg shadow-inner">
@@ -189,24 +194,11 @@
                                     <p class="text-sm text-gray-700 font-semibold">
                                         Dokumen wajib ditandai <span class="text-red-500">*</span>. Ukuran maksimum per file adalah 1MB (Format PDF atau Gambar).
                                     </p>
-                                    <div>
-                                        <label for="upload_kk" class="block text-sm font-medium text-gray-700 mb-2">Unggah Scan Kartu Keluarga <span class="text-red-500">*</span></label>
-                                        <input type="file" id="upload_kk" name="upload_kk" required accept=".pdf,image/*"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white @error('upload_kk') {{ $errorClasses }} @enderror">
-                                        @error('upload_kk') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                    {{-- NAH DI SINI TAMPILKAN INPUTANNYA SESUAI JUMLAH SYARAT AKTIF, NANTI SEBELUM KESINI KAN ADA PILIH JALUR NAH JADI SYARAT YANG MUNCUL SESUAI JALUR --}}
+                                    <div id="syarat-container" class="space-y-4">
+                                        <p class="text-gray-500 text-sm">Pilih jalur pendaftaran terlebih dahulu untuk menampilkan syarat.</p>
                                     </div>
-                                    <div>
-                                        <label for="upload-rapor" class="block text-sm font-medium text-gray-700 mb-2">Unggah Foto Rapor SMP/MTS (Semester Akhir)</label>
-                                        <input type="file" id="upload-rapor" name="upload-rapor" accept=".pdf,image/*"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white @error('upload-rapor') {{ $errorClasses }} @enderror">
-                                        @error('upload-rapor') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div>
-                                        <label for="upload-sertifikat" class="block text-sm font-medium text-gray-700 mb-2">Unggah Sertifikat Prestasi (Jika ada)</label>
-                                        <input type="file" id="upload-sertifikat" name="upload-sertifikat" accept=".pdf,image/*"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white @error('upload-sertifikat') {{ $errorClasses }} @enderror">
-                                        @error('upload-sertifikat') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
-                                    </div>
+
                                 </div>
                             </div>
                             
@@ -251,4 +243,5 @@
             </div>
         </section>
 
+        
 @endsection

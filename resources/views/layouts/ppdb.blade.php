@@ -63,7 +63,7 @@
 
         <!-- Script Module untuk Logika Aplikasi dan Firebase -->
         <script type="module" src="{{ asset('assets/js/ppdb.js') }}"></script>
-
+        
     </body>
 
 </html>

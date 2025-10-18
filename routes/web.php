@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Models\SyaratPendaftaran; // <---- tambahkan baris ini
 
 // Controller Utama
 use App\Http\Controllers\TugasPegawaiController;
@@ -57,9 +58,16 @@ Route::prefix('ppdb')->name('ppdb.')->group(function() {
     Route::get('/formulir-pendaftaran', [LandingPpdbController::class, 'formulirPendaftaran'])->name('formulirPendaftaran');
     Route::get('/kontak', [LandingPpdbController::class, 'kontak'])->name('kontak');
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-        
+    Route::get('/api/syarat-by-jalur/{jalurId}', function ($jalurId) {
+        return SyaratPendaftaran::where('is_active', true)
+            ->where('jalurPendaftaran_id', $jalurId)
+            ->select('id', 'syarat', 'is_active')
+            ->get();
     });
+
+
+    // Tambahkan route POST untuk submit form pendaftaran
+    Route::post('/formulir-pendaftaran/store', [LandingPpdbController::class, 'formulirStore'])->name('formulir.store');
 });
 
 

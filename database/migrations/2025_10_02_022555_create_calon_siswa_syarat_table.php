@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('calon_siswa_id')->constrained('calon_siswas')->onDelete('cascade');
             $table->foreignId('syarat_id')->constrained('syarat_pendaftarans')->onDelete('cascade');
             $table->boolean('is_checked')->default(false);
+            $table->string('file_path')->nullable(); // untuk simpan path file upload
             $table->timestamps();
         });
     }
