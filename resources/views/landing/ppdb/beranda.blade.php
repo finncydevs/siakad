@@ -10,7 +10,7 @@
                         <!-- TAHUN AJARAN DIGANTI DI SINI -->
                         <span
                             class="text-sm font-semibold text-white uppercase tracking-wider bg-white bg-opacity-20 inline-block px-3 py-1 rounded-full mb-4"
-                            data-aos="fade-right" data-aos-duration="800">TAHUN AJARAN 2026/2027</span>
+                            data-aos="fade-right" data-aos-duration="800">TAHUN AJARAN {{ $tahunAktif->tahun_pelajaran ?? '-'}}</span>
                         @php
                           $sloganParts = explode('||', $beranda->slogan_utama ?? '');
                         @endphp

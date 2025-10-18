@@ -1,4 +1,70 @@
 
+            function renderApplicantsTable(applicants) {
+                if (!tableContainerEl) return;
+
+                if (applicants.length === 0) {
+                    tableContainerEl.innerHTML = `
+                    <div class="text-center py-10 bg-white rounded-xl shadow-md border-b-4 border-secondary-green">
+                        <i data-lucide="info" class="w-8 h-8 text-primary-blue mx-auto mb-3"></i>
+                        <p class="text-xl font-semibold text-gray-700">Belum ada pendaftar.</p>
+                        <p class="text-gray-500">Ayo segera daftar dan muncul di daftar ini!</p>
+                    </div>
+                `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                let tableHtml = `
+                <div class="overflow-x-auto bg-white rounded-xl shadow-2xl shadow-primary-blue/20 border border-gray-100">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-primary-blue text-white">
+                            <tr>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">No. Urut</th>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">No. Pendaftaran</th>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">NISN</th>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">Nama Lengkap</th>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">Asal Sekolah</th>
+                                <th class="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-left">Jurusan Dipilih</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+                applicants.forEach((data, index) => {
+                    const rowClass = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                    const sequentialNumber = index + 1;
+                    // Generate synthetic registration number: PPDB24-0001, PPDB24-0002, dst.
+                    const registrationNumber = `PPDB26-${String(sequentialNumber).padStart(4, '0')}`;
+
+                    const jurusanText = JURUSAN_MAP[data['jurusan-minat']] || data['jurusan-minat'] || '-';
+                    const nisnDisplay = data['nisn'] || '-';
+                    const namaDisplay = data['nama-lengkap'] || 'Nama Pendaftar';
+                    const asalSekolahDisplay = data['asal-sekolah'] || '-';
+
+
+                    tableHtml += `
+                    <tr class="${rowClass} hover:bg-yellow-50/50 transition duration-150">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${sequentialNumber}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-primary-blue">${registrationNumber}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${nisnDisplay}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-semibold text-gray-700">${namaDisplay}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${asalSekolahDisplay}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-secondary-green">${jurusanText}</td>
+                    </tr>
+                `;
+                });
+
+                tableHtml += `
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500 mt-6 text-center">Total Pendaftar Saat Ini: <span class="font-bold text-lg text-primary-blue">${applicants.length}</span></p>
+                <p class="text-xs text-gray-400 mt-1 text-center">Data diperbarui secara real-time dari database.</p>
+            `;
+
+                tableContainerEl.innerHTML = tableHtml;
+            }
+
 
             // Data langkah-langkah formulir BARU (5 langkah total) - Tetap diperlukan untuk Progress Bar
             const STEPS = [
@@ -109,32 +175,6 @@
                     }
                 });
             }
-
-
-            // ======================= FIREBASE DAN LOGIKA DAFTAR SISWA =======================
-            // NOTE: Bagian ini tetap dipertahankan agar tabel real-time tetap berfungsi.
-            // Backend Laravel Anda idealnya juga perlu menulis ke Firebase collection ini
-            // agar tabelnya tetap "real-time" setelah data dikirim ke MySQL.
-
-            /**
-             * Merender tabel pendaftar dari data Firestore.
-             */
-
-            /**
-             * Memulai listener Firestore untuk mengambil daftar dokumen pendaftar secara real-time.
-             */
-
-
-            /**
-             * Fungsi untuk menambah dokumen registrasi baru saat form disubmit.
-             * FUNGSI INI SUDAH TIDAK DIPAKAI KARENA SUBMIT DITANGANI LARAVEL.
-             * window.saveRegistration = async function (data) { ... } // <-- DIHAPUS
-             */
-
-
-            /**
-             * Menginisialisasi Firebase, melakukan autentikasi, dan mendengarkan daftar pendaftar.
-             */
 
             // ======================= LOGIKA FORM DAN UI =======================
 
@@ -384,27 +424,5 @@
 
                 // Inisialisasi Tampilan Form
                 updateProgress();
-
-                // Cek jika ada error validasi dari Laravel saat halaman dimuat
-                // Jika ada, kita harus pindah ke step yang mengandung error tersebut.
-                // Ini logika tambahan yang cukup kompleks, tapi bisa dilakukan dengan
-                // memeriksa field mana yang memiliki error dan memetakan ke step-nya.
-                // Untuk saat ini, kita biarkan mulai dari step 1.
-                // Jika server-side validation gagal, Laravel akan me-refresh halaman
-                // dan JS akan memulai dari `currentStep = 1`.
-                // Anda bisa menyiasati ini dengan melewatkan variabel dari Blade ke JS
-                // @if($errors->any())
-                //     <script> let startStep = {{ $errors->first('nama-lengkap') ? 1 : ($errors->first('asal-sekolah') ? 2 : 1) }}; </script>
-                // @endif
-                // Lalu di JS: currentStep = window.startStep || 1;
-                
-
-                /**
-                 * Event listener submit SEKARANG DIHAPUS.
-                 * Form akan disubmit secara normal (non-AJAX) ke Laravel.
-                 * Notifikasi sukses/error akan ditangani oleh Laravel
-                 * (misalnya, dengan session flash message).
-                 * ppdbForm.addEventListener('submit', async function (e) { ... } // <-- DIHAPUS
-                 */
             });
         

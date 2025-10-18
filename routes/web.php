@@ -41,9 +41,6 @@ Route::get('/', function () {
     return view('admin.dashboard');
 });
 
-Route::get('/index', function () {
-    return view('index');
-});
 
 Route::post('/submitForm', [LandingPpdbController::class, 'submitForm'])->name('submitForm');
 

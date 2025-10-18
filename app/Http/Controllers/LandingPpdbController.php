@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CalonSiswa;
+use App\Models\TahunPelajaran;
 use Illuminate\Http\Request;
 use App\Models\BerandaPpdb;
 use App\Models\KeunggulanPpdb;
@@ -30,8 +32,9 @@ class LandingPpdbController extends Controller
 
         $beranda = BerandaPpdb::first();
         $keunggulanList = KeunggulanPpdb::all();
+        $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
 
-        return view('landing.ppdb.beranda', compact('beranda', 'keunggulanList'));
+        return view('landing.ppdb.beranda', compact('beranda', 'keunggulanList','tahunAktif'));
     }
 
     public function kompetensiKeahlian() {
@@ -40,12 +43,38 @@ class LandingPpdbController extends Controller
         return view('landing.ppdb.kompetensiKeahlian',compact('kompetensiList'));
     }
 
-    public function daftarCalonSiswa() {
+    public function daftarCalonSiswa(Request $request) {
+        if ($request->ajax()) {
+            $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+            if (!$tahunAktif) {
+                return response()->json(['applicants' => []]);
+            }
+
+            $yearSuffix = substr($tahunAktif->tahun_pelajaran, -2); // ambil 2 digit terakhir tahun akhir, misal '26'
+
+            $applicants = CalonSiswa::where('tahun_id', $tahunAktif->id)
+                ->orderBy('created_at', 'asc')
+                ->get()
+                ->map(function($applicant) use ($yearSuffix) {
+                    $nomerResi = $applicant->nomor_resi ?? '0';
+                    // ambil 3 digit terakhir setelah titik (misal 251018.001 -> 001)
+                    $parts = explode('.', $nomerResi);
+                    $lastThree = end($parts); 
+                    $lastThree = str_pad($lastThree, 3, '0', STR_PAD_LEFT);
+                    $applicant->registration_number = 'PPDB'.$yearSuffix.'-'.$lastThree;
+                    return $applicant;
+                });
+
+            return response()->json(['applicants' => $applicants]);
+        }
+
         return view('landing.ppdb.daftarCalonSiswa');
     }
 
     public function formulirPendaftaran() {
-        return view('landing.ppdb.formulirPendaftaraan');
+        $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
+
+        return view('landing.ppdb.formulirPendaftaraan',compact('tahunAktif'));
     }
 
     public function kontak() {
