@@ -10,7 +10,7 @@
                 </h2>
                 <p class="text-xl text-gray-600 text-center mb-12 max-w-3xl mx-auto" data-aos="fade-up"
                     data-aos-delay="100">
-                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan {{ $profilSekolah->nama}}.
+                    Kami siap menjawab semua pertanyaan Anda terkait proses PPDB dan program unggulan {{ $profilSekolah->nama ?? ''}}.
                 </p>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -19,7 +19,7 @@
                         data-aos="zoom-in" data-aos-duration="1000">
                         <!-- IFRAME PETA LOKASI SMK Nurul Islam Affandiyah Cianjur -->
                         <iframe
-                            src="https://maps.google.com/maps?q={{ urlencode($profilSekolah->alamat) }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            src="https://maps.google.com/maps?q={{ urlencode($profilSekolah->alamat ?? '') }}&t=&z=15&ie=UTF8&iwloc=&output=embed"
                             frameborder="0" style="border:0;" allowfullscreen="" aria-hidden="false" tabindex="0"
                             loading="lazy" title="Google Map Lokasi SMK Nurul Islam Affandiyah Cianjur"
                             class="absolute inset-0 w-full h-full"></iframe>
@@ -39,7 +39,7 @@
                             <li class="flex items-start">
                                 <i data-lucide="phone"
                                     class="w-6 h-6 mr-4 mt-0.5 text-secondary-green flex-shrink-0"></i>
-                                <span class="text-gray-700 font-medium">{{ $profilSekolah->telepon ?? '-'}} (Layanan PPDB)</span>
+                                <span class="text-gray-700 font-medium">{{ $profilSekolah->nomor_telepon ?? '-'}} (Layanan PPDB)</span>
                             </li>
                             <li class="flex items-start">
                                 <i data-lucide="mail"
