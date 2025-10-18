@@ -40,41 +40,42 @@
                                 @endphp
 
                                 <div>
-                                    <label for="nama-lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Calon Siswa <span class="text-red-500">*</span></label>
-                                    <input type="text" id="nama-lengkap" name="nama-lengkap" value="{{ old('nama-lengkap') }}" required
-                                        class="{{ $inputClasses }} @error('nama-lengkap') {{ $errorClasses }} @enderror" placeholder="Masukkan nama lengkap siswa">
-                                    @error('nama-lengkap') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                    <input type="hidden" name="tahun_id" value="{{ $tahunAktif->id ?? '' }}">
+                                    <label for="nama_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Calon Siswa <span class="text-red-500">*</span></label>
+                                    <input type="text" id="nama_lengkap" name="nama_lengkap" value="{{ old('nama_lengkap') }}" required
+                                        class="{{ $inputClasses }} @error('nama_lengkap') {{ $errorClasses }} @enderror" placeholder="Masukkan nama lengkap siswa">
+                                    @error('nama_lengkap') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="tempat-lahir" class="block text-sm font-medium text-gray-700 mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
-                                        <input type="text" id="tempat-lahir" name="tempat-lahir" value="{{ old('tempat-lahir') }}" required
-                                            class="{{ $inputClasses }} @error('tempat-lahir') {{ $errorClasses }} @enderror" placeholder="Contoh: Jakarta">
-                                        @error('tempat-lahir') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="tempat_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tempat Lahir <span class="text-red-500">*</span></label>
+                                        <input type="text" id="tempat_lahir" name="tempat_lahir" value="{{ old('tempat_lahir') }}" required
+                                            class="{{ $inputClasses }} @error('tempat_lahir') {{ $errorClasses }} @enderror" placeholder="Contoh: Jakarta">
+                                        @error('tempat_lahir') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
-                                        <label for="tanggal-lahir" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
-                                        <input type="date" id="tanggal-lahir" name="tanggal-lahir" value="{{ old('tanggal-lahir') }}" required
-                                            class="{{ $inputClasses }} @error('tanggal-lahir') {{ $errorClasses }} @enderror">
-                                        @error('tanggal-lahir') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="tgl_lahir" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir <span class="text-red-500">*</span></label>
+                                        <input type="date" id="tgl_lahir" name="tgl_lahir" value="{{ old('tgl_lahir') }}" required
+                                            class="{{ $inputClasses }} @error('tgl_lahir') {{ $errorClasses }} @enderror">
+                                        @error('tgl_lahir') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="alamat" class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap (Domisili) <span class="text-red-500">*</span></label>
-                                    <textarea id="alamat" name="alamat" rows="3" required
-                                        class="{{ $inputClasses }} @error('alamat') {{ $errorClasses }} @enderror" placeholder="Masukkan alamat lengkap siswa saat ini">{{ old('alamat') }}</textarea>
-                                    @error('alamat') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                    <label for="alamat_lengkap" class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap (Domisili) <span class="text-red-500">*</span></label>
+                                    <textarea id="alamat_lengkap" name="alamat_lengkap" rows="3" required
+                                        class="{{ $inputClasses }} @error('alamat_lengkap') {{ $errorClasses }} @enderror" placeholder="Masukkan alamat lengkap siswa saat ini">{{ old('alamat_lengkap') }}</textarea>
+                                    @error('alamat_lengkap') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="jenis-kelamin" class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin <span class="text-red-500">*</span></label>
-                                        <select id="jenis-kelamin" name="jenis-kelamin" required
-                                                class="{{ $inputClasses }} appearance-none bg-white @error('jenis-kelamin') {{ $errorClasses }} @enderror">
+                                        <label for="jenis_kelamin" class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin <span class="text-red-500">*</span></label>
+                                        <select id="jenis_kelamin" name="jenis_kelamin" required
+                                                class="{{ $inputClasses }} appearance-none bg-white @error('jenis_kelamin') {{ $errorClasses }} @enderror">
                                             <option value="">-- Pilih Jenis Kelamin --</option>
-                                            <option value="Laki-laki" {{ old('jenis-kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                            <option value="Perempuan" {{ old('jenis-kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                            <option value="L" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                                            <option value="P" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                                         </select>
-                                        @error('jenis-kelamin') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        @error('jenis_kelamin') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="nisn" class="block text-sm font-medium text-gray-700 mb-2">NISN <span class="text-red-500">*</span></label>
@@ -84,24 +85,24 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <label for="kontak-wa" class="block text-sm font-medium text-gray-700 mb-2">Nomor HP/WhatsApp (Aktif) <span class="text-red-500">*</span></label>
-                                    <input type="tel" id="kontak-wa" name="kontak-wa" value="{{ old('kontak-wa') }}" required
-                                        class="{{ $inputClasses }} @error('kontak-wa') {{ $errorClasses }} @enderror" placeholder="Contoh: 081234567890">
-                                    @error('kontak-wa') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                    <label for="kontak" class="block text-sm font-medium text-gray-700 mb-2">Nomor HP/WhatsApp (Aktif) <span class="text-red-500">*</span></label>
+                                    <input type="tel" id="kontak" name="kontak" value="{{ old('kontak') }}" required
+                                        class="{{ $inputClasses }} @error('kontak') {{ $errorClasses }} @enderror" placeholder="Contoh: 081234567890">
+                                    @error('kontak') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 <p class="text-sm text-gray-500 pt-2 border-t border-gray-200">Data Orang Tua (Opsional, disarankan):</p>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="nama-ayah" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Ayah</label>
-                                        <input type="text" id="nama-ayah" name="nama-ayah" value="{{ old('nama-ayah') }}"
-                                            class="{{ $inputClasses }} @error('nama-ayah') {{ $errorClasses }} @enderror" placeholder="Nama lengkap ayah/wali">
-                                        @error('nama-ayah') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="nama_ayah" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Ayah</label>
+                                        <input type="text" id="nama_ayah" name="nama_ayah" value="{{ old('nama_ayah') }}"
+                                            class="{{ $inputClasses }} @error('nama_ayah') {{ $errorClasses }} @enderror" placeholder="Nama lengkap ayah/wali">
+                                        @error('nama_ayah') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
-                                        <label for="nama-ibu" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Ibu</label>
-                                        <input type="text" id="nama-ibu" name="nama-ibu" value="{{ old('nama-ibu') }}"
-                                            class="{{ $inputClasses }} @error('nama-ibu') {{ $errorClasses }} @enderror" placeholder="Nama lengkap ibu/wali">
-                                        @error('nama-ibu') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="nama_ibu" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap Ibu</label>
+                                        <input type="text" id="nama_ibu" name="nama_ibu" value="{{ old('nama_ibu') }}"
+                                            class="{{ $inputClasses }} @error('nama_ibu') {{ $errorClasses }} @enderror" placeholder="Nama lengkap ibu/wali">
+                                        @error('nama_ibu') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -112,10 +113,10 @@
                                 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="asal-sekolah" class="block text-sm font-medium text-gray-700 mb-2">Asal Sekolah <span class="text-red-500">*</span></label>
-                                        <input type="text" id="asal-sekolah" name="asal-sekolah" value="{{ old('asal-sekolah') }}" required
-                                            class="{{ $inputClasses }} @error('asal-sekolah') {{ $errorClasses }} @enderror" placeholder="Contoh: SMP Negeri 1">
-                                        @error('asal-sekolah') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="asal_sekolah" class="block text-sm font-medium text-gray-700 mb-2">Asal Sekolah <span class="text-red-500">*</span></label>
+                                        <input type="text" id="asal_sekolah" name="asal_sekolah" value="{{ old('asal_sekolah') }}" required
+                                            class="{{ $inputClasses }} @error('asal_sekolah') {{ $errorClasses }} @enderror" placeholder="Contoh: SMP Negeri 1">
+                                        @error('asal_sekolah') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="kelas" class="block text-sm font-medium text-gray-700 mb-2">Kelas Terakhir/Saat Ini <span class="text-red-500">*</span></label>
@@ -131,27 +132,29 @@
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="ukuran-baju" class="block text-sm font-medium text-gray-700 mb-2">Ukuran Baju Seragam <span class="text-red-500">*</span></label>
-                                        <select id="ukuran-baju" name="ukuran-baju" required
-                                                class="{{ $inputClasses }} appearance-none bg-white @error('ukuran-baju') {{ $errorClasses }} @enderror">
+                                        <label for="ukuran_pakaian" class="block text-sm font-medium text-gray-700 mb-2">Ukuran Baju Seragam <span class="text-red-500">*</span></label>
+                                        <select id="ukuran_pakaian" name="ukuran_pakaian" required
+                                                class="{{ $inputClasses }} appearance-none bg-white @error('ukuran_pakaian') {{ $errorClasses }} @enderror">
                                             <option value="">-- Pilih Ukuran Baju --</option>
                                             @foreach (['S', 'M', 'L', 'XL', 'XXL', 'XXXL'] as $size)
-                                                <option value="{{ $size }}" {{ old('ukuran-baju') == $size ? 'selected' : '' }}>{{ $size }}</option>
+                                                <option value="{{ $size }}" {{ old('ukuran_pakaian') == $size ? 'selected' : '' }}>{{ $size }}</option>
                                             @endforeach
                                         </select>
-                                        @error('ukuran-baju') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        @error('ukuran_pakaian') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
-                                        <label for="jalur-pendaftaran" class="block text-sm font-medium text-gray-700 mb-2">Jalur Pendaftaran <span class="text-red-500">*</span></label>
-                                        <select id="jalur-pendaftaran" name="jalur-pendaftaran" required
-                                                class="{{ $inputClasses }} appearance-none bg-white @error('jalur-pendaftaran') {{ $errorClasses }} @enderror">
-                                            <option value="">-- Pilih Jalur Pendaftaran --</option>
-                                            <option value="Reguler" {{ old('jalur-pendaftaran') == 'Reguler' ? 'selected' : '' }}>Reguler</option>
-                                            <option value="Prestasi" {{ old('jalur-pendaftaran') == 'Prestasi' ? 'selected' : '' }}>Prestasi (Rapor/Akademik/Non-Akademik)</option>
-                                            <option value="Afirmasi" {{ old('jalur-pendaftaran') == 'Afirmasi' ? 'selected' : '' }}>Afirmasi (KIP/KKS)</option>
-                                            <option value="Perpindahan" {{ old('jalur-pendaftaran') == 'Perpindahan' ? 'selected' : '' }}>Perpindahan Tugas Orang Tua</option>
+                                        <label for="jalur_id" class="block text-sm font-medium text-gray-700 mb-2">Jalur Pendaftaran <span class="text-red-500">*</span></label>
+                                        <select id="jalur_id" name="jalur_id" required
+                                                class="{{ $inputClasses }} appearance-none bg-white @error('jalur_id') {{ $errorClasses }} @enderror">
+                                            <option value="">-- Pilih Jalur Pendaftaran --</option> 
+                                            @foreach($jalurs as $jalur)
+                                                <option value="{{ $jalur->id }}" 
+                                                    {{ old('jalur_id', $formulir->jalur_id ?? '') == $jalur->id ? 'selected' : '' }}>
+                                                    {{ $jalur->kode }}
+                                                </option>
+                                            @endforeach
                                         </select>
-                                        @error('jalur-pendaftaran') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        @error('jalur_id') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>
@@ -161,25 +164,19 @@
                                 <p class="text-gray-700 mb-6">Pilih satu kompetensi keahlian yang paling Anda minati di SMAKNIS.</p>
 
                                 <div>
-                                    <label for="jurusan-minat" class="block text-sm font-medium text-gray-700 mb-2">Pilihan Utama Jurusan <span class="text-red-500">*</span></label>
-                                    <select id="jurusan-minat" name="jurusan-minat" required
-                                            class="{{ $inputClasses }} appearance-none bg-white @error('jurusan-minat') {{ $errorClasses }} @enderror">
+                                    <label for="jurusan" class="block text-sm font-medium text-gray-700 mb-2">Pilihan Utama Jurusan <span class="text-red-500">*</span></label>
+                                    <select id="jurusan" name="jurusan" required
+                                            class="{{ $inputClasses }} appearance-none bg-white @error('jurusan') {{ $errorClasses }} @enderror">
                                         <option value="">-- Pilih Jurusan Pilihan Utama --</option>
-                                        @php
-                                            $jurusanOptions = [
-                                                "PPLG" => "PPLG - Pengembangan Perangkat Lunak dan GIM",
-                                                "TJKT" => "TJKT - Teknik Jaringan Komputer dan Telekomunikasi",
-                                                "AKL" => "AKL - Akuntansi dan Keuangan Lembaga",
-                                                "DKV" => "DKV - Desain Komunikasi Visual",
-                                                "MPLB" => "MPLB - Manajemen Perkantoran dan Layanan Bisnis",
-                                                "Otomotif" => "Otomotif - Teknik Otomotif"
-                                            ];
-                                        @endphp
-                                        @foreach ($jurusanOptions as $value => $text)
-                                            <option value="{{ $value }}" {{ old('jurusan-minat') == $value ? 'selected' : '' }}>{{ $text }}</option>
+                                        
+                                        @foreach( $jurusans as $jurusan)
+                                            <option value="{{ $jurusan  }}" 
+                                                {{ old('jurusan', $formulir->jurusan ?? '') == $jurusan ? 'selected' : '' }}>
+                                                {{ $jurusan }}
+                                            </option>
                                         @endforeach
                                     </select>
-                                    @error('jurusan-minat') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                    @error('jurusan') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 <p class="text-sm text-gray-500 pt-2 border-t border-gray-200">Memilih jurusan yang sesuai minat akan meningkatkan peluang karir Anda setelah lulus.</p>
                             </div>
@@ -193,10 +190,10 @@
                                         Dokumen wajib ditandai <span class="text-red-500">*</span>. Ukuran maksimum per file adalah 1MB (Format PDF atau Gambar).
                                     </p>
                                     <div>
-                                        <label for="upload-kk" class="block text-sm font-medium text-gray-700 mb-2">Unggah Scan Kartu Keluarga <span class="text-red-500">*</span></label>
-                                        <input type="file" id="upload-kk" name="upload-kk" required accept=".pdf,image/*"
-                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white @error('upload-kk') {{ $errorClasses }} @enderror">
-                                        @error('upload-kk') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
+                                        <label for="upload_kk" class="block text-sm font-medium text-gray-700 mb-2">Unggah Scan Kartu Keluarga <span class="text-red-500">*</span></label>
+                                        <input type="file" id="upload_kk" name="upload_kk" required accept=".pdf,image/*"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-white @error('upload_kk') {{ $errorClasses }} @enderror">
+                                        @error('upload_kk') <span class="text-xs text-red-500 mt-1">{{ $message }}</span> @enderror
                                     </div>
                                     <div>
                                         <label for="upload-rapor" class="block text-sm font-medium text-gray-700 mb-2">Unggah Foto Rapor SMP/MTS (Semester Akhir)</label>

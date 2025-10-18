@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\CalonSiswa;
 use App\Models\TahunPelajaran;
+use App\Models\JalurPendaftaran;
+use App\Models\Rombel;
 use Illuminate\Http\Request;
 use App\Models\BerandaPpdb;
 use App\Models\KeunggulanPpdb;
@@ -74,7 +76,18 @@ class LandingPpdbController extends Controller
     public function formulirPendaftaran() {
         $tahunAktif = TahunPelajaran::where('is_active', 1)->first();
 
-        return view('landing.ppdb.formulirPendaftaraan',compact('tahunAktif'));
+        $jurusans = Rombel::select('jurusan_id_str')
+            ->distinct()
+            ->orderBy('jurusan_id_str')
+            ->pluck('jurusan_id_str');
+
+        $jalurs = $tahunAktif
+            ? JalurPendaftaran::where('tahunPelajaran_id', $tahunAktif->id)
+                ->where('is_active', true)
+                ->get()
+            : collect();
+
+        return view('landing.ppdb.formulirPendaftaraan',compact('tahunAktif','jalurs', 'jurusans'));
     }
 
     public function kontak() {

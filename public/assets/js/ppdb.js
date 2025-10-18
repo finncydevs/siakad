@@ -75,25 +75,6 @@
                 { id: 5, title: 'Selesai', name: 'selesai' }
             ];
 
-            // Data Jurusan SMAKNIS dan Peta Jurusan - Tetap diperlukan untuk Real-time Table & Summary
-            const JURUSAN = [
-                { value: "PPLG", text: "PPLG - Pengembangan Perangkat Lunak dan GIM" },
-                { value: "TJKT", text: "TJKT - Teknik Jaringan Komputer dan Telekomunikasi" },
-                { value: "AKL", text: "AKL - Akuntansi dan Keuangan Lembaga" },
-                { value: "DKV", text: "DKV - Desain Komunikasi Visual" },
-                { value: "MPLB", text: "MPLB - Manajemen Perkantoran dan Layanan Bisnis" },
-                { value: "Otomotif", text: "Otomotif - Teknik Otomotif" }
-            ];
-
-            const JURUSAN_MAP = {
-                "PPLG": "PPLG (Pengembangan Perangkat Lunak)",
-                "TJKT": "TJKT (Teknik Jaringan Komputer)",
-                "AKL": "AKL (Akuntansi dan Keuangan)",
-                "DKV": "DKV (Desain Komunikasi Visual)",
-                "MPLB": "MPLB (Manajemen Perkantoran)",
-                "Otomotif": "Otomotif (Teknik Otomotif)"
-            };
-
             let currentStep = 1;
             const totalSteps = STEPS.length;
             // let formData = {}; // <-- DIHAPUS, data sekarang ada di DOM
@@ -350,14 +331,13 @@
                 // 4. MODIFIKASI: Jika di langkah terakhir, isi data summary
                 if (currentStep === totalSteps) {
                     // Ambil data langsung dari input DOM
-                    const nama = document.getElementById('nama-lengkap')?.value || '-';
-                    const jurusanVal = document.getElementById('jurusan-minat')?.value;
-                    const jurusanText = JURUSAN_MAP[jurusanVal] || '-';
-                    const kontak = document.getElementById('kontak-wa')?.value || '-';
+                    const nama = document.getElementById('nama_lengkap')?.value || '-';
+                    const jurusan = document.getElementById('jurusan')?.value || '-';
+                    const kontak = document.getElementById('kontak')?.value || '-';
 
                     // Masukkan ke elemen summary
                     document.getElementById('summary-nama').textContent = nama;
-                    document.getElementById('summary-jurusan').textContent = jurusanText;
+                    document.getElementById('summary-jurusan').textContent = jurusan;
                     document.getElementById('summary-kontak').textContent = kontak;
                 }
 
